@@ -1,0 +1,2 @@
+#define G4VERSIONSTRING "geant4-07-01-patch-01"
+#define G4VERSIONCODE 40701

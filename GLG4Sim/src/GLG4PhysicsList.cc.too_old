@@ -1,0 +1,579 @@
+// This file is part of the GenericLAND software library.
+// $Id: GLG4PhysicsList.cc,v 1.2 2013/11/09 23:48:54 jslee Exp $
+//
+// GLG4PhysicsList.cc by Glenn Horton-Smith, Feb 1999
+////////////////////////////////////////////////////////////////
+// GLG4PhysicsList
+////////////////////////////////////////////////////////////////
+//
+//      This is a version for maximum particle set
+//       (copied from ExN06, with improved scintillation added)
+// ------------------------------------------------------------
+// Modification History:
+//  G. Horton-Smith 2001.01.12:  Add hadronic processes
+//
+
+#include "GLG4Sim/GLG4PhysicsList.hh"
+#include "GLG4Sim/GLG4param.hh"
+
+#include "G4ParticleDefinition.hh"
+#include "G4ParticleWithCuts.hh"
+#include "G4ProcessManager.hh"
+#include "G4ProcessVector.hh"
+#include "G4ParticleTypes.hh"
+#include "G4ParticleTable.hh"
+#include "G4Material.hh"
+#include "G4MaterialTable.hh"
+#include "G4ios.hh"
+#include "GLG4Sim/local_g4compat.hh"
+#include "iomanip"
+
+#include "G4IonConstructor.hh"
+#include "G4IonTable.hh"
+#include "G4Ions.hh"
+#include "G4RadioactiveDecay.hh"
+
+#include "GLG4Sim/GLG4NeutronDiffusionAndCapture.hh"
+#include "GLG4Sim/GLG4DeferTrackProc.hh"
+
+#define MYNAME_PhysicsList  GLG4PhysicsList
+#define MYNAME_string       "GLG4"
+
+
+MYNAME_PhysicsList::MYNAME_PhysicsList():  G4VUserPhysicsList()
+{
+  defaultCutValue = 0.010*mm;
+  SetVerboseLevel(1);
+}
+
+MYNAME_PhysicsList::~MYNAME_PhysicsList()
+{
+}
+
+void MYNAME_PhysicsList::ConstructParticle()
+{
+  // In this method, static member functions should be called
+  // for all particles which you want to use.
+  // This ensures that objects of these particle types will be
+  // created in the program. 
+
+  ConstructBosons();
+  ConstructLeptons();
+  ConstructMesons();
+  ConstructBarions();
+  ConstructIons();
+
+}
+
+void MYNAME_PhysicsList::ConstructBosons()
+{
+  // pseudo-particles
+  G4Geantino::GeantinoDefinition();
+  G4ChargedGeantino::ChargedGeantinoDefinition();
+
+  // gamma
+  G4Gamma::GammaDefinition();
+
+  // optical photon
+  G4OpticalPhoton::OpticalPhotonDefinition();
+}
+
+void MYNAME_PhysicsList::ConstructLeptons()
+{
+  // leptons
+  G4Electron::ElectronDefinition();
+  G4Positron::PositronDefinition();
+  G4MuonPlus::MuonPlusDefinition();
+  G4MuonMinus::MuonMinusDefinition();
+
+  G4NeutrinoE::NeutrinoEDefinition();
+  G4AntiNeutrinoE::AntiNeutrinoEDefinition();
+  G4NeutrinoMu::NeutrinoMuDefinition();
+  G4AntiNeutrinoMu::AntiNeutrinoMuDefinition();
+}
+
+void MYNAME_PhysicsList::ConstructMesons()
+{
+ //  mesons
+  G4PionPlus::PionPlusDefinition();
+  G4PionMinus::PionMinusDefinition();
+  G4PionZero::PionZeroDefinition();
+  G4Eta::EtaDefinition();
+  G4EtaPrime::EtaPrimeDefinition();
+  // G4RhoZero::RhoZeroDefinition();
+  G4KaonPlus::KaonPlusDefinition();
+  G4KaonMinus::KaonMinusDefinition();
+  G4KaonZero::KaonZeroDefinition();
+  G4AntiKaonZero::AntiKaonZeroDefinition();
+  G4KaonZeroLong::KaonZeroLongDefinition();
+  G4KaonZeroShort::KaonZeroShortDefinition();
+}
+
+void MYNAME_PhysicsList::ConstructBarions()
+{
+//  barions
+  G4Proton::ProtonDefinition();
+  G4AntiProton::AntiProtonDefinition();
+  G4Neutron::NeutronDefinition();
+  G4AntiNeutron::AntiNeutronDefinition();
+}
+
+void MYNAME_PhysicsList::ConstructIons()
+{
+// ions
+  const G4IonTable *theIonTable =
+    G4ParticleTable::GetParticleTable()->GetIonTable(); // make sure it exists113a121
+  G4Alpha::AlphaDefinition();
+  G4GenericIon::GenericIonDefinition();
+}
+
+
+void MYNAME_PhysicsList::ConstructProcess()
+{
+  AddTransportation();
+  AddParameterisation();
+  ConstructEM();
+  ConstructHadronic();
+  ConstructGeneral();
+  ConstructOp();
+}
+
+#include "G4FastSimulationManagerProcess.hh"
+
+void MYNAME_PhysicsList::AddParameterisation()
+{
+  G4FastSimulationManagerProcess* 
+    theFastSimulationManagerProcess = 
+      new G4FastSimulationManagerProcess();
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    G4ProcessManager* pmanager = particle->GetProcessManager();
+    // both postStep and alongStep action are required if the detector
+    // makes use of ghost volumes. If no ghost, the postStep
+    // is sufficient (and faster?).
+#define GLG4_USES_GHOST_VOLUMES 0
+#if GLG4_USES_GHOST_VOLUMES
+    pmanager->AddProcess(theFastSimulationManagerProcess, -1, 1, 1);
+#else
+    pmanager->AddProcess(theFastSimulationManagerProcess, -1, -1, 1);
+#endif
+  }
+}
+
+#include "G4Decay.hh"
+
+void MYNAME_PhysicsList::ConstructGeneral()
+{
+  //
+  // declare particle decay process for each applicable particle
+  // also GLG4DeferTrackProc
+  //
+  G4Decay* theDecayProcess = new G4Decay();
+  GLG4DeferTrackProc* theDeferProcess= new GLG4DeferTrackProc();
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    G4ProcessManager* pmanager = particle->GetProcessManager();
+    if (theDecayProcess->IsApplicable(*particle)) {
+      pmanager->AddDiscreteProcess(theDecayProcess);
+      // set ordering for PostStepDoIt and AtRestDoIt
+      pmanager->SetProcessOrdering(theDecayProcess, idxPostStep);
+      pmanager->SetProcessOrdering(theDecayProcess, idxAtRest);
+    }
+    pmanager->AddDiscreteProcess(theDeferProcess);
+  }
+  
+  //
+  //
+  // Declare radioactive decay to the GenericIon in the IonTable.
+  //
+  const G4IonTable *theIonTable =
+    G4ParticleTable::GetParticleTable()->GetIonTable();
+  G4RadioactiveDecay *theRadioactiveDecay = new G4RadioactiveDecay();
+  theRadioactiveDecay->SetVerboseLevel(0);
+  theRadioactiveDecay->SetAnalogueMonteCarlo (true);
+  theRadioactiveDecay->SetFBeta (true);
+  for (G4int i=0; i<theIonTable->Entries(); i++)
+  {
+    G4String particleName = theIonTable->GetParticle(i)->GetParticleName();
+    if (particleName == "GenericIon")
+    {
+      G4ProcessManager* pmanager =
+        theIonTable->GetParticle(i)->GetProcessManager();
+      pmanager->SetVerboseLevel(0);
+      pmanager ->AddProcess(theRadioactiveDecay);
+      pmanager ->SetProcessOrdering(theRadioactiveDecay, idxPostStep);
+      pmanager ->SetProcessOrdering(theRadioactiveDecay, idxAtRest);
+    }
+  }
+}
+
+#include "G4AntiNeutronAnnihilationAtRest.hh"
+#include "G4AntiProtonAnnihilationAtRest.hh"
+#include "G4KaonMinusAbsorptionAtRest.hh"
+#include "G4PionMinusAbsorptionAtRest.hh"
+#include "G4MuonMinusCaptureAtRest.hh"
+// #include "G4NeutronCaptureAtRest.hh" // wrong physics, don't use! [GAHS]
+
+#include "G4HadronElasticProcess.hh"   
+#include "G4HadronInelasticProcess.hh" 
+#include "G4HadronFissionProcess.hh"   
+#include "G4HadronCaptureProcess.hh"         
+
+#include "G4NeutronHPElastic.hh"
+#include "G4NeutronHPInelastic.hh"
+#include "G4NeutronHPFission.hh"
+#include "G4NeutronHPCapture.hh"
+
+// high precision < 20 MeV
+#include "G4NeutronHPCaptureData.hh"
+#include "G4NeutronHPFissionData.hh"
+#include "G4NeutronHPElasticData.hh"
+#include "G4NeutronHPInelasticData.hh"
+
+// generic models for 0 to infinite energy (used for E > 20 MeV)
+// (these may actually be "translations" of the GEANT3.21/GHEISHA models....)
+#include "G4LElastic.hh"
+#include "G4LFission.hh"
+#include "G4LCapture.hh"
+
+// Low energy (used for 20 MeV < E < 50 GeV)
+#include "G4LENeutronInelastic.hh"  // 0 to 55 GeV
+
+// High energy (used for > 50 GeV)
+#include "G4HENeutronInelastic.hh"  // 45 GeV to 10 TeV
+
+#include "G4NeutronInelasticProcess.hh"
+
+#if (G4VERSIONCODE >= 40600)
+#define G4std  std
+inline void AddDataSet(class G4HadronicProcess*p, class G4VCrossSectionDataSet*d) { p->AddDataSet(d); }
+#else
+inline void AddDataSet(class G4HadronElasticProcess*p, class G4VCrossSectionDataSet*d) { p->GetCrossSectionDataStore()->AddDataSet(d); }
+inline void AddDataSet(class G4HadronInelasticProcess*p, class G4VCrossSectionDataSet*d) { p->GetCrossSectionDataStore()->AddDataSet(d); }
+inline void AddDataSet(class G4HadronFissionProcess*p, class G4VCrossSectionDataSet*d) { p->GetCrossSectionDataStore()->AddDataSet(d); }
+inline void AddDataSet(class G4HadronCaptureProcess*p, class G4VCrossSectionDataSet*d) { p->GetCrossSectionDataStore()->AddDataSet(d); }
+#endif
+
+
+
+
+void MYNAME_PhysicsList::ConstructHadronic()
+{
+  // -- database
+  GLG4param &db ( GLG4param::GetDB() );
+  if ( db["omit_hadronic_processes"] != 0.0 ) {
+    G4cerr << "Warning, Hadronic processes omitted.\n";
+    return;
+  }
+  bool omit_neutron_hp= ( db["omit_neutron_hp"] != 0.0 );
+  if (omit_neutron_hp) {
+    G4cerr << "WARNING: --- OMITTING neutron_hp model! ---" << G4endl;
+  }
+  else {
+    G4cerr << "Note: +++ INCLUDING neutron_hp model. +++" << G4endl;
+  }
+    
+
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    G4ProcessManager* pmanager = particle->GetProcessManager();
+
+    if ( particle == G4AntiNeutron::AntiNeutron() ) {
+      pmanager->AddRestProcess(new G4AntiNeutronAnnihilationAtRest());
+    }
+    
+    if ( particle == G4AntiProton::AntiProton() ) {
+      pmanager->AddRestProcess(new G4AntiProtonAnnihilationAtRest());
+    }
+    
+    if ( particle == G4KaonMinus::KaonMinus() ) {
+      pmanager->AddRestProcess(new G4KaonMinusAbsorptionAtRest());
+    }
+    
+    if ( particle == G4PionMinus::PionMinus() ) {
+      pmanager->AddRestProcess(new G4PionMinusAbsorptionAtRest());
+    }
+    
+    if ( particle == G4MuonMinus::MuonMinus() ) {
+      pmanager->AddRestProcess(new G4MuonMinusCaptureAtRest());
+    }
+    
+    if ( particle == G4Neutron::Neutron() ) {
+      
+      G4HadronElasticProcess*   theHadronElasticProcess
+	= new   G4HadronElasticProcess();
+      G4LElastic* theNeutronLElastic
+	= new   G4LElastic();
+      if (omit_neutron_hp ) {
+	theHadronElasticProcess->RegisterMe( theNeutronLElastic );
+      }
+      else {
+	G4NeutronHPElastic* theNeutronHPElastic
+	  = new   G4NeutronHPElastic();
+	theNeutronHPElastic->SetMaxEnergy( 20.*MeV );
+	theNeutronLElastic->SetMinEnergy( 20.*MeV );
+	theHadronElasticProcess->RegisterMe( theNeutronHPElastic );
+	theHadronElasticProcess->RegisterMe( theNeutronLElastic );
+	AddDataSet(theHadronElasticProcess, new G4NeutronHPElasticData() );
+      }
+      pmanager->AddDiscreteProcess( theHadronElasticProcess );
+      
+      G4NeutronInelasticProcess*   theNeutronInelasticProcess
+	= new   G4NeutronInelasticProcess();
+      G4LENeutronInelastic* theNeutronLENeutronInelastic
+	= new   G4LENeutronInelastic();
+      G4HENeutronInelastic* theNeutronHENeutronInelastic
+	= new   G4HENeutronInelastic();
+      if (omit_neutron_hp) {
+	theNeutronInelasticProcess->RegisterMe( theNeutronLENeutronInelastic );
+	theNeutronInelasticProcess->RegisterMe( theNeutronHENeutronInelastic );
+      }
+      else {
+	G4NeutronHPInelastic* theNeutronHPInelastic
+	  = new   G4NeutronHPInelastic();
+	theNeutronHPInelastic->SetMaxEnergy( 20.*MeV );
+	theNeutronLENeutronInelastic->SetMinEnergy( 20.*MeV );
+	theNeutronInelasticProcess->RegisterMe( theNeutronHPInelastic );
+	theNeutronInelasticProcess->RegisterMe( theNeutronLENeutronInelastic );
+	theNeutronInelasticProcess->RegisterMe( theNeutronHENeutronInelastic );
+	AddDataSet(theNeutronInelasticProcess, new G4NeutronHPInelasticData() );
+      }
+      pmanager->AddDiscreteProcess( theNeutronInelasticProcess );
+      
+      G4HadronFissionProcess*   theHadronFissionProcess
+	= new   G4HadronFissionProcess();
+      G4LFission* theNeutronLFission
+	= new   G4LFission();
+      if (omit_neutron_hp) {
+	theHadronFissionProcess->RegisterMe( theNeutronLFission );
+      }
+      else {
+	G4NeutronHPFission* theNeutronHPFission
+	  = new   G4NeutronHPFission();
+	theNeutronHPFission->SetMaxEnergy( 20.*MeV );
+	theNeutronLFission->SetMinEnergy( 20.*MeV );
+	theHadronFissionProcess->RegisterMe( theNeutronHPFission );
+	theHadronFissionProcess->RegisterMe( theNeutronLFission );
+	AddDataSet(theHadronFissionProcess, new G4NeutronHPFissionData() );
+      }
+      pmanager->AddDiscreteProcess( theHadronFissionProcess );
+      
+      G4HadronCaptureProcess*   theCaptureProcess
+	= new   G4HadronCaptureProcess();
+      G4LCapture* theNeutronLCapture
+	= new   G4LCapture();
+      if (omit_neutron_hp) {
+	theCaptureProcess->RegisterMe( theNeutronLCapture );
+      }
+      else {
+	G4NeutronHPCapture* theNeutronHPCapture
+	  = new   G4NeutronHPCapture();
+	theNeutronHPCapture->SetMaxEnergy( 20.*MeV );
+	theNeutronLCapture->SetMinEnergy( 20.*MeV );
+	theCaptureProcess->RegisterMe( theNeutronHPCapture );
+	theCaptureProcess->RegisterMe( theNeutronLCapture );
+	AddDataSet(theCaptureProcess, new G4NeutronHPCaptureData() );
+      }
+      pmanager->AddDiscreteProcess( theCaptureProcess );
+
+      // special Genericland process that works with GLG4PrimaryGeneratorAction
+      // to stack particles from neutron capture after diffusion
+      // deactivated by default because it is unexpected by new users
+      GLG4NeutronDiffusionAndCapture*   theNeutronDiffusion
+	= new   GLG4NeutronDiffusionAndCapture();
+      pmanager->AddDiscreteProcess( theNeutronDiffusion );
+      pmanager->SetProcessActivation( theNeutronDiffusion, false );
+      
+      // ( end neutron )
+    }
+
+  }
+}
+
+#include "G4ComptonScattering.hh"
+#include "G4GammaConversion.hh"
+#include "G4PhotoElectricEffect.hh"
+
+#include "G4hMultipleScattering.hh"
+
+#include "G4eIonisation.hh"
+#include "G4eBremsstrahlung.hh"
+#include "G4eplusAnnihilation.hh"
+
+#include "G4MuIonisation.hh"
+#include "G4MuBremsstrahlung.hh"
+#include "G4MuPairProduction.hh"
+
+#include "G4hIonisation.hh"
+
+void MYNAME_PhysicsList::ConstructEM()
+{
+  // -- database
+  GLG4param &db ( GLG4param::GetDB() );
+  
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    G4ProcessManager* pmanager = particle->GetProcessManager();
+    G4String particleName = particle->GetParticleName();
+
+    if (particleName == "gamma") {
+    // gamma
+      // Construct processes for gamma
+      pmanager->AddDiscreteProcess(new G4GammaConversion());
+      pmanager->AddDiscreteProcess(new G4ComptonScattering());
+      pmanager->AddDiscreteProcess(new G4PhotoElectricEffect());
+
+    } else if (particleName == "e-") {
+    //electron
+      // Construct processes for electron
+      pmanager->AddProcess(new G4hMultipleScattering(),-1,1,1);
+      pmanager->AddProcess(new G4eIonisation(),-1,2,2);
+      pmanager->AddProcess(new G4eBremsstrahlung(),-1,-1,3);
+
+    } else if (particleName == "e+") {
+    //positron
+      // Construct processes for positron
+      pmanager->AddProcess(new G4hMultipleScattering(),-1,1,1);
+      pmanager->AddProcess(new G4eIonisation(),-1,2,2);
+      pmanager->AddProcess(new G4eBremsstrahlung(),-1,-1,3);
+      pmanager->AddProcess(new G4eplusAnnihilation(),0,-1,4);
+
+    } else if( particleName == "mu+" ||
+               particleName == "mu-"    ) {
+    //muon
+      if ( db["omit_muon_processes"] != 0.0 ) {
+	G4cerr << "Warning, muon processes omitted.\n";
+      }
+      else {
+	// Construct processes for muon
+	pmanager->AddProcess(new G4hMultipleScattering(),-1,1,1);
+	pmanager->AddProcess(new G4MuIonisation(),-1,2,2);
+	pmanager->AddProcess(new G4MuBremsstrahlung(),-1,-1,3);
+	pmanager->AddProcess(new G4MuPairProduction(),-1,-1,4);
+      }
+      
+    } else {
+      if ((particle->GetPDGCharge() != 0.0) &&
+          (particle->GetParticleName() != "chargedgeantino")) {
+     // all others charged particles except geantino
+       pmanager->AddProcess(new G4hMultipleScattering(),-1,1,1);
+       pmanager->AddProcess(new G4hIonisation(),-1,2,2);
+     }
+    }
+  }
+}
+
+#include "G4Cerenkov.hh"
+//#include "G4OpAbsorption.hh"
+#include "GLG4Sim/GLG4OpAttenuation.hh"
+#include "G4OpBoundaryProcess.hh"
+
+#include "GLG4Sim/GLG4Scint.hh"
+
+void MYNAME_PhysicsList::ConstructOp()
+{
+  G4Cerenkov*   theCerenkovProcess = new G4Cerenkov("Cerenkov");
+  GLG4OpAttenuation* theAttenuationProcess = new GLG4OpAttenuation();
+  //  GLG4OpAttenuation implements Rayleigh scattering.
+  //  G4OpRayleigh is not used for the following two reasons:
+  //    1) It doesn't even try to work for anything other than water.
+  //    2) It doesn't actually work for water, either.
+  G4OpBoundaryProcess* theBoundaryProcess = new G4OpBoundaryProcess(); 
+
+  G4double alphaMass= G4Alpha::Alpha()->GetPDGMass();
+  G4double neutronMass= G4Neutron::Neutron()->GetPDGMass();
+  
+  GLG4Scint* theDefaultScintProcess = new GLG4Scint();
+  GLG4Scint* theNeutronScintProcess = new GLG4Scint("neutron", 0.9*neutronMass);
+  GLG4Scint* theAlphaScintProcess = new GLG4Scint("alpha", 0.9*alphaMass);
+
+  // request that cerenkov and scintillation photons be tracked first,
+  // before continuing originating particle step.  Otherwise, we
+  // get too many secondaries!
+  theCerenkovProcess->SetTrackSecondariesFirst(true);
+
+  if (verboseLevel > 0) {
+    theCerenkovProcess->DumpInfo();
+    theAttenuationProcess->DumpInfo();
+    theDefaultScintProcess->DumpInfo();
+    theNeutronScintProcess->DumpInfo();
+    theAlphaScintProcess->DumpInfo();
+  }
+
+  theCerenkovProcess->SetVerboseLevel(0);
+  theAttenuationProcess->SetVerboseLevel(0);
+  theBoundaryProcess->SetVerboseLevel(0);
+  theDefaultScintProcess->SetVerboseLevel(1);
+  theAlphaScintProcess->SetVerboseLevel(1);
+  theNeutronScintProcess->SetVerboseLevel(1);
+
+  // G4int MaxNumPhotons = 300;
+  // theCerenkovProcess->SetTrackSecondariesFirst(true);
+  // theCerenkovProcess->SetMaxNumPhotonsPerStep(MaxNumPhotons);
+
+  // G4OpticalSurfaceModel themodel = unified;
+  // theBoundaryProcess->SetModel(themodel);
+
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
+    G4ProcessManager* pmanager = particle->GetProcessManager();
+    G4String particleName = particle->GetParticleName();
+    if (theCerenkovProcess->IsApplicable(*particle)) {
+      pmanager->AddContinuousProcess(theCerenkovProcess);
+    }
+    if (particleName == "opticalphoton") {
+      pmanager->AddDiscreteProcess(theAttenuationProcess);
+      pmanager->AddDiscreteProcess(theBoundaryProcess);
+    }
+    //
+    // scintillation process is no longer a Geant4 "Process",
+    // so it is not added to the process manager's list
+    //
+  }
+}
+
+
+
+void MYNAME_PhysicsList::SetCuts()
+{
+//  double cut_em=  0.010*mm; //  10 micron
+//  double cut_had= 0.010*mm; //  10 micron 
+//  double cut_ion= 0.010*mm; //  10 micron
+//
+//  if (defaultCutValue < cut_em)  cut_em = defaultCutValue;
+//  if (defaultCutValue < cut_had) cut_had= defaultCutValue;
+//  if (defaultCutValue < cut_ion) cut_ion= defaultCutValue;
+  double cut_em = defaultCutValue;
+  double cut_had= defaultCutValue;
+  double cut_ion= defaultCutValue;
+
+  // set cut values for gamma at first and for e- second and next for e+,
+  // because some processes for e+/e- need cut values for gamma 
+  SetCutValue(cut_em, "gamma");
+  SetCutValue(cut_em, "e-");
+  SetCutValue(cut_em, "e+");
+ 
+  // set cut values for proton and anti_proton before all other hadrons
+  // because some processes for hadrons need cut values for proton/anti_proton 
+  SetCutValue(cut_had, "proton");
+  SetCutValue(cut_had, "anti_proton");
+  SetCutValue(cut_had, "neutron");
+  SetCutValue(cut_ion, "alpha");
+  SetCutValue(cut_ion, "GenericIon");
+  
+  //SetCutValueForOthers(defaultCutValue);
+
+  if (verboseLevel>0) {
+    if (verboseLevel <= 1)
+      DumpCutValuesTable();
+    else
+      DumpList();
+    G4cout << (MYNAME_string "PhysicsList::SetCuts: done") << G4endl;
+  }
+}
+
