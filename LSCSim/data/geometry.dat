@@ -1,0 +1,12 @@
+#
+# all dimension should be in "cm"
+#
+
+# world definition 
+worldx		   150
+worldy		   150
+worldz		   150
+
+testx 100
+testy 100
+testz 100
