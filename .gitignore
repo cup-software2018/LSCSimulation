@@ -1,0 +1,5 @@
+/.lh/
+/.vscode/
+/build/
+/test/
+/.clang-format
