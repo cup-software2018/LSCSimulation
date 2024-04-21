@@ -1,18 +1,3 @@
-/*
- *
- *  Module:  FADCWaveformGenerator
- *
- *  Author:  Jaison Lee
- *
- *  Purpose: ADC digitization simulation
- *
- *  Last Update:      $Author: cupsoft $
- *  Update Date:      $Date: 2018/12/28 00:21:15 $
- *  CVS/RCS Revision: $Revision: 1.6 $
- *  Status:           $State: Exp $
- *
- */
-
 #ifndef FADCWaveformGenerator_hh
 #define FADCWaveformGenerator_hh
 
@@ -29,13 +14,13 @@ public:
   virtual ~FADCWaveformGenerator();
 
   void SetNBIT(int val);
-  void SetVpp(double val);
-  void SetBinTimeWidth(double val);
-  void SetNBin(int val);
+  void SetVpp(double val);          // mV
+  void SetSamplingRate(double val); // MHz
+  void SetTimeWindow(double val);   // ns
 
-  void SetPedOffset(double val);
-  void SetPedRMS(double val);
-  void SetTermination(double val);
+  void SetPedOffset(double val);   // ADC count
+  void SetPedRMS(double val);      // mV
+  void SetTermination(double val); // ohm
 
   void SetSignal(AbsSignal * signal);
 
@@ -83,12 +68,15 @@ inline void FADCWaveformGenerator::SetNBIT(int val)
 
 inline void FADCWaveformGenerator::SetVpp(double val) { fVpp = val; }
 
-inline void FADCWaveformGenerator::SetBinTimeWidth(double val)
+inline void FADCWaveformGenerator::SetSamplingRate(double val)
 {
-  fBinTimeWidth = val;
+  fBinTimeWidth = 1 / (val / 1000.);
 }
 
-inline void FADCWaveformGenerator::SetNBin(int val) { fNBin = val; }
+inline void FADCWaveformGenerator::SetTimeWindow(double val)
+{
+  fNBin = val / fBinTimeWidth;
+}
 
 inline void FADCWaveformGenerator::SetPedOffset(double val)
 {

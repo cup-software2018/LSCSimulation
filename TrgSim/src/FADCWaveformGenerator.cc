@@ -1,18 +1,3 @@
-/*
- *
- *  Module:  FADCWaveformGenerator
- *
- *  Author:  Jaison Lee
- *
- *  Purpose: ADC digitization simulation
- *
- *  Last Update:      $Author: cupsoft $
- *  Update Date:      $Date: 2018/09/21 04:14:29 $
- *  CVS/RCS Revision: $Revision: 1.5 $
- *  Status:           $State: Exp $
- *
- */
-
 #include "TrgSim/FADCWaveformGenerator.hh"
 
 #include <iostream>
@@ -21,7 +6,7 @@ using namespace std;
 
 ClassImp(FADCWaveformGenerator)
 
-FADCWaveformGenerator::FADCWaveformGenerator()
+    FADCWaveformGenerator::FADCWaveformGenerator()
     : TObject()
 {
   fRandom = new TRandom3;
@@ -32,8 +17,8 @@ FADCWaveformGenerator::FADCWaveformGenerator()
   fBinTimeWidth = 2;
   fNBin = 256;
 
-  fPedOffset = 200;
-  fPedRMS = 2;
+  fPedOffset = 0;
+  fPedRMS = 1;
 
   fTermination = 50;
 
@@ -71,7 +56,7 @@ void FADCWaveformGenerator::Digitize()
 
   for (int j = 1; j <= nbin; j++) {
     double time = fWaveformHist->GetBinCenter(j) * fBinTimeWidth;
-    double ped = fRandom->Gaus(fPedOffset, fPedRMS);
+    double ped = fRandom->Gaus(fPedOffset, fPedRMS * fResolution / fVpp);
     double sig = 0;
     if (fSignal) { sig = covfactor * fSignal->EvalPulseHeight(time); }
     sig += ped;

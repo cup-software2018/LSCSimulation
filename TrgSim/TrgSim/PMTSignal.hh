@@ -1,18 +1,3 @@
-/*
- *
- *  Module:  PMTSignal
- *
- *  Author:  Jaison Lee
- *
- *  Purpose: PMT signal simulation
- *
- *  Last Update:      $Author: cupsoft $
- *  Update Date:      $Date: 2018/12/28 00:21:15 $
- *  CVS/RCS Revision: $Revision: 1.6 $
- *  Status:           $State: Exp $
- *
- */
-
 #ifndef PMTSignal_hh
 #define PMTSignal_hh
 
