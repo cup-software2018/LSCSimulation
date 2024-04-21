@@ -29,7 +29,7 @@ include_directories(${PROJECT_INCLUDE_DIR})
 add_subdirectory(MCObjs)
 add_subdirectory(GLG4Sim)
 add_subdirectory(LSCSim)
-#add_subdirectory(TrgSim)
+add_subdirectory(TrgSim)
 
 # install
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -18,6 +18,7 @@
 #include "MCObjs/MCTrackData.hh"
 #include "MCObjs/MCScintData.hh"
 #include "MCObjs/MCPMTData.hh"
+#include "MCObjs/MCEventInfo.hh"
 
 #include "LSCSim/LSCRecorderBase.hh"
 
@@ -70,6 +71,7 @@ private:
   MCTrackData * fTrackData;
   MCScintData * fScintData;
   MCPMTData * fPMTData;
+  MCEventInfo * fEventInfo;
 
   TString fRootFileName;
   TFile * fRootFile;

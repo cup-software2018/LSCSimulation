@@ -15,8 +15,19 @@ foreach(HEADER_i ${${PROJECT_NAME}_HEADERS})
   configure_file(${HEADER_i} ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME} COPYONLY)
 endforeach(HEADER_i)
 
+configure_file(${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/LinkDef.h ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME} COPYONLY)
+
+file(GLOB ${PROJECT_NAME}_HEADERS ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME}/*.hh)
+set(${PROJECT_NAME}_DICT_FILE ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME}/LinkDef.h)
+
+root_generate_dictionary(G__${PROJECT_NAME}
+  ${${PROJECT_NAME}_HEADERS}
+  LINKDEF ${${PROJECT_NAME}_DICT_FILE}
+)
+
 add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SOURCES}
+  G__${PROJECT_NAME}.cxx
 )
 
 install(PROGRAMS
@@ -28,8 +39,7 @@ install(PROGRAMS
 # ----------------------------------------------------------------------------
 # build executables
 # ----------------------------------------------------------------------------
-set(LINK_PACKAGES MCObjs GLG4Sim LSCSim)
-set(LINK_EXTERNALS ${ROOT_LIBRARIES} ${Geant4_LIBRARIES})
+set(LINK_EXTERNALS ${ROOT_LIBRARIES})
 
 file(GLOB ${PROJECT_NAME}_EXECUTABLES ${PROJECT_SOURCE_DIR}/test/*.cc)
 
@@ -39,6 +49,3 @@ foreach(testsourcefile ${${PROJECT_NAME}_EXECUTABLES})
   target_link_libraries(${testname} ${LINK_PACKAGES} ${LINK_EXTERNALS})
   install(TARGETS ${testname} DESTINATION ${CMAKE_INSTALL_BINDIR})
 endforeach(testsourcefile ${${PROJECT_NAME}_EXECUTABLES})
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/mac DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -15,5 +15,6 @@
 #pragma link C++ class  MCPhotonHit+;
 #pragma link C++ class  MCPMT+;
 #pragma link C++ class  MCPMTData+;
+#pragma link C++ class  MCEventInfo+;
 
 #endif

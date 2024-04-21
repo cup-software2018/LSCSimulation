@@ -132,7 +132,9 @@ void LSCRootManager::BeginOfEvent(const G4Event *)
 void LSCRootManager::EndOfEvent(const G4Event * anEvent)
 {
   G4RunManager * runManager = G4RunManager::GetRunManager();
-  G4int eventId = anEvent->GetEventID();
+  G4int eventId = anEvent->GetEventID() + 1; // event number starts from 1
+
+  fEventInfo->SetEventNumber(eventId);
 
   // primary vertex
   G4int npvx = anEvent->GetNumberOfPrimaryVertex();
@@ -311,12 +313,14 @@ void LSCRootManager::CloseRootFile()
 
 void LSCRootManager::Booking()
 {
+  fEventInfo = new MCEventInfo();
   fPrimaryData = new MCPrimaryData();
   fTrackData = new MCTrackData();
   fScintData = new MCScintData();
   fPMTData = new MCPMTData();
 
   fEventTree = new TTree("Event", "Event");
+  fEventTree->Branch("MCEventInfo", &fEventInfo);
   fEventTree->Branch("MCPrimaryData", &fPrimaryData);
   fEventTree->Branch("MCTrackData", &fTrackData);
   fEventTree->Branch("MCScintData", &fScintData);
