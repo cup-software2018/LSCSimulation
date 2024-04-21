@@ -30,7 +30,7 @@ void PrintHelp()
 {
   cout << endl;
   cout << "Usage: LSCSim [-n # of event] [-o output] [-f macro]" << endl
-       << "              [-g geometry] [-m material] [-v]" << endl;
+       << "              [-g geometry] [-p pmt_position data] [-m material] [-v macro]" << endl;
   cout << endl;
 
   exit(0);
@@ -50,17 +50,24 @@ int main(int argc, char ** argv)
 
   G4String outputFileName;
   G4String macroFileName;
+  G4String vis_macroFileName;
   G4String materialData;
   G4String geometryData;
+  G4String pmtposData;
 
-  while ((opt = getopt(argc, argv, "o:f:m:g:n:vh")) != -1) {
+  while ((opt = getopt(argc, argv, "o:f:m:g:p:n:v:h")) != -1) {
     switch (opt) {
       case 'o': outputFileName = G4String(optarg); break;
       case 'f': macroFileName = G4String(optarg); break;
       case 'm': materialData = G4String(optarg); break;
       case 'g': geometryData = G4String(optarg); break;
+      case 'p': pmtposData = G4String(optarg); break;
       case 'n': nevent = atoi(G4String(optarg).data()); break;
-      case 'v': doVis = 1; break;
+      case 'v': {
+        vis_macroFileName = G4String(optarg);
+        doVis = 1;
+        break;
+      }
       case 'h': PrintHelp(); break;
       default: PrintHelp();
     }
@@ -86,6 +93,7 @@ int main(int argc, char ** argv)
 
   LSCDetectorConstruction * LSCDetector = new LSCDetectorConstruction();
   if (!geometryData.empty()) LSCDetector->SetGeometryDataFile(geometryData);
+  if (!pmtposData.empty()) LSCDetector->SetPMTPositionDataFile(pmtposData);
   if (!materialData.empty()) LSCDetector->SetMaterialDataFile(materialData);
 
   runManager->SetUserInitialization(LSCDetector);
@@ -111,11 +119,7 @@ int main(int argc, char ** argv)
   // get the pointer to the UI manager and set verbosities
   G4UImanager * UImanager = G4UImanager::GetUIpointer();
 
-  G4String command = "/run/initialize";
-  UImanager->ApplyCommand(command);
-
-  command = "/control/execute ";
-  command += macroFileName;
+  G4String command = Form("/control/execute %s", macroFileName.c_str());
   UImanager->ApplyCommand(command);
 
   if (!doVis) {
@@ -123,7 +127,8 @@ int main(int argc, char ** argv)
     UImanager->ApplyCommand(command);
   }
   else {
-    UImanager->ApplyCommand("/control/execute vis.mac");
+    command = Form("/control/execute %s", vis_macroFileName.c_str());
+    UImanager->ApplyCommand(command);
 
     G4UIsession * theSession = new G4UIterminal(new G4UItcsh);
     theSession->SessionStart();

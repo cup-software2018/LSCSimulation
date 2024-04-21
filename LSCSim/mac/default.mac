@@ -1,13 +1,19 @@
+/control/verbose 2
+
 #/event/verbose 1
 /tracking/storeTrajectory 1
 
-/LSC/det/geomcheck 1
+/LSC/det/geomcheck true
+/LSC/det/geometrydata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/geometry.dat
+/LSC/det/materialdata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/materials.dat
 
 /LSC/ROOT/savetrackopt  1
 /LSC/ROOT/savehitphoton 1
 /LSC/ROOT/savescintstep 1
 
-/LSC/Scintillation/scinton 1
+/run/initialize
+
+/LSC/Scintillation/scinton true
 
 /generator/pos/set 9 "80 0 0"
 /generator/vtx/set 17 "gamma 1 0 0  0.5"

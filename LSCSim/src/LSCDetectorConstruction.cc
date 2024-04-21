@@ -23,6 +23,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
 #include "G4Tubs.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImanager.hh"
@@ -41,14 +42,26 @@ LSCDetectorConstruction::LSCDetectorConstruction()
 {
   fDetectorDir = new G4UIdirectory("/LSC/det/");
 
-  fGeomCheck = true;
-  fGeomCheckOptCmd = new G4UIcmdWithAString("/LSC/det/geomcheck", this);
+  fGeomCheck = false;
+
+  fGeomCheckOptCmd = new G4UIcmdWithABool("/LSC/det/geomcheck", this);
+  fMaterialDataFileCmd = new G4UIcmdWithAString("/LSC/det/materialdata", this);
+  fGeometryDataFileCmd = new G4UIcmdWithAString("/LSC/det/geometrydata", this);
+  fPMTPositionDataFileCmd = new G4UIcmdWithAString("/LSC/det/pmtposdata", this);
 
   fGeometryDataFile = "";
+  fPMTPositionDataFile = "";
   fMaterialDataFile = "";
 }
 
-LSCDetectorConstruction::~LSCDetectorConstruction() { delete fGeomCheckOptCmd; }
+LSCDetectorConstruction::~LSCDetectorConstruction()
+{
+  delete fDetectorDir;
+  delete fGeomCheckOptCmd;
+  delete fMaterialDataFileCmd;
+  delete fGeometryDataFileCmd;
+  delete fPMTPositionDataFileCmd;
+}
 
 void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
                                           G4String newValues)
@@ -57,6 +70,13 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
     istringstream is((const char *)newValues);
     is >> fGeomCheck;
   }
+  if (command == fGeometryDataFileCmd) {
+    fGeometryDataFile = newValues;
+  }
+  if (command == fMaterialDataFileCmd) {
+    fMaterialDataFile = newValues;
+  }
+  if (command == fPMTPositionDataFileCmd) { fPMTPositionDataFile = newValues; }
 }
 
 G4VPhysicalVolume * LSCDetectorConstruction::Construct()

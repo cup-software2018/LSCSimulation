@@ -9,7 +9,7 @@
 #include "G4ParticleTypes.hh"
 #include "G4EmProcessSubType.hh"
 #include "G4UIdirectory.hh"
-#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithABool.hh"
 
 #include "LSCSim/LSCScintillation.hh"
 
@@ -39,9 +39,9 @@ LSCScintillation::LSCScintillation(const G4String & processName,
   emSaturation = NULL;
 
   fScintillationDir = new G4UIdirectory("/LSC/Scintillation/");
-  fScintOnCmd = new G4UIcmdWithAString("/LSC/Scintillation/scinton", this);
+  fScintOnCmd = new G4UIcmdWithABool("/LSC/Scintillation/scinton", this);
 
-  fIsScintOn = 1;
+  fIsScintOn = true;
 }
 
 ////////////////
