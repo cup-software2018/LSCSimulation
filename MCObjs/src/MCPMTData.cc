@@ -4,13 +4,13 @@
 ClassImp(MCPMTData)
 
 MCPMTData::MCPMTData()
-    : TClonesArray("MCPMT")
+  : TClonesArray("MCPMT")
 {
   fN = 0;
 }
 
 MCPMTData::MCPMTData(const MCPMTData & data)
-    : TClonesArray(data)
+  : TClonesArray(data)
 {
 }
 

@@ -12,15 +12,11 @@
   */
 
 #include "LSCSim/LSCPMTOpticalModel.hh"
-#include "LSCSim/LSCPMTSD.hh"
-
-#include <CLHEP/Units/PhysicalConstants.h>
-#include <CLHEP/Units/SystemOfUnits.h>
 
 #include <complex>
 
-#include "TMath.h"
-
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include "G4GeometryTolerance.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4MaterialPropertiesTable.hh"
@@ -33,7 +29,10 @@
 #include "G4Version.hh"
 #include "Randomize.hh"
 
+#include "TMath.h"
+
 #include "GLG4Sim/local_g4compat.hh"
+#include "LSCSim/LSCPMTSD.hh"
 
 using namespace std;
 
@@ -48,7 +47,7 @@ LSCPMTOpticalModel::LSCPMTOpticalModel(
     G4LogicalVolume * envelope_log, G4OpticalSurface * pc_opsurf,
     double efficiency_correction, double dynodeTop, double dynodeRadius,
     double prepulseProb, double photocathode_MINrho, double photocathode_MAXrho)
-    : G4VFastSimulationModel(modelName, envelope_region)
+  : G4VFastSimulationModel(modelName, envelope_region)
 {
   surfaceTolerance = G4GeometryTolerance::GetInstance()->GetSurfaceTolerance();
   _verbosity = 0;
@@ -246,7 +245,7 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
   G4double n_glass;
   G4VSolid * envelope_solid = fastTrack.GetEnvelopeSolid();
   G4VSensitiveDetector * detector =
-      fastTrack.GetEnvelopeLogicalVolume()->GetSensitiveDetector();  
+      fastTrack.GetEnvelopeLogicalVolume()->GetSensitiveDetector();
   enum EWhereAmI { kInGlass, kInVacuum } whereAmI;
   int ipmt = -1;
 
@@ -339,8 +338,8 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
       dist = _inner1_solid->DistanceToOut(pos, dir);
       if (dist < 0.0) {
         G4cerr << "LSCPMTOpticalModel::DoIt(): "
-             << "Warning, strangeness detected! inner1->DistanceToOut()="
-             << dist << endl;
+               << "Warning, strangeness detected! inner1->DistanceToOut()="
+               << dist << endl;
         dist = 0.0;
       }
       pos += dist * dir;
@@ -369,13 +368,13 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     if (_cos_theta1 < 0.0) {
 #ifdef G4DEBUG
       G4G4cerr << "LSCPMTOpticalModel::DoIt(): "
-             << " The normal points the wrong way!" << endl
-             << "  norm: " << norm << endl
-             << "  dir:  " << dir << endl
-             << "  _cos_theta1:  " << _cos_theta1 << endl
-             << "  pos:  " << pos << endl
-             << "  whereAmI:  " << (int)(whereAmI) << endl
-             << " Reversing normal!" << endl;
+               << " The normal points the wrong way!" << endl
+               << "  norm: " << norm << endl
+               << "  dir:  " << dir << endl
+               << "  _cos_theta1:  " << _cos_theta1 << endl
+               << "  pos:  " << pos << endl
+               << "  whereAmI:  " << (int)(whereAmI) << endl
+               << " Reversing normal!" << endl;
 #endif
       _cos_theta1 = -_cos_theta1;
       norm = -norm;
@@ -405,11 +404,11 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     if (A < 0.0 || A > 1.0 || collection_eff < 0.0 || collection_eff > 1.0) {
       G4cout << "LSCPMTOpticalModel::DoIt(): Strange coefficients!" << endl;
       G4cout << "T, R, A, An, weight: " << T << " " << R << " " << A << " "
-                 << An << " " << weight << endl;
+             << An << " " << weight << endl;
       G4cout << "collection eff, std QE: " << collection_eff << " "
-                 << _efficiency << endl;
+             << _efficiency << endl;
       G4cout << "========================================================="
-                 << endl;
+             << endl;
       A = collection_eff = 0.5; // safe values???
     }
 #endif
@@ -426,9 +425,9 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
       }
       else {
         G4cerr << "LSCPMTOpticalModel[" << GetName()
-             << "] warning: individual efficiency correction for PMT " << ipmt
-             << " is " << EfficiencyCorrection[ipmt] << ", resetting to 1"
-             << endl;
+               << "] warning: individual efficiency correction for PMT " << ipmt
+               << " is " << EfficiencyCorrection[ipmt] << ", resetting to 1"
+               << endl;
         EfficiencyCorrection[ipmt] = 1.0;
       }
     }
@@ -497,7 +496,7 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
 
       if (_verbosity >= 2) {
         G4cout << "LSCPMTOpticalModel transmits track, now in "
-                   << (whereAmI == kInVacuum ? " vacuum" : " glass") << endl;
+               << (whereAmI == kInVacuum ? " vacuum" : " glass") << endl;
       }
     }
   }
@@ -511,7 +510,7 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     fastStep.ProposeTrackStatus(fStopAndKill);
     if (weight < 0) {
       G4cerr << "LSCPMTOpticalModel::DoIt(): Logic error, weight = " << weight
-           << endl;
+             << endl;
     }
   }
   else {
@@ -521,8 +520,8 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
 
   if (iloop >= max_iloop) {
     G4cerr << "LSCPMTOpticalModel::DoIt(): Too many loops, particle trapped! "
-            "Killing it."
-         << endl;
+              "Killing it."
+           << endl;
     fastStep.ProposeTrackStatus(fStopAndKill);
   }
 
@@ -672,15 +671,15 @@ void LSCPMTOpticalModel::CalculateCoefficients()
 
 #ifdef G4DEBUG
   if (_verbosity >= 10) {
-    G4cout << "=> lam, n1, n2: " << _wavelength / nanometer << " " << _n1
-               << " " << _n2comp << endl;
-    G4cout << "=> Angles: " << real(theta1) / degree << " "
-               << theta2 / degree << " " << theta3 / degree << endl;
-    G4cout << "Rper, Rpar, Tper, Tpar: " << fR_s << " " << fR_p << " "
-               << fT_s << " " << fT_p;
+    G4cout << "=> lam, n1, n2: " << _wavelength / nanometer << " " << _n1 << " "
+           << _n2comp << endl;
+    G4cout << "=> Angles: " << real(theta1) / degree << " " << theta2 / degree
+           << " " << theta3 / degree << endl;
+    G4cout << "Rper, Rpar, Tper, Tpar: " << fR_s << " " << fR_p << " " << fT_s
+           << " " << fT_p;
     G4cout << "\nRn, Tn : " << fR_n << " " << fT_n;
     G4cout << "\n-------------------------------------------------------"
-               << endl;
+           << endl;
   }
 #endif
 }

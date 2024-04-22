@@ -4,13 +4,13 @@
 ClassImp(MCPrimaryData)
 
 MCPrimaryData::MCPrimaryData()
-    : TClonesArray("MCPrimary")
+  : TClonesArray("MCPrimary")
 {
   fN = 0;
 }
 
 MCPrimaryData::MCPrimaryData(const MCPrimaryData & data)
-    : TClonesArray(data)
+  : TClonesArray(data)
 {
 }
 

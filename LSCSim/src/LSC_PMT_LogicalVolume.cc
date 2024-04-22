@@ -15,7 +15,6 @@
 #include "G4PVPlacement.hh"
 #include "G4Tubs.hh"
 #include "G4VisAttributes.hh" // for G4VisAttributes::Invisible
-
 #include "GLG4Sim/GLG4TorusStack.hh"
 #include "LSCSim/LSCPMTOpticalModel.hh"
 
@@ -32,9 +31,9 @@ LSC_PMT_LogicalVolume::LSC_PMT_LogicalVolume(
     G4double hh_bound,       // half height of bounding cylinder
     G4Material * ExteriorMat // material which fills the bounding cylinder
     )
-    : G4LogicalVolume(new G4Tubs(plabel + "_envelope_solid", 0.0, r_bound,
-                                 hh_bound, 0., 2. * M_PI),
-                      ExteriorMat, plabel)
+  : G4LogicalVolume(new G4Tubs(plabel + "_envelope_solid", 0.0, r_bound,
+                               hh_bound, 0., 2. * M_PI),
+                    ExteriorMat, plabel)
 {
   if (our_Mirror_opsurf == NULL) {
     // construct a static mirror surface with idealized properties
@@ -118,10 +117,10 @@ LSC_17inch_LogicalVolume::LSC_17inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(
-          plabel, 260. * millimeter,
-          340. * millimeter, // hh_bound: half height of bounding cylinder
-          ExteriorMat)
+  : LSC_PMT_LogicalVolume(
+        plabel, 260. * millimeter,
+        340. * millimeter, // hh_bound: half height of bounding cylinder
+        ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
@@ -227,10 +226,10 @@ LSC_20inch_LogicalVolume::LSC_20inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(
-          plabel, 260. * millimeter,
-          340. * millimeter, // hh_bound: half height of bounding cylinder
-          ExteriorMat)
+  : LSC_PMT_LogicalVolume(
+        plabel, 260. * millimeter,
+        340. * millimeter, // hh_bound: half height of bounding cylinder
+        ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
@@ -292,8 +291,8 @@ LSC_8inch_LogicalVolume::LSC_8inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(plabel, 110. * millimeter, 150. * millimeter,
-                            ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 110. * millimeter, 150. * millimeter,
+                          ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R5912_n_edge, R5912_z_edge, R5912_rho_edge, R5912_z_o,
@@ -350,8 +349,8 @@ LSC_5inch_LogicalVolume::LSC_5inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(plabel, 64. * millimeter, 108. * millimeter,
-                            ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 64. * millimeter, 108. * millimeter,
+                          ExteriorMat)
 {
 
   ConstructPMT_UsingTorusStack(

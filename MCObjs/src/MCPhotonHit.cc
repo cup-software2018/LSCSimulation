@@ -3,14 +3,14 @@
 ClassImp(MCPhotonHit)
 
 MCPhotonHit::MCPhotonHit()
-    : TObject()
+  : TObject()
 {
   fTime = -1;
   fKE = -1;
 }
 
 MCPhotonHit::MCPhotonHit(const MCPhotonHit & photon)
-    : TObject()
+  : TObject()
 {
   fTime = photon.GetTime();
   fKE = photon.GetKineticEnergy();

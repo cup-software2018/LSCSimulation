@@ -4,14 +4,14 @@
 ClassImp(MCPMT)
 
 MCPMT::MCPMT()
-    : TClonesArray("MCPhotonHit")
+  : TClonesArray("MCPhotonHit")
 {
   fPMTId = 0;
   fNHit = 0;
 }
 
 MCPMT::MCPMT(const MCPMT & pmt)
-    : TClonesArray(pmt)
+  : TClonesArray(pmt)
 {
   fPMTId = pmt.GetId();
   fNHit = pmt.GetNHit();

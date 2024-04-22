@@ -37,8 +37,8 @@ using namespace std;
 LSCPMTSD * LSCDetectorConstruction::fPmt_SD = NULL;
 
 LSCDetectorConstruction::LSCDetectorConstruction()
-    : G4VUserDetectorConstruction(),
-      G4UImessenger()
+  : G4VUserDetectorConstruction(),
+    G4UImessenger()
 {
   fDetectorDir = new G4UIdirectory("/LSC/det/");
 

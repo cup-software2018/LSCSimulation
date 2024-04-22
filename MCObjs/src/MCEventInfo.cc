@@ -3,13 +3,13 @@
 ClassImp(MCEventInfo)
 
 MCEventInfo::MCEventInfo()
-    : TObject()
+  : TObject()
 {
   fEventNumber = 0;
 }
 
 MCEventInfo::MCEventInfo(const MCEventInfo & info)
-    : TObject()
+  : TObject()
 {
   fEventNumber = info.GetEventNumber();
 }

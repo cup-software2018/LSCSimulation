@@ -14,7 +14,7 @@ public:
   MCPMT(const MCPMT & pmt);
   virtual ~MCPMT();
 
-  virtual void Clear(const Option_t * opt = "");    
+  virtual void Clear(const Option_t * opt = "");
 
   void SetId(int id);
   int GetId() const;
@@ -28,7 +28,6 @@ public:
   virtual void Print(const Option_t * opt = "") const;
 
 private:
-
   int fPMTId;
   int fNHit;
 
@@ -36,7 +35,6 @@ private:
 };
 
 inline void MCPMT::SetId(int Id) { fPMTId = Id; }
-
 inline int MCPMT::GetId() const { return fPMTId; }
 
 inline int MCPMT::GetNHit() const { return GetEntriesFast(); }
