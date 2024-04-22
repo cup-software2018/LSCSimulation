@@ -71,12 +71,14 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
     is >> fGeomCheck;
   }
   if (command == fGeometryDataFileCmd) {
-    fGeometryDataFile = newValues;
+    if (fGeometryDataFile.empty()) fGeometryDataFile = newValues;
   }
   if (command == fMaterialDataFileCmd) {
-    fMaterialDataFile = newValues;
+    if (fMaterialDataFile.empty()) fMaterialDataFile = newValues;
   }
-  if (command == fPMTPositionDataFileCmd) { fPMTPositionDataFile = newValues; }
+  if (command == fPMTPositionDataFileCmd) {
+    if (fPMTPositionDataFile.empty()) fPMTPositionDataFile = newValues;
+  }
 }
 
 G4VPhysicalVolume * LSCDetectorConstruction::Construct()
