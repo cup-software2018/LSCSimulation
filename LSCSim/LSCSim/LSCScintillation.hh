@@ -21,7 +21,7 @@
 // #include "LSCSim/LSCEmSaturation.hh"
 
 class G4UIdirectory;
-class G4UIcmdWithABool;
+class G4UIcmdWithAString;
 
 class LSCScintillation : public G4VRestDiscreteProcess, public G4UImessenger {
 
@@ -152,10 +152,9 @@ protected:
 
 private:
   G4UIdirectory * fScintillationDir;
+  G4UIcmdWithAString * fScintOnCmd;
 
-  G4UIcmdWithABool * fScintOnCmd;
-
-  G4bool fIsScintOn;
+  G4int fIsScintOn;
 
   // setep infomation
   G4double fTotalEdep;

@@ -7,7 +7,7 @@ using namespace std;
 ClassImp(FADCWaveformGenerator)
 
     FADCWaveformGenerator::FADCWaveformGenerator()
-    : TObject()
+  : TObject()
 {
   fRandom = new TRandom3;
   fRandom->SetSeed(0);
@@ -38,9 +38,10 @@ FADCWaveformGenerator::~FADCWaveformGenerator()
 
 void FADCWaveformGenerator::Prepare()
 {
-  if (!fWaveform) { fWaveform = new unsigned int[fNBin]; }
-
-  fWaveformHist->SetBins(fNBin, 0, fNBin);
+  if (!fWaveform) {
+    fWaveform = new unsigned int[fNBin];
+    fWaveformHist->SetBins(fNBin, 0, fNBin);
+  }
   fWaveformHist->Reset();
 
   if (fSignal) { fSignal->Prepare(); }

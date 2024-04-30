@@ -9,7 +9,7 @@
 #include "G4ParticleTypes.hh"
 #include "G4EmProcessSubType.hh"
 #include "G4UIdirectory.hh"
-#include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithAString.hh"
 
 #include "LSCSim/LSCScintillation.hh"
 
@@ -39,9 +39,9 @@ LSCScintillation::LSCScintillation(const G4String & processName,
   emSaturation = NULL;
 
   fScintillationDir = new G4UIdirectory("/LSC/Scintillation/");
-  fScintOnCmd = new G4UIcmdWithABool("/LSC/Scintillation/scinton", this);
+  fScintOnCmd = new G4UIcmdWithAString("/LSC/Scintillation/scinton", this);
 
-  fIsScintOn = true;
+  fIsScintOn = 1;
 }
 
 ////////////////
@@ -65,6 +65,9 @@ void LSCScintillation::SetNewValue(G4UIcommand * command, G4String newValues)
   if (command == fScintOnCmd) {
     istringstream is((const char *)newValues);
     is >> fIsScintOn;
+    if (fIsScintOn == 0) {
+      G4cout << "LSCScintillation::Scintillation will be turned off" << G4endl;
+    }
   }
 }
 
@@ -274,13 +277,12 @@ LSCScintillation::PostStepDoIt(const G4Track & aTrack, const G4Step & aStep)
     // return unchanged particle and no secondaries
 
     aParticleChange.SetNumberOfSecondaries(0);
-
     return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
   }
 
   fNScintillationPhoton = NumPhotons;
 
-  if (!fIsScintOn) {
+  if (fIsScintOn == 0) {
     aParticleChange.SetNumberOfSecondaries(0);
     return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
   }

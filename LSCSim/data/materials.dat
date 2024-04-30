@@ -175,6 +175,7 @@ PROPERTY  BACKSCATTERCONSTANT
 200  0.0
 800  0.0
 
+
 ########################################
 MATERIAL  "Tyvek"
 ########################################
@@ -184,6 +185,17 @@ PROPERTY  REFLECTIVITY
 OPTION wavelength
 200 0.95
 800 0.95
+
+
+########################################
+MATERIAL  "Steel"
+########################################
+
+PROPERTY  REFLECTIVITY
+# UNITS  nm\E 1 	
+OPTION wavelength
+200 0.01
+800 0.01
 
 
 ########################################
@@ -301,7 +313,7 @@ PROPERTY  THICKNESS     # Thickness of photocathode as function of Z position
 MATERIAL  "LS_LAB"
 ########################################
 
-CONSTPROPERTY SCINTILLATIONYIELD	 1000
+CONSTPROPERTY SCINTILLATIONYIELD	 8000
 CONSTPROPERTY RESOLUTIONSCALE		 1.0
 CONSTPROPERTY FASTTIMECONSTANT	 	 4.3
 CONSTPROPERTY SLOWTIMECONSTANT1	 	 16
