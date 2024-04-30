@@ -13,7 +13,8 @@
 
 /run/initialize
 
-/LSC/Scintillation/scinton true
+/LSC/Scintillation/scinton 1
+/LSC/Cerenkov/cerenkov 1
 
 /generator/pos/set 9 "80 0 0"
 /generator/vtx/set 17 "gamma 1 0 0  0.5"

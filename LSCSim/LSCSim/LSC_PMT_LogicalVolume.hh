@@ -24,6 +24,7 @@ public:
   G4double GetZEquator() { return z_equator; }
 
 protected:
+  G4bool isvisible;
   G4double z_equator; // Z location of equator of tube
 
   static G4OpticalSurface * our_Mirror_opsurf;

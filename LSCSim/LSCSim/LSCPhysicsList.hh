@@ -59,6 +59,7 @@ private:
   G4UIcmdWithADoubleAndUnit * posCutCmd;
   G4UIcmdWithADoubleAndUnit * allCutCmd;
   G4UIcmdWithAnInteger * verboseCmd;
+  G4UIcmdWithAString * cherenkovOnCmd;
 };
 
 #endif

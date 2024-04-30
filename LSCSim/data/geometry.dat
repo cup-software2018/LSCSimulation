@@ -3,10 +3,19 @@
 #
 
 # world definition 
-worldx		   150
-worldy		   150
-worldz		   150
+worldx		   3000
+worldy		   3000
+worldz		   3000
 
-testx 100
-testy 100
-testz 100
+pit_radius 1000
+pit_height 2000
+
+buffer_radius 850
+buffer_height 1700
+buffer_thickness 2.5
+
+target_radius 700
+target_height 1400
+target_thickness 6
+
+

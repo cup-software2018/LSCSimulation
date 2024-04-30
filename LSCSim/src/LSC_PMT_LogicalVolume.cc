@@ -583,11 +583,11 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
   ////
   G4VisAttributes * visAtt;
   this->SetVisAttributes(G4VisAttributes::GetInvisible());
-  // PMT glass
-  // visAtt= new G4VisAttributes(G4Color(0.0,1.0,1.0,0.05));
-  // body_log->SetVisAttributes( visAtt );
-  body_log->SetVisAttributes(G4VisAttributes::GetInvisible());
-  // dynode is medium gray
+  //  PMT glass
+  visAtt = new G4VisAttributes(G4Color(0.0, 1.0, 1.0, 0.05));
+  body_log->SetVisAttributes(visAtt);
+  // body_log->SetVisAttributes(G4VisAttributes::GetInvisible());
+  //  dynode is medium gray
   visAtt = new G4VisAttributes(G4Color(0.5, 0.5, 0.5, 1.0));
   dynode_log->SetVisAttributes(visAtt);
   // (surface of) interior vacuum is clear orangish gray on top (PC),

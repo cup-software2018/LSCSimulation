@@ -331,10 +331,10 @@ void LSCDetectorConstruction::ConstructMaterials()
       G4Material::GetMaterial("photocathode")->GetMaterialPropertiesTable());
 
   Stainless_opsurf = new G4OpticalSurface("Stainless_opsurf");
-  Stainless_opsurf->SetFinish(ground);
+  Stainless_opsurf->SetFinish(polished);
   Stainless_opsurf->SetModel(glisur);
   Stainless_opsurf->SetType(dielectric_metal);
-  Stainless_opsurf->SetPolish(0.1); // a guess -- FIXME?
+  Stainless_opsurf->SetPolish(0.95); // a guess -- FIXME?
   Stainless_opsurf->SetMaterialPropertiesTable(
       stainless->GetMaterialPropertiesTable());
 

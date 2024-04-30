@@ -1,5 +1,6 @@
 #include "LSCSim/LSCPhysicsList.hh"
-
+#include <iostream>
+#include <sstream>
 #include <iomanip>
 
 #include "G4DeexPrecoParameters.hh"
@@ -26,14 +27,15 @@
 #include "G4UIdirectory.hh"
 #include "G4UserLimits.hh"
 #include "G4ios.hh"
-#include "globals.hh"
-
 #include "GLG4Sim/GLG4DeferTrackProc.hh"
 #include "GLG4Sim/GLG4param.hh"
+#include "globals.hh"
+
+using namespace std;
 
 // Constructor /////////////////////////////////////////////////////////////
 LSCPhysicsList::LSCPhysicsList()
-    : G4VModularPhysicsList()
+  : G4VModularPhysicsList()
 {
   defaultCutValue = 1.0 * micrometer; //
   cutForGamma = defaultCutValue;
@@ -434,10 +436,10 @@ void LSCPhysicsList::ConstructEM()
 
 // Optical Processes ////////////////////////////////////////////////////////
 // EJ: start
-#include "G4Cerenkov.hh"
+//#include "G4Cerenkov.hh"
+#include "LSCSim/LSCCerenkov.hh"
 #include "G4EmSaturation.hh"
 #include "G4OpBoundaryProcess.hh"
-
 #include "LSCSim/LSCOpAttenuation.hh"
 #include "LSCSim/LSCScintillation.hh"
 // EJ: end
@@ -446,40 +448,16 @@ void LSCPhysicsList::ConstructOp()
 {
   // EJ: start
   // scintillation process
-  LSCScintillation * theScintProcessDef = new LSCScintillation("Scintillation");
-  // theScintProcessDef->DumpPhysicsTable();
-  theScintProcessDef->SetTrackSecondariesFirst(true);
-  theScintProcessDef->SetScintillationYieldFactor(1.0);     //
-  theScintProcessDef->SetScintillationExcitationRatio(0.0); //
-  theScintProcessDef->SetVerboseLevel(OpVerbLevel);
+  LSCScintillation * theScintProcess = new LSCScintillation("Scintillation");
+  theScintProcess->SetTrackSecondariesFirst(true);
+  theScintProcess->SetScintillationYieldFactor(1.0);     //
+  theScintProcess->SetScintillationExcitationRatio(0.0); //
+  theScintProcess->SetVerboseLevel(OpVerbLevel);
 
   G4EmSaturation * emSaturation =
       G4LossTableManager::Instance()->EmSaturation();
-  theScintProcessDef->AddSaturation(emSaturation);
+  theScintProcess->AddSaturation(emSaturation);
 
-  /*
-    // scintillation process for alpha:
-    CupScintillation * theScintProcessAlpha =
-        new CupScintillation("Scintillation");
-    // theScintProcessNuc->DumpPhysicsTable();
-    theScintProcessAlpha->SetTrackSecondariesFirst(true);
-    theScintProcessAlpha->SetScintillationYieldFactor(1.1);
-    theScintProcessAlpha->SetScintillationExcitationRatio(1.0);
-    theScintProcessAlpha->SetVerboseLevel(OpVerbLevel);
-
-    theScintProcessAlpha->AddSaturation(emSaturation);
-
-    // scintillation process for heavy nuclei
-    CupScintillation * theScintProcessNuc = new
-    CupScintillation("Scintillation");
-    // theScintProcessNuc->DumpPhysicsTable();
-    theScintProcessNuc->SetTrackSecondariesFirst(true);
-    theScintProcessNuc->SetScintillationYieldFactor(0.2);
-    theScintProcessNuc->SetScintillationExcitationRatio(1.0);
-    theScintProcessNuc->SetVerboseLevel(OpVerbLevel);
-
-    theScintProcessNuc->AddSaturation(emSaturation);
-  */
 
   // optical processes
   LSCOpAttenuation * theAttenuationProcess = new LSCOpAttenuation();
@@ -490,20 +468,22 @@ void LSCPhysicsList::ConstructOp()
   theBoundaryProcess->SetVerboseLevel(OpVerbLevel);
 
   // Cerenkov
-  G4Cerenkov * theCerenkovProcess = new G4Cerenkov();
+  //G4Cerenkov * theCerenkovProcess = new G4Cerenkov();
+  auto theCerenkovProcess = new LSCCerenkov();
   theCerenkovProcess->SetTrackSecondariesFirst(true);
 
   auto theParticleIterator = GetParticleIterator();
-
   theParticleIterator->reset();
   while ((*theParticleIterator)()) {
     G4ParticleDefinition * particle = theParticleIterator->value();
     G4ProcessManager * pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
-    if (theScintProcessDef->IsApplicable(*particle)) {
-      pmanager->AddProcess(theScintProcessDef);
-      pmanager->SetProcessOrderingToLast(theScintProcessDef, idxAtRest);
-      pmanager->SetProcessOrderingToLast(theScintProcessDef, idxPostStep);
+    if (theScintProcess->IsApplicable(*particle)) {
+      pmanager->AddProcess(theScintProcess);
+      pmanager->SetProcessOrderingToLast(theScintProcess, idxAtRest);
+      pmanager->SetProcessOrderingToLast(theScintProcess, idxPostStep);
+    }
+    if (theCerenkovProcess->IsApplicable(*particle)) {
       pmanager->AddProcess(theCerenkovProcess);
       pmanager->SetProcessOrdering(theCerenkovProcess, idxPostStep);
     }
@@ -511,6 +491,7 @@ void LSCPhysicsList::ConstructOp()
     if (particleName == "opticalphoton") {
       pmanager->AddDiscreteProcess(theAttenuationProcess);
       pmanager->AddDiscreteProcess(theBoundaryProcess);
+      pmanager->SetProcessOrderingToLast(theBoundaryProcess, idxPostStep);
     }
   }
 }
@@ -523,7 +504,6 @@ void LSCPhysicsList::ConstructHad() {}
 #include "G4IonTable.hh"
 #include "G4Ions.hh"
 #include "G4RadioactiveDecay.hh"
-
 #include "GLG4Sim/GLG4DeferTrackProc.hh"
 
 void LSCPhysicsList::ConstructGeneral()
