@@ -1,10 +1,7 @@
 #ifndef MCPMT_hh
 #define MCPMT_hh
 
-#include <iostream>
-
 #include "TClonesArray.h"
-#include "TVector3.h"
 
 class MCPhotonHit;
 class MCPMT : public TClonesArray {

@@ -770,7 +770,7 @@ int LSCPMTOpticalModel::GetPMTID(const G4FastTrack & fastTrack)
   auto handle = fastTrack.GetPrimaryTrack()->GetTouchableHandle();
   for (iDepth = 0; iDepth < handle->GetHistoryDepth(); iDepth++) {
     const std::string volName = handle->GetVolume(iDepth)->GetName();
-    const size_t envelopeHistory = volName.find("_pmtenv_");
+    const size_t envelopeHistory = volName.find("PMTPhys");
     if (envelopeHistory != std::string::npos) {
       return handle->GetCopyNumber(iDepth);
     }

@@ -1,5 +1,9 @@
+#include <iostream>
+
 #include "MCObjs/MCPMT.hh"
 #include "MCObjs/MCPhotonHit.hh"
+
+using namespace std;
 
 ClassImp(MCPMT)
 
@@ -32,4 +36,7 @@ void MCPMT::Clear(const Option_t * opt)
   Delete();
 }
 
-void MCPMT::Print(const Option_t * opt) const {}
+void MCPMT::Print(const Option_t * opt) const 
+{
+  cout << Form("PMTID=%4d, # of hit=%d", fPMTId, GetNHit()) << endl;
+}

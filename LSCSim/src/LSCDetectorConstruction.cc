@@ -206,7 +206,7 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
     // coord_y *= cm;
     // coord_z *= cm;
 
-    sprintf(PMTname, "physInnerPMT%d", pmtno);
+    sprintf(PMTname, "InnerPMTPhys%d", pmtno);
 
     G4double r =
         sqrt(coord_x * coord_x + coord_y * coord_y + coord_z * coord_z);
