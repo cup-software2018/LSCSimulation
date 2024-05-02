@@ -1,3 +1,4 @@
+#include <iostream>
 #include "MCObjs/MCPrimary.hh"
 
 using namespace std;
@@ -33,7 +34,7 @@ MCPrimary::~MCPrimary()
 
 void MCPrimary::Print(const Option_t * opt) const
 {
-  cout << "  Primary particle : " << fName << endl;
+  cout << "          particle : " << fName << endl;
   cout << "       Global Time : " << fT0 << " [ns]" << endl;
   cout << "    Kinetic Energy : " << fKineticEnergy << " [MeV]" << endl;
   cout << "          Momentum : "
@@ -44,5 +45,4 @@ void MCPrimary::Print(const Option_t * opt) const
        << Form("%7.2f", fVx) << " "
        << Form("%7.2f", fVy) << " "
        << Form("%7.2f", fVz) << " [mm]" << endl;
-
 }

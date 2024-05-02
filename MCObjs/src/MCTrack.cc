@@ -61,7 +61,7 @@ void MCTrack::Print(const Option_t * opt) const
   cout << "         MotherId = " << fParentId << endl;
   cout << "     ParticleName = " << fParticleName << endl;
   cout << "     ProcessName  = " << fProcessName << endl;
-  cout << Form("     Global Time  = %6.2f [ns]", fGlobalTime) << endl;
-  cout << Form("   Kinetic Energy = %6.2f [MeV]", fKineticEnergy) << endl;
+  cout << Form("     Global Time  = %0.6f [ns]", fGlobalTime) << endl;
+  cout << Form("   Kinetic Energy = %0.6f [MeV]", fKineticEnergy) << endl;
   cout << endl;
 }

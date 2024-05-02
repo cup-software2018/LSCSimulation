@@ -129,7 +129,7 @@ public:
   // step infomation
   G4double GetEnergyDeposit() const { return fTotalEdep; }
   G4double GetEnergyVisible() const { return fEvis; }
-  G4double GetNScintillationPhoton() const { return fNScintillationPhoton; }
+  G4int GetNScintillationPhoton() const { return fNScintillationPhoton; }
 
 protected:
   void BuildThePhysicsTable();

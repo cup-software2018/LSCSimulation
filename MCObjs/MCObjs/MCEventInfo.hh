@@ -12,6 +12,8 @@ public:
   void SetEventNumber(unsigned int n);
   unsigned int GetEventNumber() const;
 
+  virtual void Print(const Option_t * opt = "");
+
 private:
   unsigned int fEventNumber;
 

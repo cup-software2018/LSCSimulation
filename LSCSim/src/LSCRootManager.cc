@@ -1,5 +1,4 @@
 #include "LSCSim/LSCRootManager.hh"
-#include "LSCSim/LSCScintillation.hh"
 
 #include <iomanip>
 #include <iostream>
@@ -20,7 +19,7 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
 #include "G4VPhysicalVolume.hh"
-
+#include "LSCSim/LSCScintillation.hh"
 #include "LSCSim/PMTHit.hh"
 #include "MCObjs/MCPMT.hh"
 #include "MCObjs/MCPhotonHit.hh"
@@ -30,10 +29,11 @@
 #include "MCObjs/MCTrack.hh"
 
 using namespace std;
+using namespace CLHEP;
 
 LSCRootManager::LSCRootManager()
-    : G4UImessenger(),
-      fPMTHitCollId(-1)
+  : G4UImessenger(),
+    fPMTHitCollId(-1)
 {
   fTrackSaveOption = 0;
   fStepSaveOption = 0;
@@ -244,23 +244,29 @@ void LSCRootManager::RecordStep(const G4Step * aStep, const G4VProcess * proc)
   G4StepPoint * preStepPoint = aStep->GetPreStepPoint();
   G4StepPoint * postStepPoint = aStep->GetPostStepPoint();
 
-  G4VPhysicalVolume * currentVolume = postStepPoint->GetPhysicalVolume();
-  if (!currentVolume) return;
+  G4VPhysicalVolume * volume = postStepPoint->GetPhysicalVolume();
+  if (!volume) return;
 
   G4Track * track = aStep->GetTrack();
   const G4ParticleDefinition * particleDef = track->GetParticleDefinition();
 
   if (proc->GetProcessName() == "Scintillation") {
     LSCScintillation * scintproc = (LSCScintillation *)proc;
-    G4String currentVolumeName = currentVolume->GetName();
-    if (G4StrUtil::contains(currentVolumeName, "LSPhys") &&
-        scintproc->GetEnergyDeposit() > 0.) {
-
-      const G4VTouchable * touch = aStep->GetPostStepPoint()->GetTouchable();
-
+    G4String volumeName = volume->GetName();
+    if (G4StrUtil::contains(volumeName, "LSPhys")) {
       MCScint * aScint = nullptr;
-
-      if (G4StrUtil::contains(currentVolumeName, "Target")) { aScint = fScintData->Add(); }
+      if (G4StrUtil::contains(volumeName, "Target")) {
+        aScint = fScintData->FindScint(0); // target volume id = 0
+        if (!aScint) {
+          aScint = fScintData->Add(0);
+        }
+      }
+      else {
+        aScint = fScintData->FindScint(1);
+        if (!aScint) {
+          aScint = fScintData->Add(1);
+        }        
+      }
 
       if (aScint) {
         aScint->AddEnergyDeposit(scintproc->GetEnergyDeposit());
@@ -274,7 +280,7 @@ void LSCRootManager::RecordStep(const G4Step * aStep, const G4VProcess * proc)
           step->SetEnergyDeposit(scintproc->GetEnergyDeposit());
           step->SetEnergyVisible(scintproc->GetEnergyVisible());
           step->SetGlobalTime(postStepPoint->GetGlobalTime());
-          step->SetVolumeName(currentVolume->GetName().data());
+          step->SetVolumeName(volume->GetName().data());
           step->SetNScintPhoton(scintproc->GetNScintillationPhoton());
         }
       }
@@ -291,7 +297,7 @@ void LSCRootManager::RecordStep(const G4Step * aStep, const G4VProcess * proc)
       mcStep->SetEnergyDeposit(aStep->GetTotalEnergyDeposit());
       mcStep->SetEnergyDepositNonIonizing(aStep->GetNonIonizingEnergyDeposit());
       mcStep->SetGlobalTime(postStepPoint->GetGlobalTime());
-      mcStep->SetVolumeName(currentVolume->GetName().data());
+      mcStep->SetVolumeName(volume->GetName().data());
     }
   }
 }

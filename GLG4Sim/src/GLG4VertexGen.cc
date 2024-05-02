@@ -19,16 +19,14 @@
 #include "G4OpticalPhoton.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTable.hh"
-#include "G4Track.hh"
-#include "Randomize.hh"
-#include "globals.hh"
-#include "sstream"
-
 #include "G4PrimaryVertex.hh"
-
+#include "G4Track.hh"
 #include "GLG4Sim/GLG4PosGen.hh" // for Strip() utility function
 #include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
 #include "GLG4Sim/GLG4param.hh"
+#include "Randomize.hh"
+#include "globals.hh"
+#include "sstream"
 
 #if defined(__GNUC__) && __GNUC__ < 3
 extern "C" {
@@ -60,11 +58,11 @@ const char * GLG4VertexGen_Gun::theElementNames[] = {
 };
 
 GLG4VertexGen_Gun::GLG4VertexGen_Gun(const char * arg_dbname)
-    : GLG4VVertexGen(arg_dbname),
-      _mom(0., 0., 0.),
-      _ke(0.0),
-      _pol(0., 0., 0.),
-      _multiplicity(1)
+  : GLG4VVertexGen(arg_dbname),
+    _mom(0., 0., 0.),
+    _ke(0.0),
+    _pol(0., 0., 0.),
+    _multiplicity(1)
 {
   _pDef = G4ParticleTable::GetParticleTable()->FindParticle("geantino");
 }
@@ -225,8 +223,7 @@ void GLG4VertexGen_Gun::SetState(G4String newValues)
       for (Z = 1; Z <= numberOfElements; Z++)
         if (elementName == theElementNames[Z - 1]) break;
       if (Z <= numberOfElements)
-        newTestGunG4Code =
-            G4IonTable::GetIonTable()->GetIon(Z, A, 0.0);
+        newTestGunG4Code = G4IonTable::GetIonTable()->GetIon(Z, A, 0.0);
     }
     if (newTestGunG4Code == NULL) {
       G4cerr << "test gun particle type not changed! Could not"
@@ -303,7 +300,7 @@ G4String GLG4VertexGen_Gun::GetState()
 ////////////////////////////////////////////////////////////////
 
 GLG4VertexGen_HEPEvt::GLG4VertexGen_HEPEvt(const char * arg_dbname)
-    : GLG4VVertexGen(arg_dbname)
+  : GLG4VVertexGen(arg_dbname)
 {
   _filename = "";
   _file = 0;
@@ -738,7 +735,7 @@ G4String GLG4VertexGen_HEPEvt::GetState() { return G4String(_filename); }
 
 GLG4VertexGen_Stack::GLG4VertexGen_Stack(
     const char * arg_dbname, GLG4PrimaryGeneratorAction * argGLG4PGA)
-    : GLG4VVertexGen(arg_dbname)
+  : GLG4VVertexGen(arg_dbname)
 {
   fGLG4PGA = argGLG4PGA;
 }
