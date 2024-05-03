@@ -254,45 +254,37 @@ void LSCRootManager::RecordStep(const G4Step * aStep, const G4VProcess * proc)
     LSCScintillation * scintproc = (LSCScintillation *)proc;
     G4String volumeName = volume->GetName();
     if (G4StrUtil::contains(volumeName, "LSPhys")) {
-      MCScint * aScint = nullptr;
-      if (G4StrUtil::contains(volumeName, "Target")) {
-        aScint = fScintData->FindScint(0); // target volume id = 0
-        if (!aScint) {
-          aScint = fScintData->Add(0);
-        }
-      }
+      int volumeId;
+      if (G4StrUtil::contains(volumeName, "Target")) { volumeId = 0; }
       else {
-        aScint = fScintData->FindScint(1);
-        if (!aScint) {
-          aScint = fScintData->Add(1);
-        }        
+        volumeId = 1;
       }
 
-      if (aScint) {
-        aScint->AddEnergyDeposit(scintproc->GetEnergyDeposit());
-        aScint->AddEnergyVisible(scintproc->GetEnergyVisible());
-        aScint->AddScintPhotons(scintproc->GetNScintillationPhoton());
+      auto aScint = fScintData->FindScint(volumeId);
+      if (!aScint) { aScint = fScintData->Add(volumeId); }
 
-        if (fScintStepSave) {
-          MCScintStep * step = aScint->AddStep();
+      aScint->AddEnergyDeposit(scintproc->GetEnergyDeposit());
+      aScint->AddEnergyVisible(scintproc->GetEnergyVisible());
+      aScint->AddScintPhotons(scintproc->GetNScintillationPhoton());
 
-          step->SetStepLength(aStep->GetStepLength());
-          step->SetEnergyDeposit(scintproc->GetEnergyDeposit());
-          step->SetEnergyVisible(scintproc->GetEnergyVisible());
-          step->SetGlobalTime(postStepPoint->GetGlobalTime());
-          step->SetVolumeName(volume->GetName().data());
-          step->SetNScintPhoton(scintproc->GetNScintillationPhoton());
-        }
+      if (fScintStepSave) {
+        MCScintStep * step = aScint->AddStep();
+        step->SetStepLength(aStep->GetStepLength());
+        step->SetEnergyDeposit(scintproc->GetEnergyDeposit());
+        step->SetEnergyVisible(scintproc->GetEnergyVisible());
+        step->SetGlobalTime(postStepPoint->GetGlobalTime());
+        step->SetVolumeName(volume->GetName().data());
+        step->SetNScintPhoton(scintproc->GetNScintillationPhoton());
       }
     }
+    scintproc->InitializeScint();
   }
-
+  
   if (fTrackSaveOption > 0 && fStepSaveOption > 0) {
     int trackId = track->GetTrackID();
     MCTrack * mcTrack = fTrackData->FindTrack(trackId);
     if (mcTrack) {
       MCStep * mcStep = mcTrack->AddStep();
-
       mcStep->SetStepLength(aStep->GetStepLength());
       mcStep->SetEnergyDeposit(aStep->GetTotalEnergyDeposit());
       mcStep->SetEnergyDepositNonIonizing(aStep->GetNonIonizingEnergyDeposit());

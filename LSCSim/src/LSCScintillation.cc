@@ -96,7 +96,7 @@ G4VParticleChange * LSCScintillation::PostStepDoIt(const G4Track & aTrack,
 // evenly along the track segment and uniformly into 4pi.
 
 {
-  fEvis = 0;
+  fEvis = 0.;
   fTotalEdep = 0.;
   fNScintillationPhoton = 0;
 
@@ -111,6 +111,11 @@ G4VParticleChange * LSCScintillation::PostStepDoIt(const G4Track & aTrack,
   G4ThreeVector x0 = pPreStepPoint->GetPosition();
   G4ThreeVector p0 = aStep.GetDeltaPosition().unit();
   G4double t0 = pPreStepPoint->GetGlobalTime();
+
+  fTotalEdep = aStep.GetTotalEnergyDeposit();
+  if (fTotalEdep <= 0.) {
+    return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
+  }
 
   G4MaterialPropertiesTable * aMaterialPropertiesTable =
       aMaterial->GetMaterialPropertiesTable();
@@ -234,8 +239,6 @@ G4VParticleChange * LSCScintillation::PostStepDoIt(const G4Track & aTrack,
 
   G4double ResolutionScale =
       aMaterialPropertiesTable->GetConstProperty("RESOLUTIONSCALE");
-
-  fTotalEdep = aStep.GetTotalEnergyDeposit();
 
   // Birks law saturation:
   // G4double constBirks = 0.0;

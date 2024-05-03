@@ -130,6 +130,11 @@ public:
   G4double GetEnergyDeposit() const { return fTotalEdep; }
   G4double GetEnergyVisible() const { return fEvis; }
   G4int GetNScintillationPhoton() const { return fNScintillationPhoton; }
+  void InitializeScint() {
+    fTotalEdep = 0.;
+    fEvis = 0.;
+    fNScintillationPhoton = 0;
+  }
 
 protected:
   void BuildThePhysicsTable();
