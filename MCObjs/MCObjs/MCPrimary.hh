@@ -1,11 +1,11 @@
 #ifndef MCPrimary_hh
 #define MCPrimary_hh
 
-#include <iostream>
+
 
 #include "TObject.h"
 #include "TString.h"
-#include "TVector3.h"
+
 
 class MCPrimary : public TObject {
 public:

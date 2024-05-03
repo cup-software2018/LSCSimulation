@@ -1,14 +1,15 @@
+#include "MCObjs/MCScint.hh"
+
 #include <iostream>
 
 #include "MCObjs/MCScintStep.hh"
-#include "MCObjs/MCScint.hh"
 
 using namespace std;
 
 ClassImp(MCScint)
 
-    MCScint::MCScint()
-    : TClonesArray("MCScintStep")
+MCScint::MCScint()
+  : TClonesArray("MCScintStep")
 {
   fVolumeId = 0;
 
@@ -21,7 +22,7 @@ ClassImp(MCScint)
 }
 
 MCScint::MCScint(int id)
-    : TClonesArray("MCScintStep")
+  : TClonesArray("MCScintStep")
 {
   fVolumeId = id;
 
@@ -34,7 +35,7 @@ MCScint::MCScint(int id)
 }
 
 MCScint::MCScint(const MCScint & scint)
-    : TClonesArray(scint)
+  : TClonesArray(scint)
 {
   fVolumeId = scint.GetVolumeId();
 
@@ -46,24 +47,32 @@ MCScint::MCScint(const MCScint & scint)
 
 MCScint::~MCScint() {}
 
-MCScintStep * MCScint::AddStep() { return new ((*this)[fNStep++]) MCScintStep(); }
+MCScintStep * MCScint::AddStep()
+{
+  return new ((*this)[fNStep++]) MCScintStep();
+}
 
 void MCScint::Clear(const Option_t * opt)
 {
+  // Scint
+  fEdep = 0;
+  fEdepQuenched = 0;
+  fNScintPhoton = 0;
+
   fNStep = 0;
   Delete();
 }
 
-void MCScint::print(const Option_t * opt) const
+void MCScint::Print(const Option_t * opt) const
 {
-  cout << Form("   Deposit Energy    = %6.3f [MeV]", GetEnergyDeposit())
+  cout << Form("Volume: %d ", fVolumeId) << endl;
+  cout << Form("   Deposit Energy    = %.6f [MeV]", GetEnergyDeposit())
        << endl;
-  cout << Form("   Visible Energy    = %6.3f [MeV]", GetEnergyVisible())
+  cout << Form("   Visible Energy    = %.6f [MeV]", GetEnergyVisible())
        << endl;
   cout << Form("   # of Scint Photon = %d         ", GetNScintPhoton()) << endl;
 
   if (GetNStep() > 0) {
-    cout << Form("   # of Scint Step   = %d         ", GetNStep())
-         << endl;
+    cout << Form("   # of Scint Step   = %d         ", GetNStep()) << endl;
   }
 }

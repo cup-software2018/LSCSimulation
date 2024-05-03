@@ -27,7 +27,7 @@ public:
   int GetNStep() const;
   MCScintStep * GetStep(int i) const;
 
-  virtual void print(const Option_t * opt = "") const;
+  virtual void Print(const Option_t * opt = "") const;
 
 private:
   int fVolumeId;

@@ -13,9 +13,11 @@ public:
   virtual void Clear(const Option_t * opt = "");
 
   MCScint * Add();
+  MCScint * Add(int id);
 
   int GetN() const;
   MCScint * Get(int i) const;
+  MCScint * FindScint(int id);
 
   virtual void Print(const Option_t * opt = "") const;
 

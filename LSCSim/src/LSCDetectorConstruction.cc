@@ -127,18 +127,18 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
       new G4PVPlacement(0, G4ThreeVector(), BufferTankLog, "BufferTankPhys",
                         WorldLog, false, fGeomCheck);
 
-  auto BufferTubs = new G4Tubs("BufferTubs", 0, bufferR - bufferT,
+  auto BufferLiquidTubs = new G4Tubs("BufferLiquidTubs", 0, bufferR - bufferT,
                                bufferH / 2 - bufferT, 0, 360 * deg);
-  auto BufferLog = new G4LogicalVolume(
-      BufferTubs, G4Material::GetMaterial("Water"), "BufferLog", 0, 0, 0);
-  BufferLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto BufferPhys =
-      new G4PVPlacement(0, G4ThreeVector(), BufferLog, "BufferPhys",
+  auto BufferLiquidLog = new G4LogicalVolume(
+      BufferLiquidTubs, G4Material::GetMaterial("Water"), "BufferLog", 0, 0, 0);
+  BufferLiquidLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  auto BufferLiquidPhys =
+      new G4PVPlacement(0, G4ThreeVector(), BufferLiquidLog, "BufferLiquidPhys",
                         BufferTankLog, false, fGeomCheck);
 
-  new G4LogicalBorderSurface("buffer_logsurf1", BufferTankPhys, BufferPhys,
+  new G4LogicalBorderSurface("buffer_logsurf1", BufferTankPhys, BufferLiquidPhys,
                              Stainless_opsurf);
-  new G4LogicalBorderSurface("buffer_logsurf2", BufferPhys, BufferTankPhys,
+  new G4LogicalBorderSurface("buffer_logsurf2", BufferLiquidPhys, BufferTankPhys,
                              Stainless_opsurf);
 
   // Target
@@ -154,15 +154,15 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   // TargetTankLog->SetVisAttributes(G4VisAttributes::GetInvisible());
   auto TargetTankPhys =
       new G4PVPlacement(0, G4ThreeVector(), TargetTankLog, "TargetTankPhys",
-                        BufferLog, false, fGeomCheck);
+                        BufferLiquidLog, false, fGeomCheck);
 
-  auto TargetTubs = new G4Tubs("TargetTubs", 0, targetR - targetT,
+  auto TargetLSTubs = new G4Tubs("TargetLSTubs", 0, targetR - targetT,
                                targetH / 2 - targetT, 0, 360 * deg);
-  auto TargetLog = new G4LogicalVolume(
-      TargetTubs, G4Material::GetMaterial("LS_LAB"), "TargetLog", 0, 0, 0);
-  TargetLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto TargetPhys =
-      new G4PVPlacement(0, G4ThreeVector(), TargetLog, "TargetPhys",
+  auto TargetLSLog = new G4LogicalVolume(
+      TargetLSTubs, G4Material::GetMaterial("LS_LAB"), "TargetLSLog", 0, 0, 0);
+  TargetLSLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  auto TargetLSPhys =
+      new G4PVPlacement(0, G4ThreeVector(), TargetLSLog, "TargetLSPhys",
                         TargetTankLog, false, fGeomCheck);
 
   ///////////////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
     G4ThreeVector pmtpos(coord_x, coord_y, coord_z);
 
     new G4PVPlacement(PMT_rotation, pmtpos, PMTname, _logiInnerPMT20,
-                      BufferPhys, false, pmtno - 1, fGeomCheck);
+                      BufferLiquidPhys, false, pmtno - 1, fGeomCheck);
   }
 
   return WorldPhys;

@@ -8,6 +8,7 @@
 #define __GLG4PosGen_h__ 1
 
 #include "globals.hh"
+#include "G4ThreeVector.hh"
 #include "G4GeometryTolerance.hh"
 
 class G4PrimaryVertex;
