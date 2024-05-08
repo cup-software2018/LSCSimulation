@@ -227,15 +227,7 @@ void LSCPhysicsList::AddParameterisation()
   while ((*theParticleIterator)()) {
     G4ParticleDefinition * particle = theParticleIterator->value();
     G4ProcessManager * pmanager = particle->GetProcessManager();
-    // both postStep and alongStep action are required if the detector
-    // makes use of ghost volumes. If no ghost, the postStep
-    // is sufficient (and faster?).
-#define Cup_USES_GHOST_VOLUMES 0
-#if Cup_USES_GHOST_VOLUMES
-    pmanager->AddProcess(theFastSimulationManagerProcess, -1, 1, 1);
-#else
     pmanager->AddProcess(theFastSimulationManagerProcess, -1, -1, 1);
-#endif
   }
 }
 

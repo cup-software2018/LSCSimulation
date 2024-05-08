@@ -34,9 +34,7 @@ private:
 
   void ConstructMaterials();
   G4VPhysicalVolume * ConstructDetector();
-  G4LogicalVolume * BuildCylindricalPMT(G4double pmtradius, G4double pmtlength,
-                                        LSCPMTSD * detector);
-
+  
   // Optical surface
   G4OpticalSurface * Photocathode_opsurf;
   G4OpticalSurface * Stainless_opsurf;
