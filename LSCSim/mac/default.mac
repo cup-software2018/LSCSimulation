@@ -4,22 +4,23 @@
 /tracking/storeTrajectory 1
 
 /LSC/det/geomcheck true
-/LSC/det/geometrydata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/geometry.dat
-/LSC/det/materialdata /home/cupsoft/Devs/lscdev/LSCSimulation/LSCSim/data/materials.dat
+/LSC/det/geometrydata /home/cupsoft/Devs/lscdev/LSCSimulation_Develop/LSCSim/data/geometry.dat
+/LSC/det/materialdata /home/cupsoft/Devs/lscdev/LSCSimulation_Develop/LSCSim/data/materials.dat
+/LSC/det/pmtposdata /home/cupsoft/Devs/lscdev/LSCSimulation_Develop/LSCSim/data/pmtpos.dat
 
-/LSC/ROOT/savetrackopt  1
+/LSC/ROOT/savetrackopt  2
+/LSC/ROOT/savestepopt  1
 /LSC/ROOT/savehitphoton 1
 /LSC/ROOT/savescintstep 1
 
 /run/initialize
 
 /LSC/Scintillation/scinton 1
-/LSC/Cerenkov/cerenkov 1
+/LSC/Cerenkov/cerenkovon 1
 
 /process/activate DeferTrackProc
 
 /generator/event_window 5000
 /generator/rates 3 1
-/generator/pos/set 9 "80 0 0"
-/generator/vtx/set 17 "gamma 1 0 0  0.5"
-
+/generator/pos/set 9 "0 0 0"
+/generator/vtx/set 17 "gamma 0 0 0 1"

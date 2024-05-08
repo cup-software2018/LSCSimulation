@@ -29,11 +29,13 @@ public:
   void SetMaterialDataFile(const char * file) { fMaterialDataFile = file; }
 
 private:
-  void ConstructMaterials();
-  G4VPhysicalVolume * ConstructDetector();
-
   // Sensitive Detectors
   static LSCPMTSD * fPmt_SD;
+
+  void ConstructMaterials();
+  G4VPhysicalVolume * ConstructDetector();
+  G4LogicalVolume * BuildCylindricalPMT(G4double pmtradius, G4double pmtlength,
+                                        LSCPMTSD * detector);
 
   // Optical surface
   G4OpticalSurface * Photocathode_opsurf;
