@@ -27,6 +27,7 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImanager.hh"
+
 #include "GLG4Sim/GLG4param.hh"
 #include "LSCSim/LSCPMTSD.hh"
 #include "LSCSim/LSC_PMT_LogicalVolume.hh"
@@ -36,8 +37,8 @@ using namespace std;
 LSCPMTSD * LSCDetectorConstruction::fPmt_SD = NULL;
 
 LSCDetectorConstruction::LSCDetectorConstruction()
-  : G4VUserDetectorConstruction(),
-    G4UImessenger()
+    : G4VUserDetectorConstruction(),
+      G4UImessenger()
 {
   fDetectorDir = new G4UIdirectory("/LSC/det/");
 
@@ -100,70 +101,32 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
     geom_db.ReadFile(fGeometryDataFile.c_str());
   }
 
-  // World (Rock)
-  G4double worldX = cm * geom_db["worldx"];
-  G4double worldY = cm * geom_db["worldy"];
-  G4double worldZ = cm * geom_db["worldz"];
+  // Experimental Hall
+  G4double expHall_x = cm * geom_db["worldx"];
+  G4double expHall_y = cm * geom_db["worldy"];
+  G4double expHall_z = cm * geom_db["worldz"];
 
-  auto WorldBox = new G4Box("WorldBox", worldX / 2, worldY / 2, worldZ / 2);
-  auto WorldLog = new G4LogicalVolume(WorldBox, G4Material::GetMaterial("Rock"),
-                                      "WorldLog", 0, 0, 0);
-  WorldLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto WorldPhys = new G4PVPlacement(0, G4ThreeVector(), WorldLog, "WorldPhys",
-                                     0, false, fGeomCheck);
+  G4Box * ExpHallBox =
+      new G4Box("ExpHallBox", expHall_x / 2, expHall_y / 2, expHall_z / 2);
 
-  // Buffer
-  G4double bufferR = cm * geom_db["buffer_radius"];
-  G4double bufferH = cm * geom_db["buffer_height"];
-  G4double bufferT = cm * geom_db["buffer_tichkness"];
+  G4LogicalVolume * ExpHallLog = new G4LogicalVolume(
+      ExpHallBox, G4Material::GetMaterial("Air"), "ExpHallLog", 0, 0, 0);
 
-  auto BufferTankTubs =
-      new G4Tubs("BufferTankTubs", 0, bufferR, bufferH / 2, 0, 360 * deg);
-  auto BufferTankLog =
-      new G4LogicalVolume(BufferTankTubs, G4Material::GetMaterial("Steel"),
-                          "BufferTankLog", 0, 0, 0);
-  BufferTankLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto BufferTankPhys =
-      new G4PVPlacement(0, G4ThreeVector(), BufferTankLog, "BufferTankPhys",
-                        WorldLog, false, fGeomCheck);
+  G4VPhysicalVolume * ExpHallPhys = new G4PVPlacement(
+      0, G4ThreeVector(), ExpHallLog, "ExpHallPhys", 0, false, fGeomCheck);
 
-  auto BufferLiquidTubs = new G4Tubs("BufferLiquidTubs", 0, bufferR - bufferT,
-                               bufferH / 2 - bufferT, 0, 360 * deg);
-  auto BufferLiquidLog = new G4LogicalVolume(
-      BufferLiquidTubs, G4Material::GetMaterial("Water"), "BufferLog", 0, 0, 0);
-  BufferLiquidLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto BufferLiquidPhys =
-      new G4PVPlacement(0, G4ThreeVector(), BufferLiquidLog, "BufferLiquidPhys",
-                        BufferTankLog, false, fGeomCheck);
+  G4double Test_x = cm * geom_db["testx"];
+  G4double Test_y = cm * geom_db["testy"];
+  G4double Test_z = cm * geom_db["testz"];
 
-  new G4LogicalBorderSurface("buffer_logsurf1", BufferTankPhys, BufferLiquidPhys,
-                             Stainless_opsurf);
-  new G4LogicalBorderSurface("buffer_logsurf2", BufferLiquidPhys, BufferTankPhys,
-                             Stainless_opsurf);
+  G4Box * TestBox = new G4Box("TestBox", Test_x / 2, Test_y / 2, Test_z / 2);
 
-  // Target
-  G4double targetR = cm * geom_db["target_radius"];
-  G4double targetH = cm * geom_db["target_height"];
-  G4double targetT = cm * geom_db["target_tichkness"];
+  G4LogicalVolume * TestLog = new G4LogicalVolume(
+      TestBox, G4Material::GetMaterial("LS_LAB"), "TestLog", 0, 0, 0);
 
-  auto TargetTankTubs =
-      new G4Tubs("TargetTankTubs", 0, targetR, targetH / 2, 0, 360 * deg);
-  auto TargetTankLog =
-      new G4LogicalVolume(TargetTankTubs, G4Material::GetMaterial("Acrylic"),
-                          "TargetTankLog", 0, 0, 0);
-  // TargetTankLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto TargetTankPhys =
-      new G4PVPlacement(0, G4ThreeVector(), TargetTankLog, "TargetTankPhys",
-                        BufferLiquidLog, false, fGeomCheck);
-
-  auto TargetLSTubs = new G4Tubs("TargetLSTubs", 0, targetR - targetT,
-                               targetH / 2 - targetT, 0, 360 * deg);
-  auto TargetLSLog = new G4LogicalVolume(
-      TargetLSTubs, G4Material::GetMaterial("LS_LAB"), "TargetLSLog", 0, 0, 0);
-  TargetLSLog->SetVisAttributes(G4VisAttributes::GetInvisible());
-  auto TargetLSPhys =
-      new G4PVPlacement(0, G4ThreeVector(), TargetLSLog, "TargetLSPhys",
-                        TargetTankLog, false, fGeomCheck);
+  G4VPhysicalVolume * TestPhys =
+      new G4PVPlacement(0, G4ThreeVector(), TestLog, "TargetLSPhys", ExpHallLog,
+                        false, fGeomCheck);
 
   ///////////////////////////////////////////////////////////////////////////
   // --- PMT sensitive detector
@@ -172,69 +135,80 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   LSCPMTSD * pmtSDInner = new LSCPMTSD("/LSC/PMT/inner");
   fSDman->AddNewDetector(pmtSDInner);
 
-  ///////////////////////////////////////////////////////////////////////////
-  // --- make the fundamental inner  PMT assembly
-  ///////////////////////////////////////////////////////////////////////////
-  auto _logiInnerPMT20 = new LSC_20inch_LogicalVolume(
-      "InnerPMT", G4Material::GetMaterial("Water"),
-      G4Material::GetMaterial("Glass"), Photocathode_opsurf,
-      G4Material::GetMaterial("PMT_Vac"), G4Material::GetMaterial("Steel"),
-      nullptr,
-      pmtSDInner); // sensitive detector hook
+  // simple 2" pmt with PMT sensitive detector, no using fast simulation
+  G4LogicalVolume * apmt = BuildCylindricalPMT(51.8, 200, pmtSDInner);
 
-  if (fPMTPositionDataFile.empty()) {
-    G4String msg = "Error, pmt position data file could not be opened.\n";
-    G4cerr << msg << G4endl;
-    G4Exception("LSCDetectorConstruction::LSCDetectorConstruction", "",
-                FatalException, msg);
-  }
+  new G4PVPlacement(0, G4ThreeVector(), "PMTPhys_0", apmt,
+                    TestPhys, // physical parent
+                    false, 0, fGeomCheck);
+  
+  return ExpHallPhys;
+}
 
-  char PMTname[64];
+G4LogicalVolume * LSCDetectorConstruction::BuildCylindricalPMT(
+    G4double pmtradius, G4double pmtlength, LSCPMTSD * detector)
+{
+  //****************** Build PMTs
+  G4double ShieldThickness = 1. * mm;
 
-  double coord_x, coord_y, coord_z;
-  int pmtno, nring, region;
+  G4Tubs * PmtTubs = new G4Tubs("PmtTubs", 0.0, pmtradius, pmtlength / 2,
+                                0. * deg, 360. * deg);
 
-  string line;
-  ifstream pmtposfile(fPMTPositionDataFile.c_str());
-  while (getline(pmtposfile, line)) {
-    if (line.empty() || line[0] == '#') continue;
+  pmtradius = pmtradius - ShieldThickness;
 
-    istringstream sline(line);
-    sline >> pmtno >> coord_x >> coord_y >> coord_z >> nring >> region;
+  G4LogicalVolume * PmtLog = new G4LogicalVolume(
+      PmtTubs, G4Material::GetMaterial("Steel"), "PmtLog", 0, 0, 0);
 
-    // coord_x *= cm;
-    // coord_y *= cm;
-    // coord_z *= cm;
+  G4double pmtglasslength = pmtlength / 2.;
+  G4Tubs * PmtGlassTubs = new G4Tubs("PmtGlassTubs", 0.0, pmtradius,
+                                     pmtglasslength / 2, 0. * deg, 360. * deg);
 
-    sprintf(PMTname, "InnerPMTPhys%d", pmtno);
+  G4LogicalVolume * PmtGlassLog = new G4LogicalVolume(
+      PmtGlassTubs, G4Material::GetMaterial("Glass"), "PmtGlassLog", 0, 0, 0);
 
-    G4double r =
-        sqrt(coord_x * coord_x + coord_y * coord_y + coord_z * coord_z);
-    G4double dx = -coord_x / r;
-    G4double dy = -coord_y / r;
-    G4double dz = -coord_z / r;
+  // PmtGlassLog->SetVisAttributes(fRedVisSolid);
 
-    double angle_z = atan2(dx, dy);
-    double angle_x = atan2(dz, sqrt(dx * dx + dy * dy));
+  G4double pmtglassthickness = 3. * mm;
+  G4double pmtvacuumradius = pmtradius - pmtglassthickness;
+  G4double pmtvacuumlength = pmtglasslength - 2 * pmtglassthickness;
 
-    if (region != 0) {
-      // top or bottom PMTs
-      double normal_angle = (region > 0 ? -M_PI / 2 : M_PI / 2);
-      angle_x = normal_angle;
-    }
-    else {
-      angle_x = 0;
-    }
+  G4Tubs * PmtVacuumTubs =
+      new G4Tubs("PmtVacuumTubs", 0.0, pmtvacuumradius, pmtvacuumlength / 2,
+                 0. * deg, 360. * deg);
 
-    auto PMT_rotation = new G4RotationMatrix();
-    PMT_rotation->rotateZ(angle_z);
-    PMT_rotation->rotateX(M_PI / 2.0 - angle_x);
+  G4LogicalVolume * PmtVacuumLog =
+      new G4LogicalVolume(PmtVacuumTubs, G4Material::GetMaterial("PMT_Vac"),
+                          "PmtVacuumLog", 0, 0, 0);
 
-    G4ThreeVector pmtpos(coord_x, coord_y, coord_z);
+  new G4PVPlacement(0, G4ThreeVector(0, 0, 0), PmtVacuumLog, "PmtVacuumPhys",
+                    PmtGlassLog, false, 0, fGeomCheck);
 
-    new G4PVPlacement(PMT_rotation, pmtpos, PMTname, _logiInnerPMT20,
-                      BufferLiquidPhys, false, pmtno - 1, fGeomCheck);
-  }
+  new G4PVPlacement(0, G4ThreeVector(0, 0, (pmtlength - pmtglasslength) / 2.),
+                    PmtGlassLog, "PmtGlassPhys", PmtLog, false, 0, fGeomCheck);
 
-  return WorldPhys;
+  G4double frontThickness = pmtglassthickness;
+  G4double cathodThickness = 10. * mm;
+  G4double cathodRadius = pmtvacuumradius;
+
+  G4Tubs * PhotocathodeTubs =
+      new G4Tubs("PhotocathodeTubs", 0.0, cathodRadius, cathodThickness / 2,
+                 0. * deg, 360. * deg);
+
+  G4LogicalVolume * PhotocathodeLog = new G4LogicalVolume(
+      PhotocathodeTubs, G4Material::GetMaterial("photocathode"),
+      "PhotocathodeLog");
+  auto RedVisSolid = new G4VisAttributes(G4Colour::Red());
+  RedVisSolid->SetForceSolid(true);
+  PhotocathodeLog->SetVisAttributes(RedVisSolid);
+  PhotocathodeLog->SetSensitiveDetector(detector);
+
+  G4VPhysicalVolume * PhotocathodePhys = new G4PVPlacement(
+      0, G4ThreeVector(0, 0, (pmtvacuumlength - cathodThickness) / 2.),
+      PhotocathodeLog, "PhotocathodePhys", PmtVacuumLog, false, 0, fGeomCheck);
+
+  //**Create logical skin surfaces
+  new G4LogicalSkinSurface("PhotocathodLogSkin", PhotocathodeLog,
+                           Photocathode_opsurf);
+
+  return PmtLog;
 }
