@@ -568,15 +568,11 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
 
   ////////////////////////////////////////////////////////////////
   // FastSimulationModel
-  ////
-  /**  LSCPMTOpticalModel * pmtOpticalModel =  **/
-  // new LSCPMTOpticalModel(GetName() + "_optical_model", body_phys);
-
   // setup optical model
-  //G4Region * body_region = new G4Region(GetName() + "_GLG4_PMTOpticalRegion");
-  //body_region->AddRootLogicalVolume(body_log);
-  //new LSCPMTOpticalModel(GetName() + "_optical_model", body_region, body_log,
-  //                       OpPCSurface);
+  G4Region * body_region = new G4Region(GetName() + "_GLG4_PMTOpticalRegion");
+  body_region->AddRootLogicalVolume(body_log);
+  new LSCPMTOpticalModel(GetName() + "_optical_model", body_region, body_log,
+                         OpPCSurface);
 
   ////////////////////////////////////////////////////////////////
   // Set colors and visibility
