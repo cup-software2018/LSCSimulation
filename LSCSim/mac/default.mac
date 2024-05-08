@@ -16,6 +16,10 @@
 /LSC/Scintillation/scinton 1
 /LSC/Cerenkov/cerenkov 1
 
+/process/activate DeferTrackProc
+
+/generator/event_window 5000
+/generator/rates 3 1
 /generator/pos/set 9 "80 0 0"
 /generator/vtx/set 17 "gamma 1 0 0  0.5"
 
