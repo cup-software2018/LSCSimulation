@@ -79,6 +79,24 @@ public:
   );
 };
 
+
+// Hamamatsu R7081 ("10-inch") PMT with optional face mask
+class LSC_10inch_LogicalVolume : public LSC_PMT_LogicalVolume {
+public:
+  LSC_10inch_LogicalVolume(
+      const G4String & plabel, // label -- subvolume names are derived from this
+      G4Material * ExteriorMat, // material which fills the bounding cylinder
+      G4Material * GlassMat,    // glass material
+      G4OpticalSurface * Photocathode_opsurf, // photocathode surface
+      G4Material * PMT_Vacuum,                // vacuum inside tube
+      G4Material * DynodeMat,                 // dynode material
+      G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
+                            // OK to set MaskMat == NULL for no mask
+      G4VSensitiveDetector * detector // sensitive detector hook
+  );
+};
+
+
 // Hamamatsu R1408 ("8-inch") PMT with optional face mask
 //  (note R5912 and R4558 use same glass envelope, but dynode may be different)
 class LSC_8inch_LogicalVolume : public LSC_PMT_LogicalVolume {

@@ -23,7 +23,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
 #include "G4Tubs.hh"
-#include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImanager.hh"
@@ -41,9 +41,9 @@ LSCDetectorConstruction::LSCDetectorConstruction()
 {
   fDetectorDir = new G4UIdirectory("/LSC/det/");
 
-  fGeomCheck = false;
+  fGeomCheck = 0;
 
-  fGeomCheckOptCmd = new G4UIcmdWithABool("/LSC/det/geomcheck", this);
+  fGeomCheckOptCmd = new G4UIcmdWithAnInteger("/LSC/det/geomcheck", this);
   fMaterialDataFileCmd = new G4UIcmdWithAString("/LSC/det/materialdata", this);
   fGeometryDataFileCmd = new G4UIcmdWithAString("/LSC/det/geometrydata", this);
   fPMTPositionDataFileCmd = new G4UIcmdWithAString("/LSC/det/pmtposdata", this);
@@ -66,7 +66,7 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
                                           G4String newValues)
 {
   if (command == fGeomCheckOptCmd) {
-    istringstream is((const char *)newValues);
+    istringstream is(newValues);
     is >> fGeomCheck;
   }
   if (command == fGeometryDataFileCmd) {
@@ -175,7 +175,7 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   ///////////////////////////////////////////////////////////////////////////
   // --- make the fundamental inner  PMT assembly
   ///////////////////////////////////////////////////////////////////////////
-  auto _logiInnerPMT20 = new LSC_20inch_LogicalVolume(
+  auto _logiInnerPMT = new LSC_10inch_LogicalVolume(
       "InnerPMT", G4Material::GetMaterial("Water"),
       G4Material::GetMaterial("Glass"), Photocathode_opsurf,
       G4Material::GetMaterial("PMT_Vac"), G4Material::GetMaterial("Steel"),
@@ -232,7 +232,7 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
 
     G4ThreeVector pmtpos(coord_x, coord_y, coord_z);
 
-    new G4PVPlacement(PMT_rotation, pmtpos, PMTname, _logiInnerPMT20,
+    new G4PVPlacement(PMT_rotation, pmtpos, PMTname, _logiInnerPMT,
                       BufferLiquidPhys, false, pmtno - 1, fGeomCheck);
   }
 
