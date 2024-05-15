@@ -74,6 +74,7 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
   }
   if (command == fMaterialDataFileCmd) {
     if (fMaterialDataFile.empty()) fMaterialDataFile = newValues;
+    G4cout << fMaterialDataFile << G4endl;
   }
   if (command == fPMTPositionDataFileCmd) {
     if (fPMTPositionDataFile.empty()) fPMTPositionDataFile = newValues;
