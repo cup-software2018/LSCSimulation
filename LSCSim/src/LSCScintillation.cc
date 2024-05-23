@@ -324,18 +324,6 @@ G4VParticleChange * LSCScintillation::PostStepDoIt(const G4Track & aTrack,
   G4double decayfrac1 = 0.;
   G4double decayfrac2 = 0.;
 
-  if (aMaterialPropertiesTable->ConstPropertyExists("DECAYFRACTION1")) {
-    decayfrac1 = aMaterialPropertiesTable->GetConstProperty("DECAYFRACTION1");
-  }
-  if (aMaterialPropertiesTable->ConstPropertyExists("DECAYFRACTION2")) {
-    decayfrac2 = aMaterialPropertiesTable->GetConstProperty("DECAYFRACTION2");
-  }
-
-  if (decayfrac1 > 0 && decayfrac2 > 0) {
-    decayfrac1 = decayfrac1 / (decayfrac1 + decayfrac2);
-  }
-  if (decayfrac1 > 0 && decayfrac2 == 0.) decayfrac1 = 1.;
-
   if (aMaterialPropertiesTable->ConstPropertyExists("RISETIME")) {
     risetime = aMaterialPropertiesTable->GetConstProperty("RISETIME");
   }
@@ -345,11 +333,13 @@ G4VParticleChange * LSCScintillation::PostStepDoIt(const G4Track & aTrack,
   if (aMaterialPropertiesTable->ConstPropertyExists("DECAYTIME2")) {
     decaytime2 = aMaterialPropertiesTable->GetConstProperty("DECAYTIME2");
   }
-
-  if (decaytime1 == 0.) {
-    return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
+  if (aMaterialPropertiesTable->ConstPropertyExists("DECAYFRACTION1")) {
+    decayfrac1 = aMaterialPropertiesTable->GetConstProperty("DECAYFRACTION1");
   }
-  if (decaytime2 == 0.) { decayfrac1 = 1.; }
+  if (aMaterialPropertiesTable->ConstPropertyExists("DECAYFRACTION2")) {
+    decayfrac2 = aMaterialPropertiesTable->GetConstProperty("DECAYFRACTION2");
+  }
+
 
   Num = NumPhotons;
 
