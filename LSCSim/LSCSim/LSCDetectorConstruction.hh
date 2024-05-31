@@ -8,7 +8,7 @@
 
 class G4VPhysicalVolume;
 class G4UIdirectory;
-class G4UIcmdWithABool;
+class G4UIcmdWithAnInteger;
 class G4UIcmdWithAString;
 class LSCPMTSD;
 
@@ -47,7 +47,7 @@ private:
   G4String fPMTPositionDataFile;
 
   G4UIdirectory * fDetectorDir;
-  G4UIcmdWithABool * fGeomCheckOptCmd;
+  G4UIcmdWithAnInteger * fGeomCheckOptCmd;
   G4UIcmdWithAString * fMaterialDataFileCmd;
   G4UIcmdWithAString * fGeometryDataFileCmd;
   G4UIcmdWithAString * fPMTPositionDataFileCmd;

@@ -86,14 +86,21 @@ static const G4double R3600_z_o[R3600_n_edge] = {
 // };
 //
 
+static const int R7081_n_edge = 6;
+static const G4double R7081_z_edge[R7081_n_edge + 1] = {
+    96.7, 40.0, 0.0, -40.0, -90.0, -142.0, -223.3};
+static const G4double R7081_rho_edge[R7081_n_edge + 1] = {
+    0.0, 111.0, 126.5, 111.0, 42.25, 42.25, 42.25};
+static const G4double R7081_z_o[R7081_n_edge] = {-40.0, 0.0,    0.0,
+                                                 40.0,  -142.0, -223.3};
+
 static const int R5912_n_edge = 6;
 static const G4double R5912_z_edge[R5912_n_edge + 1] = {
     75.00, 53.06, 0.00, -53.06, -73.86, -85.00, -215.00};
 static const G4double R5912_rho_edge[R5912_n_edge + 1] = {
     0.00, 72.57, 101.00, 72.57, 44.32, 42.00, 42.00};
-static const G4double R5912_z_o[R5912_n_edge] = {
-    -56.00, 0.00,   0.00,
-    56.00,  -85.00, -215.00 /* includes 20-pin connector at back */};
+static const G4double R5912_z_o[R5912_n_edge] = {-56.00, 0.00,   0.00,
+                                                 56.00,  -85.00, -215.00};
 
 static const int ETI_9372A_n_edge = 5;
 static const G4double ETI_9372A_z_edge[ETI_9372A_n_edge + 1] = {
@@ -274,6 +281,64 @@ LSC_20inch_LogicalVolume::LSC_20inch_LogicalVolume(
     //    G4VisAttributes(G4Color(0.0,0.0,0.0,1.0));
     G4VisAttributes * visAtt = new G4VisAttributes(G4Color(0.8, 0.8, 0.8, 1.0));
     mask_log->SetVisAttributes(visAtt);
+  }
+}
+
+////////////////////////////////////////////////////////////////
+// LSC_10inch_LogicalVolume
+//
+LSC_10inch_LogicalVolume::LSC_10inch_LogicalVolume(
+    const G4String & plabel,  // label -- subvolume names are derived from this
+    G4Material * ExteriorMat, // material which fills the bounding cylinder
+    G4Material * GlassMat,    // glass material
+    G4OpticalSurface * Photocathode_opsurf, // photocathode
+    G4Material * PMT_Vacuum,                // vacuum inside tube
+    G4Material * DynodeMat,                 // dynode material
+    G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
+                          // OK to set MaskMat == NULL for no mask
+    G4VSensitiveDetector * detector // sensitive detector hook
+    )
+  : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 160. * millimeter,
+                          ExteriorMat)
+{
+  ConstructPMT_UsingTorusStack(
+      R7081_n_edge, R7081_z_edge, R7081_rho_edge, R7081_z_o,
+      27.5 * millimeter,   // radius of dynode stack
+      -55.0 * millimeter,  // z coordinate of top of dynode stack, equator=0
+      3. * millimeter,     // thickness of the walls
+      ExteriorMat,         // material outside tube
+      GlassMat,            // glass material
+      Photocathode_opsurf, // photocathode surface
+      PMT_Vacuum,          // tube interior
+      DynodeMat,           // dynode stack metal
+      detector             // detector hook
+  );
+
+  if (MaskMat != NULL) {
+    // make the mask -- use thin cylindrical disk for now
+    G4double r_mask_inner = 96. * millimeter;
+    G4double r_mask_outer = ((G4Tubs *)(this->GetSolid()))
+                                ->GetOuterRadius(); // bounding cylinder size
+    G4double hh_mask = 1.0 * millimeter;            // half height
+
+    G4LogicalVolume * mask_log = new G4LogicalVolume(
+        new G4Tubs(plabel + "_mask_solid",     // name of solid
+                   r_mask_inner, r_mask_outer, // inner and outer radii
+                   hh_mask,             // use flat disk, 2mm thick for now
+                   0. * deg, 360. * deg // start and end span angle
+                   ),
+        MaskMat, plabel + "_mask_log");
+
+    /**    G4PVPlacement* mask_phys =  **/
+    new G4PVPlacement(
+        0, // no rotation
+        G4ThreeVector(0., 0.,
+                      R5912_z_edge[1] + hh_mask + z_equator), // displacement
+        mask_log,                                             // logical volume
+        plabel + "_mask_phys",                                // name
+        this,                                                 // mother volume
+        false,                                                // no boolean ops
+        0);                                                   // copy number
   }
 }
 
