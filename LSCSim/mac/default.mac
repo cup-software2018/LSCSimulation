@@ -1,17 +1,17 @@
-/control/verbose 2
-
+/control/verbose 1
 #/event/verbose 1
+
 /tracking/storeTrajectory 1
 
-/LSC/det/geomcheck true
+/LSC/det/geomcheck 1
 /LSC/det/geometrydata /home/cupsoft/Devs/lscdev/LSCSimulation_Develop/LSCSim/data/geometry.dat
 /LSC/det/materialdata /home/cupsoft/Devs/lscdev/LSCSimulation_Develop/LSCSim/data/materials.dat
 /LSC/det/pmtposdata /home/cupsoft/Devs/lscdev/LSCSimulation_Develop/LSCSim/data/pmtpos.dat
 
-/LSC/ROOT/savetrackopt  2
-/LSC/ROOT/savestepopt  1
+/LSC/ROOT/savetrackopt  0
+/LSC/ROOT/savestepopt  0
 /LSC/ROOT/savehitphoton 1
-/LSC/ROOT/savescintstep 1
+/LSC/ROOT/savescintstep 0
 
 /run/initialize
 

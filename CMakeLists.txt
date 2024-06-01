@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 #
 # Locate the ROOT package
 #
-find_package(ROOT REQUIRED)
+find_package(ROOT)
 include(${ROOT_USE_FILE})
 
 #

@@ -1,0 +1,18 @@
+#
+# all dimension should be in "cm"
+#
+
+# world definition 
+worldx		   300
+worldy		   300
+worldz		   300
+
+buffer_radius 110
+buffer_height 220
+buffer_thickness 0.6
+
+target_radius 60
+target_height 120
+target_thickness 1
+
+

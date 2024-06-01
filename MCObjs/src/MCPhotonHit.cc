@@ -5,8 +5,8 @@ ClassImp(MCPhotonHit)
 MCPhotonHit::MCPhotonHit()
   : TObject()
 {
-  fTime = -1;
-  fKE = -1;
+  fTime = 0;
+  fKE = 0;
 }
 
 MCPhotonHit::MCPhotonHit(const MCPhotonHit & photon)

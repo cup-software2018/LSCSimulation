@@ -3,7 +3,6 @@
 #include "G4MaterialTable.hh"
 #include "G4NistManager.hh"
 #include "G4OpticalSurface.hh"
-
 #include "GLG4Sim/GLG4InputDataReader.hh"
 #include "LSCSim/LSCDetectorConstruction.hh"
 
@@ -297,6 +296,34 @@ void LSCDetectorConstruction::ConstructMaterials()
                       BisMSB_fraction / (1.0 + PPO_fraction + BisMSB_fraction));
 
   LS_LAB->GetIonisation()->SetBirksConstant(0.117 * mm / MeV);
+
+  // Pyrene
+  density = 1.271 * g / cm3;
+  nelements = 2;
+  auto Pyrene = new G4Material("Pyrene", density, nelements);
+
+  Pyrene->SetChemicalFormula("FLUOR");
+  Pyrene->AddElement(elementC, 16);
+  Pyrene->AddElement(elementH, 10);
+
+  mol = elementC->GetA() * 16 + elementH->GetA() * 12;
+  MPT = new G4MaterialPropertiesTable();
+  MPT->AddConstProperty("MOL", mol / g, true);
+  Pyrene->SetMaterialPropertiesTable(MPT);
+
+  density = 0.86 * g / cm3;
+  nelements = 7;
+  auto Pyrene_LS = new G4Material(name = "Pyrene_LS", density, nelements);
+
+  G4double Pyrene_fraction = 10 * g / (m3 * density);
+  Pyrene_LS->AddMaterial(LAB[0], 0.0047 / (1.0 + Pyrene_fraction));
+  Pyrene_LS->AddMaterial(LAB[1], 0.097 / (1.0 + Pyrene_fraction));
+  Pyrene_LS->AddMaterial(LAB[2], 0.3385 / (1.0 + Pyrene_fraction));
+  Pyrene_LS->AddMaterial(LAB[3], 0.3472 / (1.0 + Pyrene_fraction));
+  Pyrene_LS->AddMaterial(LAB[4], 0.2083 / (1.0 + Pyrene_fraction));
+  Pyrene_LS->AddMaterial(LAB[5], 0.0043 / (1.0 + Pyrene_fraction));
+  Pyrene_LS->AddMaterial(Pyrene, Pyrene_fraction / (1.0 + Pyrene_fraction));
+  Pyrene_LS->GetIonisation()->SetBirksConstant(0.117 * mm / MeV);
 
   //***Material properties tables
   std::ifstream ifs;

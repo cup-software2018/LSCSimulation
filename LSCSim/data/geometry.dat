@@ -1,21 +1,33 @@
 #
 # all dimension should be in "cm"
+# angle in "deg"
 #
 
 # world definition 
-worldx		   3000
-worldy		   3000
-worldz		   3000
+worldx		          10000
+worldy		          10000
+worldz		          10000
 
-pit_radius 1000
-pit_height 2000
+cavern_arch_radius    3125
+cavern_arch_height    2200
+cavern_arch_thickness 200
+cavern_arch_angle     20.6096924
+cavern_height         800
 
-buffer_radius 850
-buffer_height 1700
-buffer_thickness 2.5
+tunnel_radius         500
+tunnel_height         2000
 
-target_radius 700
-target_height 1400
-target_thickness 6
+pit_radius            1000
+pit_height            2000
 
+veto_radius           975
+veto_height           2000
+veto_thickness        2.5 #.5
 
+buffer_radius         850
+buffer_height         1700
+buffer_thickness      5
+
+target_radius         700
+target_height         1400
+target_thickness      6

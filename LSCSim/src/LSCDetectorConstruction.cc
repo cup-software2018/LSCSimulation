@@ -23,7 +23,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
 #include "G4Tubs.hh"
-#include "G4UIcmdWithABool.hh"
+#include "G4UnionSolid.hh"
+#include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImanager.hh"
@@ -41,9 +42,9 @@ LSCDetectorConstruction::LSCDetectorConstruction()
 {
   fDetectorDir = new G4UIdirectory("/LSC/det/");
 
-  fGeomCheck = false;
+  fGeomCheck = 0;
 
-  fGeomCheckOptCmd = new G4UIcmdWithABool("/LSC/det/geomcheck", this);
+  fGeomCheckOptCmd = new G4UIcmdWithAnInteger("/LSC/det/geomcheck", this);
   fMaterialDataFileCmd = new G4UIcmdWithAString("/LSC/det/materialdata", this);
   fGeometryDataFileCmd = new G4UIcmdWithAString("/LSC/det/geometrydata", this);
   fPMTPositionDataFileCmd = new G4UIcmdWithAString("/LSC/det/pmtposdata", this);
@@ -66,7 +67,7 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
                                           G4String newValues)
 {
   if (command == fGeomCheckOptCmd) {
-    istringstream is((const char *)newValues);
+    istringstream is(newValues);
     is >> fGeomCheck;
   }
   if (command == fGeometryDataFileCmd) {
@@ -74,6 +75,7 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command,
   }
   if (command == fMaterialDataFileCmd) {
     if (fMaterialDataFile.empty()) fMaterialDataFile = newValues;
+    G4cout << fMaterialDataFile << G4endl;
   }
   if (command == fPMTPositionDataFileCmd) {
     if (fPMTPositionDataFile.empty()) fPMTPositionDataFile = newValues;
@@ -104,34 +106,122 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   G4double worldX = cm * geom_db["worldx"];
   G4double worldY = cm * geom_db["worldy"];
   G4double worldZ = cm * geom_db["worldz"];
-
   auto WorldBox = new G4Box("WorldBox", worldX / 2, worldY / 2, worldZ / 2);
   auto WorldLog = new G4LogicalVolume(WorldBox, G4Material::GetMaterial("Rock"),
                                       "WorldLog", 0, 0, 0);
   WorldLog->SetVisAttributes(G4VisAttributes::GetInvisible());
   auto WorldPhys = new G4PVPlacement(0, G4ThreeVector(), WorldLog, "WorldPhys",
-                                     0, false, fGeomCheck);
+                                     0, false, 0, fGeomCheck);
+
+  // Pit
+  G4double pitR = cm * geom_db["pit_radius"];
+  G4double pitH = cm * geom_db["pit_height"];
+  auto PitTubs = new G4Tubs("PitTubs", 0, pitR, pitH / 2, 0, 360 * deg);
+
+  // Tunnel
+  G4double tunnelR = cm * geom_db["tunnel_radius"];
+  G4double tunnelH = cm * geom_db["tunnel_height"];
+  auto TunnelTubs = new G4Tubs("TunnelTubs", 0, tunnelR, tunnelH / 2, 
+                                0*deg, 180*deg);
+
+  auto TunnelRot = new G4RotationMatrix();
+  TunnelRot->rotateX(-90 * deg);
+  auto PitUni = new G4UnionSolid("PitUni_1", PitTubs, TunnelTubs, TunnelRot, 
+                  G4ThreeVector(0, TunnelTubs->GetZHalfLength()*1.8, pitH/2));
+  TunnelRot->rotateX(180 * deg); 
+  TunnelRot->rotateZ(90 * deg);
+  PitUni = new G4UnionSolid("PitUni_2", PitUni, TunnelTubs, 
+                        G4Transform3D(*TunnelRot, G4ThreeVector(
+                          TunnelTubs->GetZHalfLength()*1.8, 0, pitH/2-tunnelR)));
+  TunnelRot->rotateY(-10 * deg);
+  TunnelRot->rotateZ(-135 * deg);
+  PitUni = new G4UnionSolid("PitUni_3", PitUni, TunnelTubs, 
+                        G4Transform3D(*TunnelRot, G4ThreeVector(
+                          -pitR*1.25, -pitR*1.25, -pitH/2+tunnelR/2)));
+  // Cavern (Top)
+  G4double cavernR = cm * geom_db["cavern_arch_radius"];
+  G4double cavernH = cm * geom_db["cavern_arch_height"];
+  G4double cavernT = cm * geom_db["cavern_arch_tichkness"];
+  G4double cavernA = deg * geom_db["cavern_arch_angle"];
+  auto CavernTubs = 
+      new G4Tubs("CavernTubs", cavernR-cavernH/8, cavernR, cavernH / 2, 
+                  0*deg, cavernA*2);
+
+  // Cavern (Bottom)
+  G4double cavernX = cm * geom_db["cavern_arch_height"];
+  G4double cavernY = cm * geom_db["cavern_arch_height"];
+  G4double cavernZ = cm * geom_db["cavern_height"];
+  auto CavernBox = 
+      new G4Box("CavernBox", cavernX/2, cavernY/2, (cavernZ-cavernT)/2.);
+  auto CavernRot = new G4RotationMatrix();
+  CavernRot->rotateZ( -cavernA );
+  CavernRot->rotateY( -90 * deg );
+
+  // Cavern (Union of pit, tunnel, top and bottom caverns)
+  auto CavernUni = new G4UnionSolid("CavernUni", CavernBox, CavernTubs,
+                        G4Transform3D(*CavernRot, G4ThreeVector(
+                        0, 0, CavernBox->GetZHalfLength() - (cavernR-cavernH/10) )));
+  CavernUni = new G4UnionSolid("CavernUni", PitUni, CavernUni,0, G4ThreeVector(
+                        0, 0, pitH/2. + CavernBox->GetZHalfLength()));
+  auto CavernLog = new G4LogicalVolume(CavernUni, G4Material::GetMaterial("Air"),
+                          "CavernLog", 0, 0, 0);
+  CavernLog->SetVisAttributes(G4Colour::Gray());
+  auto CavernPhys = new G4PVPlacement(0, G4ThreeVector(), CavernLog, "CavernPhys",
+                        WorldLog, false, 0, fGeomCheck);
+
+  // Veto
+  G4double vetoR = cm * geom_db["veto_radius"];
+  G4double vetoH = cm * geom_db["veto_height"];
+  G4double vetoT = cm * geom_db["veto_tichkness"];
+  auto VetoTankTubs =
+      new G4Tubs("VetoTankTubs", 0, vetoR, vetoH / 2, 0, 360 * deg);
+  auto VetoTankLog = 
+      new G4LogicalVolume(VetoTankTubs, G4Material::GetMaterial("Steel"),
+                          "VetoTankLog", 0, 0, 0);
+  VetoTankLog->SetVisAttributes(G4Colour::Black());
+  auto VetoTankPhys = 
+      new G4PVPlacement(0, G4ThreeVector(), VetoTankLog, "VetoTankPhys",
+                        CavernLog, false, 0, fGeomCheck);
+  
+  auto VetoLiquidTubs = 
+      new G4Tubs("VetoLiquidTubs", 0, vetoR - vetoT, vetoH / 2 - vetoT, 
+                  0, 360 * deg);
+  auto VetoLiquidLog = 
+      new G4LogicalVolume(VetoLiquidTubs, G4Material::GetMaterial("Water"),
+                          "VetoLiquidLog", 0, 0, 0);
+  VetoLiquidLog->SetVisAttributes(G4Colour(0, 0, 1, 0.1));
+  auto VetoLiquidPhys = 
+      new G4PVPlacement(0, G4ThreeVector(), VetoLiquidLog, "VetoLiquidPhys",
+                        VetoTankLog, false, 0, fGeomCheck);
+
+  new G4LogicalBorderSurface("veto_logsurf1", VetoTankPhys, VetoLiquidPhys,
+                             Stainless_opsurf);
+  new G4LogicalBorderSurface("veto_logsurf2", VetoLiquidPhys, VetoTankPhys,
+                             Stainless_opsurf);
 
   // Buffer
   G4double bufferR = cm * geom_db["buffer_radius"];
   G4double bufferH = cm * geom_db["buffer_height"];
   G4double bufferT = cm * geom_db["buffer_tichkness"];
-
   auto BufferTankTubs =
       new G4Tubs("BufferTankTubs", 0, bufferR, bufferH / 2, 0, 360 * deg);
   auto BufferTankLog =
       new G4LogicalVolume(BufferTankTubs, G4Material::GetMaterial("Steel"),
                           "BufferTankLog", 0, 0, 0);
-  BufferTankLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  // BufferTankLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  BufferTankLog->SetVisAttributes(G4Colour::Black());
   auto BufferTankPhys =
       new G4PVPlacement(0, G4ThreeVector(), BufferTankLog, "BufferTankPhys",
                         WorldLog, false, fGeomCheck);
 
-  auto BufferLiquidTubs = new G4Tubs("BufferLiquidTubs", 0, bufferR - bufferT,
-                               bufferH / 2 - bufferT, 0, 360 * deg);
-  auto BufferLiquidLog = new G4LogicalVolume(
-      BufferLiquidTubs, G4Material::GetMaterial("Water"), "BufferLog", 0, 0, 0);
-  BufferLiquidLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  auto BufferLiquidTubs = 
+      new G4Tubs("BufferLiquidTubs", 0, bufferR - bufferT, bufferH / 2 - bufferT, 
+                  0, 360 * deg);
+  auto BufferLiquidLog = 
+      new G4LogicalVolume(BufferLiquidTubs, G4Material::GetMaterial("Water"), 
+                          "BufferLog", 0, 0, 0);
+  // BufferLiquidLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  BufferLiquidLog->SetVisAttributes(G4Colour(0, 0, 1, 0.1)); //blue
   auto BufferLiquidPhys =
       new G4PVPlacement(0, G4ThreeVector(), BufferLiquidLog, "BufferLiquidPhys",
                         BufferTankLog, false, fGeomCheck);
@@ -152,6 +242,7 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
       new G4LogicalVolume(TargetTankTubs, G4Material::GetMaterial("Acrylic"),
                           "TargetTankLog", 0, 0, 0);
   // TargetTankLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  TargetTankLog->SetVisAttributes(G4Colour(1, 1, 1, 0.1)); //white
   auto TargetTankPhys =
       new G4PVPlacement(0, G4ThreeVector(), TargetTankLog, "TargetTankPhys",
                         BufferLiquidLog, false, fGeomCheck);
@@ -159,8 +250,9 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   auto TargetLSTubs = new G4Tubs("TargetLSTubs", 0, targetR - targetT,
                                targetH / 2 - targetT, 0, 360 * deg);
   auto TargetLSLog = new G4LogicalVolume(
-      TargetLSTubs, G4Material::GetMaterial("LS_LAB"), "TargetLSLog", 0, 0, 0);
-  TargetLSLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+      TargetLSTubs, G4Material::GetMaterial("Pyrene_LS"), "TargetLSLog", 0, 0, 0);
+  // TargetLSLog->SetVisAttributes(G4VisAttributes::GetInvisible());
+  TargetLSLog->SetVisAttributes(G4Colour(0, 1, 0, 0.1)); //green
   auto TargetLSPhys =
       new G4PVPlacement(0, G4ThreeVector(), TargetLSLog, "TargetLSPhys",
                         TargetTankLog, false, fGeomCheck);
@@ -201,10 +293,6 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
 
     istringstream sline(line);
     sline >> pmtno >> coord_x >> coord_y >> coord_z >> nring >> region;
-
-    // coord_x *= cm;
-    // coord_y *= cm;
-    // coord_z *= cm;
 
     sprintf(PMTname, "InnerPMTPhys%d", pmtno);
 

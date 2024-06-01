@@ -26,7 +26,7 @@ public:
 
 private:
   int fPMTId;
-  int fNHit;
+  int fNHit; //!
 
   ClassDef(MCPMT, 1);
 };
