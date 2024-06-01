@@ -250,7 +250,7 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   auto TargetLSTubs = new G4Tubs("TargetLSTubs", 0, targetR - targetT,
                                targetH / 2 - targetT, 0, 360 * deg);
   auto TargetLSLog = new G4LogicalVolume(
-      TargetLSTubs, G4Material::GetMaterial("Pyrene_LS"), "TargetLSLog", 0, 0, 0);
+      TargetLSTubs, G4Material::GetMaterial("LS_LAB"), "TargetLSLog", 0, 0, 0);
   // TargetLSLog->SetVisAttributes(G4VisAttributes::GetInvisible());
   TargetLSLog->SetVisAttributes(G4Colour(0, 1, 0, 0.1)); //green
   auto TargetLSPhys =
