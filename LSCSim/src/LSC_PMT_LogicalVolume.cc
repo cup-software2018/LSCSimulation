@@ -67,7 +67,7 @@ LSC_PMT_LogicalVolume::LSC_PMT_LogicalVolume(
 static const int R3600_n_edge = 9;
 static const G4double R3600_z_edge[R3600_n_edge + 1] = {
     188.00,  116.71,  0.00,    -116.71, -136.05,
-    -195.00, -282.00, -355.00, -370.00, -422.00};
+    -195.00, -282.00, -355.00, -370.00, -492.00};
 static const G4double R3600_rho_edge[R3600_n_edge + 1] = {
     0.00, 198.55, 254.00, 198.55, 165.40, 127.00, 127.00, 53.00, 41.35, 41.35};
 static const G4double R3600_z_o[R3600_n_edge] = {

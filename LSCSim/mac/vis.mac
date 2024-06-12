@@ -1,5 +1,5 @@
 # Open a viewer
-/vis/open OGL
+/vis/open OGL 800x800
 
 # This opens the default viewer - see examples/basic/B1/vis.mac for a
 # more comprehensive overview of options. Also the documentation.

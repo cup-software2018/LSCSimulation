@@ -197,6 +197,12 @@ OPTION wavelength
 200 0.01
 800 0.01
 
+PROPERTY  EFFICIENCY
+# UNITS  nm\E 1 	
+OPTION wavelength
+200 0.0
+800 0.0
+
 
 ########################################
 MATERIAL  "photocathode"

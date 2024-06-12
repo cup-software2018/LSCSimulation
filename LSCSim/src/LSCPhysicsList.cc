@@ -420,30 +420,97 @@ void LSCPhysicsList::ConstructEM()
 
 void LSCPhysicsList::ConstructOp()
 {
-  // EJ: start
+  G4ProcessManager * pManager =
+      G4OpticalPhoton::OpticalPhoton()->GetProcessManager();
+  if (!pManager) {
+    G4ExceptionDescription ed;
+    ed << "Optical Photon without a Process Manager";
+    G4Exception("G4OpticalPhysics::ConstructProcess()", "", FatalException, ed);
+    return;
+  }
+
+  LSCOpAttenuation * attenuation = new LSCOpAttenuation();
+  attenuation->UseTimeProfile("exponential");
+  attenuation->SetVerboseLevel(OpVerbLevel);
+  pManager->AddDiscreteProcess(attenuation);
+
+  G4OpBoundaryProcess * boundary = new G4OpBoundaryProcess();
+  boundary->SetVerboseLevel(OpVerbLevel);
+  pManager->AddDiscreteProcess(boundary);
+
   // scintillation process
-  LSCScintillation * theScintProcess = new LSCScintillation("Scintillation");
-  theScintProcess->SetTrackSecondariesFirst(true);
-  theScintProcess->SetScintillationYieldFactor(1.0);     //
-  theScintProcess->SetScintillationExcitationRatio(0.0); //
-  theScintProcess->SetVerboseLevel(OpVerbLevel);
+  LSCScintillation * scint = new LSCScintillation("Scintillation");
+  scint->SetTrackSecondariesFirst(true);
+  scint->SetScintillationYieldFactor(1.0);
+  scint->SetScintillationExcitationRatio(0.0);
+  scint->SetVerboseLevel(OpVerbLevel);
 
   G4EmSaturation * emSaturation =
       G4LossTableManager::Instance()->EmSaturation();
-  theScintProcess->AddSaturation(emSaturation);
-
-  // optical processes
-  LSCOpAttenuation * theAttenuationProcess = new LSCOpAttenuation();
-  theAttenuationProcess->UseTimeProfile("exponential");
-  theAttenuationProcess->SetVerboseLevel(OpVerbLevel);
-
-  G4OpBoundaryProcess * theBoundaryProcess = new G4OpBoundaryProcess();
-  theBoundaryProcess->SetVerboseLevel(OpVerbLevel);
+  scint->AddSaturation(emSaturation);
 
   // Cerenkov
-  // G4Cerenkov * theCerenkovProcess = new G4Cerenkov();
-  auto theCerenkovProcess = new LSCCerenkov();
-  theCerenkovProcess->SetTrackSecondariesFirst(true);
+  auto cerenkov = new LSCCerenkov();
+  cerenkov->SetTrackSecondariesFirst(true);
+
+  auto myParticleIterator = GetParticleIterator();
+  myParticleIterator->reset();
+
+  while ((*myParticleIterator)()) {
+    G4ParticleDefinition * particle = myParticleIterator->value();
+    G4String particleName = particle->GetParticleName();
+
+    pManager = particle->GetProcessManager();
+    if (!pManager) {
+      G4ExceptionDescription ed;
+      ed << "Particle " << particleName << "without a Process Manager";
+      G4Exception("G4OpticalPhysics::ConstructProcess()", "", FatalException,
+                  ed);
+      return; // else coverity complains for pManager use below
+    }
+
+    if (cerenkov->IsApplicable(*particle)) {
+      pManager->AddProcess(cerenkov);
+      pManager->SetProcessOrdering(cerenkov, idxPostStep);
+    }
+    if (scint->IsApplicable(*particle)) {
+      pManager->AddProcess(scint);
+      pManager->SetProcessOrderingToLast(scint, idxAtRest);
+      pManager->SetProcessOrderingToLast(scint, idxPostStep);
+    }
+    if (boundary->IsApplicable(*particle)) {
+      pManager->SetProcessOrderingToLast(boundary, idxPostStep);
+    }
+  }
+}
+
+/*
+void LSCPhysicsList::ConstructOp()
+{
+  // EJ: start
+  // scintillation process
+  LSCScintillation * scint = new LSCScintillation("Scintillation");
+  scint->SetTrackSecondariesFirst(true);
+  scint->SetScintillationYieldFactor(1.0);     //
+  scint->SetScintillationExcitationRatio(0.0); //
+  scint->SetVerboseLevel(OpVerbLevel);
+
+  G4EmSaturation * emSaturation =
+      G4LossTableManager::Instance()->EmSaturation();
+  scint->AddSaturation(emSaturation);
+
+  // optical processes
+  LSCOpAttenuation * attenuation = new LSCOpAttenuation();
+  attenuation->UseTimeProfile("exponential");
+  attenuation->SetVerboseLevel(OpVerbLevel);
+
+  G4OpBoundaryProcess * boundary = new G4OpBoundaryProcess();
+  boundary->SetVerboseLevel(OpVerbLevel);
+
+  // Cerenkov
+  // G4Cerenkov * cerenkov = new G4Cerenkov();
+  auto cerenkov = new LSCCerenkov();
+  cerenkov->SetTrackSecondariesFirst(true);
 
   auto theParticleIterator = GetParticleIterator();
   theParticleIterator->reset();
@@ -451,23 +518,24 @@ void LSCPhysicsList::ConstructOp()
     G4ParticleDefinition * particle = theParticleIterator->value();
     G4ProcessManager * pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
-    if (theScintProcess->IsApplicable(*particle)) {
-      pmanager->AddProcess(theScintProcess);
-      pmanager->SetProcessOrderingToLast(theScintProcess, idxAtRest);
-      pmanager->SetProcessOrderingToLast(theScintProcess, idxPostStep);
+    if (scint->IsApplicable(*particle)) {
+      pmanager->AddProcess(scint);
+      pmanager->SetProcessOrderingToLast(scint, idxAtRest);
+      pmanager->SetProcessOrderingToLast(scint, idxPostStep);
     }
-    if (theCerenkovProcess->IsApplicable(*particle)) {
-      pmanager->AddProcess(theCerenkovProcess);
-      pmanager->SetProcessOrdering(theCerenkovProcess, idxPostStep);
+    if (cerenkov->IsApplicable(*particle)) {
+      pmanager->AddProcess(cerenkov);
+      pmanager->SetProcessOrdering(cerenkov, idxPostStep);
     }
 
     if (particleName == "opticalphoton") {
-      pmanager->AddDiscreteProcess(theAttenuationProcess);
-      pmanager->AddDiscreteProcess(theBoundaryProcess);
-      pmanager->SetProcessOrderingToLast(theBoundaryProcess, idxPostStep);
+      pmanager->AddDiscreteProcess(attenuation);
+      pmanager->AddDiscreteProcess(boundary);
+      pmanager->SetProcessOrderingToLast(boundary, idxPostStep);
     }
   }
 }
+*/
 
 // Hadronic processes ////////////////////////////////////////////////////////
 void LSCPhysicsList::ConstructHad() {}
@@ -476,8 +544,8 @@ void LSCPhysicsList::ConstructHad() {}
 #include "G4Decay.hh"
 #include "G4IonTable.hh"
 #include "G4Ions.hh"
-#include "G4RadioactiveDecay.hh"
 #include "G4PhysicsListHelper.hh"
+#include "G4RadioactiveDecay.hh"
 #include "GLG4Sim/GLG4DeferTrackProc.hh"
 
 void LSCPhysicsList::ConstructGeneral()
