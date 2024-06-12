@@ -337,9 +337,7 @@ void LSCDetectorConstruction::ConstructMaterials()
     ifs.open(fMaterialDataFile.data());
   }
 
-  // now read materials, keeping error count
   int errorCount_ReadMaterials = GLG4InputDataReader::ReadMaterials(ifs);
-  // close file
   ifs.close();
 
   if (errorCount_ReadMaterials) {

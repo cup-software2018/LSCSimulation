@@ -11,6 +11,7 @@ class G4UIdirectory;
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithAString;
 class LSCPMTSD;
+class GLG4param;
 
 class LSCDetectorConstruction : public G4VUserDetectorConstruction,
                                 public G4UImessenger {
@@ -34,6 +35,9 @@ private:
 
   void ConstructMaterials();
   G4VPhysicalVolume * ConstructDetector();
+  void ConstructDetector_LSC(G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db);
+  void ConstructDetector_Prototype(G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db);
+
   
   // Optical surface
   G4OpticalSurface * Photocathode_opsurf;
@@ -45,12 +49,14 @@ private:
   G4String fMaterialDataFile;
   G4String fGeometryDataFile;
   G4String fPMTPositionDataFile;
+  G4String fWhichDetector;
 
   G4UIdirectory * fDetectorDir;
   G4UIcmdWithAnInteger * fGeomCheckOptCmd;
   G4UIcmdWithAString * fMaterialDataFileCmd;
   G4UIcmdWithAString * fGeometryDataFileCmd;
   G4UIcmdWithAString * fPMTPositionDataFileCmd;
+  G4UIcmdWithAString * fWhichDetectorCmd;
   G4int fGeomCheck;
 };
 
