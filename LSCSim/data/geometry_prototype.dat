@@ -15,4 +15,4 @@ target_radius 60
 target_height 120
 target_thickness 1
 
-
+reflector_on 1

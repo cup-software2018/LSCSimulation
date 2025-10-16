@@ -39,7 +39,8 @@ enum LSCTrackStatus {
   absorbed = 4,
   boundaryAbsorbed = 8,
   hitSphere = 16,
-  inactive = 14
+  inactive = 14,
+  deferred = 15
 };
 
 /*LSCTrackStatus:
@@ -78,6 +79,7 @@ private:
   int fStatus;
   G4int fReflections;
   G4bool fForcedraw;
+
 };
 
 #endif

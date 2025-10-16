@@ -16,6 +16,9 @@ public:
   float GetKineticEnergy() const;
   float GetWavelength() const;
 
+  virtual bool IsSortable() const { return true; }
+  virtual int Compare(const TObject * object) const;
+
 private:
   float fTime;
   float fKE;

@@ -3,6 +3,7 @@
 #include "G4MaterialTable.hh"
 #include "G4NistManager.hh"
 #include "G4OpticalSurface.hh"
+
 #include "GLG4Sim/GLG4InputDataReader.hh"
 #include "LSCSim/LSCDetectorConstruction.hh"
 
@@ -105,6 +106,20 @@ void LSCDetectorConstruction::ConstructMaterials()
   stainless->AddElement(elementFe, 0.71);
   stainless->AddElement(elementCr, 0.19);
   stainless->AddElement(elementNi, 0.10);
+
+  name = "Steel_polished";
+  density = 7.87 * g / cm3;
+  nelements = 1;
+
+  auto steel_polished = new G4Material(name, density, nelements);
+  steel_polished->AddMaterial(stainless, 1);
+
+  name = "Steel_unpolished";
+  density = 7.87 * g / cm3;
+  nelements = 1;
+
+  auto steel_unpolished = new G4Material(name, density, nelements);
+  steel_unpolished->AddMaterial(stainless, 1);
 
   // --- Lead  Pb ------
   name = "Lead";
@@ -355,19 +370,27 @@ void LSCDetectorConstruction::ConstructMaterials()
   Photocathode_opsurf->SetMaterialPropertiesTable(
       G4Material::GetMaterial("photocathode")->GetMaterialPropertiesTable());
 
-  Stainless_opsurf = new G4OpticalSurface("Stainless_opsurf");
+  Stainless_opsurf = new G4OpticalSurface("steel_polished_opsurf");
   Stainless_opsurf->SetFinish(polished);
   Stainless_opsurf->SetModel(glisur);
   Stainless_opsurf->SetType(dielectric_metal);
   Stainless_opsurf->SetPolish(0.95); // a guess -- FIXME?
   Stainless_opsurf->SetMaterialPropertiesTable(
-      stainless->GetMaterialPropertiesTable());
+      steel_polished->GetMaterialPropertiesTable());
+
+  Stainless_opsurf = new G4OpticalSurface("steel_unpolished_opsurf");
+  Stainless_opsurf->SetFinish(ground);
+  Stainless_opsurf->SetModel(glisur);
+  Stainless_opsurf->SetType(dielectric_metal);
+  Stainless_opsurf->SetPolish(0.1); // a guess -- FIXME?
+  Stainless_opsurf->SetMaterialPropertiesTable(
+      steel_unpolished->GetMaterialPropertiesTable());
 
   Polyethylene_opsurf = new G4OpticalSurface("Polyethylene_opsurf");
-  Polyethylene_opsurf->SetFinish(ground);              // a guess -- FIXME?
-  Polyethylene_opsurf->SetModel(glisur);               // a guess -- FIXME?
-  Polyethylene_opsurf->SetType(dielectric_dielectric); // a guess -- FIXME?
-  Polyethylene_opsurf->SetPolish(0.7);                 // a guess -- FIXME?
+  Polyethylene_opsurf->SetFinish(ground);         // a guess -- FIXME?
+  Polyethylene_opsurf->SetModel(glisur);          // a guess -- FIXME?
+  Polyethylene_opsurf->SetType(dielectric_metal); // a guess -- FIXME?
+  Polyethylene_opsurf->SetPolish(0.7);            // a guess -- FIXME?
   Polyethylene_opsurf->SetMaterialPropertiesTable(
       polyethylene->GetMaterialPropertiesTable());
 

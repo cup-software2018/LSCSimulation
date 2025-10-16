@@ -30,7 +30,9 @@ void PrintHelp()
 {
   cout << endl;
   cout << "Usage: LSCSim [-n # of event] [-o output] [-f macro]" << endl
-       << "              [-g geometry] [-p pmt_position data] [-m material] [-v macro]" << endl;
+       << "              [-g geometry] [-p pmt_position data] [-m material] "
+          "[-v macro]"
+       << endl;
   cout << endl;
 
   exit(0);
@@ -44,18 +46,17 @@ int main(int argc, char ** argv)
   }
 
   int opt;
-
   int nevent = 1;
   int doVis = 0;
 
   G4String outputFileName;
   G4String macroFileName;
-  G4String vis_macroFileName;
   G4String materialData;
   G4String geometryData;
   G4String pmtposData;
+  G4String detectorType = "LSCS";
 
-  while ((opt = getopt(argc, argv, "o:f:m:g:p:n:v:h")) != -1) {
+  while ((opt = getopt(argc, argv, "o:f:m:g:p:n:vhcst")) != -1) {
     switch (opt) {
       case 'o': outputFileName = G4String(optarg); break;
       case 'f': macroFileName = G4String(optarg); break;
@@ -63,11 +64,10 @@ int main(int argc, char ** argv)
       case 'g': geometryData = G4String(optarg); break;
       case 'p': pmtposData = G4String(optarg); break;
       case 'n': nevent = atoi(G4String(optarg).data()); break;
-      case 'v': {
-        vis_macroFileName = G4String(optarg);
-        doVis = 1;
-        break;
-      }
+      case 'v': doVis = 1; break;
+      case 'c': detectorType = "LSCC"; break;
+      case 's': detectorType = "LSCS"; break;
+      case 't': detectorType = "PROTO"; break;
       case 'h': PrintHelp(); break;
       default: PrintHelp();
     }
@@ -77,7 +77,7 @@ int main(int argc, char ** argv)
     G4cout << "LSCSim main: Number of event is not set !" << G4endl;
     PrintHelp();
   }
-  if (macroFileName.empty()) {
+  if (!doVis && macroFileName.empty()) {
     G4cout << "LSCSim main: No macro file !" << G4endl;
     PrintHelp();
   }
@@ -92,6 +92,7 @@ int main(int argc, char ** argv)
   G4RunManager * runManager = new G4RunManager;
 
   LSCDetectorConstruction * LSCDetector = new LSCDetectorConstruction();
+  LSCDetector->SetDetectorType(detectorType);
   if (!geometryData.empty()) LSCDetector->SetGeometryDataFile(geometryData);
   if (!pmtposData.empty()) LSCDetector->SetPMTPositionDataFile(pmtposData);
   if (!materialData.empty()) LSCDetector->SetMaterialDataFile(materialData);
@@ -110,33 +111,28 @@ int main(int argc, char ** argv)
   runManager->SetUserAction(new LSCTrackingAction(rootManager));
   runManager->SetUserAction(new LSCSteppingAction(rootManager));
 
-  G4VisManager * visManager = NULL;
-  if (doVis) {
-    visManager = new G4VisExecutive;
-    visManager->Initialize();
-  }
-
-  // get the pointer to the UI manager and set verbosities
   G4UImanager * UImanager = G4UImanager::GetUIpointer();
 
-  G4String command = Form("/control/execute %s", macroFileName.c_str());
-  UImanager->ApplyCommand(command);
+  G4UIExecutive * ui = nullptr;
+  G4VisManager * visManager = nullptr;
+  if (doVis) {
+    ui = new G4UIExecutive(argc, argv);
+    visManager = new G4VisExecutive;
+    visManager->Initialize();
 
-  if (!doVis) {
+    UImanager->ApplyCommand("/control/execute init_vis.mac");
+    ui->SessionStart();
+    delete ui;
+  }
+  else {
+    G4String command = Form("/control/execute %s", macroFileName.c_str());
+    UImanager->ApplyCommand(command);
     command = Form("/run/beamOn %d", nevent);
     UImanager->ApplyCommand(command);
   }
-  else {
-    command = Form("/control/execute %s", vis_macroFileName.c_str());
-    UImanager->ApplyCommand(command);
-
-    G4UIsession * theSession = new G4UIterminal(new G4UItcsh);
-    theSession->SessionStart();
-    delete theSession;
-  }
-
+  
   if (rootManager) delete rootManager;
-  if (visManager != NULL) delete visManager;
+  if (visManager != nullptr) delete visManager;
 
   // job termination
   delete runManager;

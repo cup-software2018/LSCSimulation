@@ -185,13 +185,16 @@ void LSCRootManager::EndOfEvent(const G4Event * anEvent)
           MCPhotonHit * ph = pmt->GetHit(j);
           mcpmt->AddHit(ph);
         }
+        mcpmt->Sort();
       }
     }
+    fPMTData->Sort();
   }
 
   fEventTree->Fill();
 
-  G4cout << std::setw(12) << eventId << " events processed ..." << G4endl;
+  if (eventId > 0 && eventId % 100 ==0)
+    G4cout << std::setw(12) << eventId << " events processed ..." << G4endl;
 }
 
 void LSCRootManager::RecordTrack(const G4Track * gtrack)

@@ -39,7 +39,7 @@ FADCWaveformGenerator::~FADCWaveformGenerator()
 void FADCWaveformGenerator::Prepare()
 {
   if (!fWaveform) {
-    fWaveform = new unsigned int[fNBin];
+    fWaveform = new unsigned short[fNBin];
     fWaveformHist->SetBins(fNBin, 0, fNBin);
   }
   fWaveformHist->Reset();
@@ -63,7 +63,7 @@ void FADCWaveformGenerator::Digitize()
     sig += ped;
     if (sig < 0) sig = 0;
 
-    unsigned int digi = TMath::Min(TMath::Nint(sig), TMath::Nint(fResolution));
+    unsigned short digi = TMath::Min(TMath::Nint(sig), TMath::Nint(fResolution));
 
     fWaveform[j - 1] = digi;
     fWaveformHist->SetBinContent(j, digi);

@@ -19,6 +19,10 @@
 #include "G4ProcessTable.hh"
 #include "G4GeometryTolerance.hh" // for kCarTolerance
 
+#include "TString.h"
+
+#include "LSCSim/LSCUserTrackInformation.hh"
+
 using namespace CLHEP;
 
 GLG4DeferTrackProc::GLG4DeferTrackProc(const G4String & aName)
@@ -64,6 +68,10 @@ G4double GLG4DeferTrackProc::PostStepGetPhysicalInteractionLength(const G4Track 
 G4VParticleChange * GLG4DeferTrackProc::PostStepDoIt(const G4Track & aTrack, const G4Step&)
 {
   _generator->DeferTrackToLaterEvent(&aTrack);
+
+  LSCUserTrackInformation * info = (LSCUserTrackInformation*)aTrack.GetUserInformation();
+  info->SetTrackStatusFlags(LSCTrackStatus::deferred);
+
   aParticleChange.Initialize(aTrack);
   aParticleChange.ProposeTrackStatus(fStopAndKill);
   return &aParticleChange;

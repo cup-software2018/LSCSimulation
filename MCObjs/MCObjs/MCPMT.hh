@@ -22,6 +22,9 @@ public:
   int GetNHit() const;
   MCPhotonHit * GetHit(int i) const;
 
+  virtual bool IsSortable() const { return true; }
+  virtual int Compare(const TObject * object) const;
+
   virtual void Print(const Option_t * opt = "") const;
 
 private:
@@ -36,5 +39,6 @@ inline int MCPMT::GetId() const { return fPMTId; }
 
 inline int MCPMT::GetNHit() const { return GetEntriesFast(); }
 inline MCPhotonHit * MCPMT::GetHit(int n) const { return (MCPhotonHit *)At(n); }
+
 
 #endif

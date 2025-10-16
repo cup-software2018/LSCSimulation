@@ -19,102 +19,10 @@
 using namespace std;
 using namespace CLHEP;
 
-void LSCDetectorConstruction::ConstructDetector_LSC(
-    G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db)
+void LSCDetectorConstruction::ConstructDetector_LSC_Cylinder(
+    G4VPhysicalVolume * vetoliquid, LSCPMTSD * pmtsd, GLG4param & geom_db)
 {
-  auto WorldLog = worldphys->GetLogicalVolume();
-
-  /*
-    // Pit
-    G4double pitR = cm * geom_db["pit_radius"];
-    G4double pitH = cm * geom_db["pit_height"];
-    auto PitTubs = new G4Tubs("PitTubs", 0, pitR, pitH / 2, 0, 360 * deg);
-
-    // Tunnel
-    G4double tunnelR = cm * geom_db["tunnel_radius"];
-    G4double tunnelH = cm * geom_db["tunnel_height"];
-    auto TunnelTubs =
-        new G4Tubs("TunnelTubs", 0, tunnelR, tunnelH / 2, 0 * deg, 180 * deg);
-
-    auto TunnelRot = new G4RotationMatrix();
-    TunnelRot->rotateX(-90 * deg);
-    auto PitUni = new G4UnionSolid(
-        "PitUni_1", PitTubs, TunnelTubs, TunnelRot,
-        G4ThreeVector(0, TunnelTubs->GetZHalfLength() * 1.8, pitH / 2));
-    TunnelRot->rotateX(180 * deg);
-    TunnelRot->rotateZ(90 * deg);
-    PitUni = new G4UnionSolid(
-        "PitUni_2", PitUni, TunnelTubs,
-        G4Transform3D(*TunnelRot,
-                      G4ThreeVector(TunnelTubs->GetZHalfLength() * 1.8, 0,
-                                    pitH / 2 - tunnelR)));
-    TunnelRot->rotateY(-10 * deg);
-    TunnelRot->rotateZ(-135 * deg);
-    PitUni = new G4UnionSolid(
-        "PitUni_3", PitUni, TunnelTubs,
-        G4Transform3D(*TunnelRot, G4ThreeVector(-pitR * 1.25, -pitR * 1.25,
-                                                -pitH / 2 + tunnelR / 2)));
-    // Cavern (Top)
-    G4double cavernR = cm * geom_db["cavern_arch_radius"];
-    G4double cavernH = cm * geom_db["cavern_arch_height"];
-    G4double cavernT = cm * geom_db["cavern_arch_thickness"];
-    G4double cavernA = deg * geom_db["cavern_arch_angle"];
-    auto CavernTubs = new G4Tubs("CavernTubs", cavernR - cavernH / 8, cavernR,
-                                 cavernH / 2, 0 * deg, cavernA * 2);
-
-    // Cavern (Bottom)
-    G4double cavernX = cm * geom_db["cavern_arch_height"];
-    G4double cavernY = cm * geom_db["cavern_arch_height"];
-    G4double cavernZ = cm * geom_db["cavern_height"];
-    auto CavernBox = new G4Box("CavernBox", cavernX / 2, cavernY / 2,
-                               (cavernZ - cavernT) / 2.);
-    auto CavernRot = new G4RotationMatrix();
-    CavernRot->rotateZ(-cavernA);
-    CavernRot->rotateY(-90 * deg);
-
-    // Cavern (Union of pit, tunnel, top and bottom caverns)
-    auto CavernUni = new G4UnionSolid(
-        "CavernUni", CavernBox, CavernTubs,
-        G4Transform3D(*CavernRot, G4ThreeVector(0, 0,
-                                                CavernBox->GetZHalfLength() -
-                                                    (cavernR - cavernH / 10))));
-    CavernUni = new G4UnionSolid(
-        "CavernUni", PitUni, CavernUni, 0,
-        G4ThreeVector(0, 0, pitH / 2. + CavernBox->GetZHalfLength()));
-    auto CavernLog = new G4LogicalVolume(
-        CavernUni, G4Material::GetMaterial("Air"), "CavernLog");
-    CavernLog->SetVisAttributes(G4Colour::Gray());
-    auto CavernPhys =
-        new G4PVPlacement(0, G4ThreeVector(), CavernLog, "CavernPhys", WorldLog,
-                          false, 0, fGeomCheck);
-*/
-  // Veto
-  G4double vetoR = cm * geom_db["veto_radius"];
-  G4double vetoH = cm * geom_db["veto_height"];
-  G4double vetoT = cm * geom_db["veto_thickness"];
-  auto VetoTankTubs =
-      new G4Tubs("VetoTankTubs", 0, vetoR, vetoH / 2, 0, 360 * deg);
-  auto VetoTankLog = new G4LogicalVolume(
-      VetoTankTubs, G4Material::GetMaterial("Steel"), "VetoTankLog", 0, 0, 0);
-  VetoTankLog->SetVisAttributes(G4Colour::Black());
-  auto VetoTankPhys =
-      new G4PVPlacement(0, G4ThreeVector(), VetoTankLog, "VetoTankPhys",
-                        WorldLog, false, 0, fGeomCheck);
-
-  auto VetoLiquidTubs = new G4Tubs("VetoLiquidTubs", 0, vetoR - vetoT,
-                                   vetoH / 2 - vetoT, 0, 360 * deg);
-  auto VetoLiquidLog =
-      new G4LogicalVolume(VetoLiquidTubs, G4Material::GetMaterial("Water"),
-                          "VetoLiquidLog", 0, 0, 0);
-  VetoLiquidLog->SetVisAttributes(G4Colour(0, 0, 1, 0.1));
-  auto VetoLiquidPhys =
-      new G4PVPlacement(0, G4ThreeVector(), VetoLiquidLog, "VetoLiquidPhys",
-                        VetoTankLog, false, 0, fGeomCheck);
-
-  new G4LogicalBorderSurface("veto_logsurf1", VetoTankPhys, VetoLiquidPhys,
-                             Stainless_opsurf);
-  new G4LogicalBorderSurface("veto_logsurf2", VetoLiquidPhys, VetoTankPhys,
-                             Stainless_opsurf);
+  auto VetoLiquidLog = vetoliquid->GetLogicalVolume();
 
   // Buffer
   G4double bufferR = cm * geom_db["buffer_radius"];
@@ -129,7 +37,7 @@ void LSCDetectorConstruction::ConstructDetector_LSC(
   BufferTankLog->SetVisAttributes(G4Colour::Black());
   auto BufferTankPhys =
       new G4PVPlacement(0, G4ThreeVector(), BufferTankLog, "BufferTankPhys",
-                        WorldLog, false, fGeomCheck);
+                        VetoLiquidLog, false, fGeomCheck);
 
   auto BufferLiquidTubs = new G4Tubs("BufferLiquidTubs", 0, bufferR - bufferT,
                                      bufferH / 2 - bufferT, 0, 360 * deg);
@@ -165,7 +73,7 @@ void LSCDetectorConstruction::ConstructDetector_LSC(
   auto TargetLSTubs = new G4Tubs("TargetLSTubs", 0, targetR - targetT,
                                  targetH / 2 - targetT, 0, 360 * deg);
   auto TargetLSLog = new G4LogicalVolume(
-      TargetLSTubs, G4Material::GetMaterial("LS_LAB"), "TargetLSLog", 0, 0, 0);
+      TargetLSTubs, G4Material::GetMaterial("Pyrene_LS"), "TargetLSLog", 0, 0, 0);
   // TargetLSLog->SetVisAttributes(G4VisAttributes::GetInvisible());
   TargetLSLog->SetVisAttributes(G4Colour(0, 1, 0, 0.1)); // green
   auto TargetLSPhys =

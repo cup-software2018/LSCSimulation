@@ -26,7 +26,7 @@ public:
 
   void Digitize();
 
-  const unsigned int * GetWaveform() const;
+  const unsigned short * GetWaveform() const;
   TH1D * GetWaveformHist() const;
 
   virtual void Draw(Option_t * option = "");
@@ -51,7 +51,7 @@ private:
 
   AbsSignal * fSignal;
 
-  unsigned int * fWaveform;
+  unsigned short * fWaveform;
 
   TH1D * fWaveformHist;
   TH1D * fChannelTrgHist;
@@ -95,7 +95,7 @@ inline void FADCWaveformGenerator::SetSignal(AbsSignal * signal)
   fSignal = signal;
 }
 
-inline const unsigned int * FADCWaveformGenerator::GetWaveform() const
+inline const unsigned short * FADCWaveformGenerator::GetWaveform() const
 {
   return fWaveform;
 }

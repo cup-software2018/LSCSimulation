@@ -17,6 +17,7 @@
 #include "G4Track.hh"
 #include "G4ios.hh"
 #include "Randomize.hh"
+#include "TString.h"
 #include "globals.hh"
 
 #include "CLHEP/Units/SystemOfUnits.h"
@@ -98,7 +99,7 @@ G4String GLG4PrimaryGeneratorAction::GetEventTypeName(int argEventType)
 }
 
 // constructor and destructor (mildly interesting because generators created)
-//GLG4PrimaryGeneratorAction::GLG4PrimaryGeneratorAction(
+// GLG4PrimaryGeneratorAction::GLG4PrimaryGeneratorAction(
 //    GLG4DetectorConstruction * argDC)
 //    : myDetector(argDC)
 GLG4PrimaryGeneratorAction::GLG4PrimaryGeneratorAction()
@@ -126,33 +127,32 @@ GLG4PrimaryGeneratorAction::GLG4PrimaryGeneratorAction()
   GLG4param & db(GLG4param::GetDB());
   myEventWindow = db.GetWithDefault("gen.eventWindow", 1000. * ns);
   myChainClip = db.GetWithDefault("gen.chainClip", 100.0 * second);
-  {
-    for (int i = 0; i < theNumEventTypes; i++) {
-      char key[16];
-      sprintf(key, "gen.rate%d", i);
-      myEventRate[i] = db.GetWithDefault(key, 0.0);
-      sprintf(key, "gen.trig%d", i);
-      switch (i) {
-        case 32: // C-14 in scintillator
-        case 33: // U-238  in rock
-        case 34: // Th-232 in rock
-        case 35: // Radon  in rock
-        case 36: // Thoron in rock
-        case 37: // K-40   in rock
-          myEventTriggerCondition[i] =
-              (int)(db.GetWithDefault(key, kGeneratorTriggerPileupOnly));
-          break;
-        case kDelayEvtIndex:
-          myEventTriggerCondition[i] =
-              (int)(db.GetWithDefault(key, kGeneratorTriggerDelay));
-          break;
-        default:
-          myEventTriggerCondition[i] =
-              (int)(db.GetWithDefault(key, kGeneratorTriggerNormal));
-          break;
-      }
-      myTimeToNextEvent[i] = -1.0;
+
+  for (int i = 0; i < theNumEventTypes; i++) {
+    char key[16];
+    sprintf(key, "gen.rate%d", i);
+    myEventRate[i] = db.GetWithDefault(key, 0.0);
+    sprintf(key, "gen.trig%d", i);
+    switch (i) {
+      case 32: // C-14 in scintillator
+      case 33: // U-238  in rock
+      case 34: // Th-232 in rock
+      case 35: // Radon  in rock
+      case 36: // Thoron in rock
+      case 37: // K-40   in rock
+        myEventTriggerCondition[i] =
+            (int)(db.GetWithDefault(key, kGeneratorTriggerPileupOnly));
+        break;
+      case kDelayEvtIndex:
+        myEventTriggerCondition[i] =
+            (int)(db.GetWithDefault(key, kGeneratorTriggerDelay));
+        break;
+      default:
+        myEventTriggerCondition[i] =
+            (int)(db.GetWithDefault(key, kGeneratorTriggerNormal));
+        break;
     }
+    myTimeToNextEvent[i] = -1.0;
   }
 
   // set generator arrays -- classes and initial state are hard-coded
@@ -259,17 +259,23 @@ void GLG4PrimaryGeneratorAction::GeneratePrimaries(G4Event * argEvent)
   G4double min_time_to_next_event = DBL_MAX;
 
   // find the next event, resetting any "expired" events along the way
-  {
-    for (int i = 0; i < theNumEventTypes; i++) {
-      if (myTimeToNextEvent[i] < 0.0 && myEventRate[i] > 0.0 &&
-          myEventTriggerCondition[i] == kGeneratorTriggerNormal) {
-        myTimeToNextEvent[i] = -log(1.0 - G4UniformRand()) / myEventRate[i];
-      }
-      if (myTimeToNextEvent[i] >= 0.0 &&
-          myTimeToNextEvent[i] < min_time_to_next_event) {
-        next_event_type = i;
-        min_time_to_next_event = myTimeToNextEvent[i];
-      }
+  for (int i = 0; i < theNumEventTypes; i++) {
+
+    if (myTimeToNextEvent[i] < 0.0 && myEventRate[i] > 0.0 &&
+        myEventTriggerCondition[i] == kGeneratorTriggerNormal) {
+      myTimeToNextEvent[i] = -log(1.0 - G4UniformRand()) / myEventRate[i];
+      // myTimeToNextEvent[i] = 1.0 / myEventRate[i];
+      //G4cout << Form("1-- %5d %20e %20e", i, myTimeToNextEvent[i],
+      //               myEventRate[i])
+      //       << G4endl;
+    }
+    if (myTimeToNextEvent[i] >= 0.0 &&
+        myTimeToNextEvent[i] < min_time_to_next_event) {
+      next_event_type = i;
+      min_time_to_next_event = myTimeToNextEvent[i];
+      //G4cout << Form("2-- %5d %20e %20e", i, myTimeToNextEvent[i],
+      //               myEventRate[i])
+      //       << G4endl;
     }
   }
 
@@ -286,15 +292,21 @@ void GLG4PrimaryGeneratorAction::GeneratePrimaries(G4Event * argEvent)
   // update universal time and decrement all time-to-next-events
   myUniversalTimeSincePriorEvent = min_time_to_next_event;
   myUniversalTime += min_time_to_next_event;
-  {
-    for (int i = 0; i < theNumEventTypes; i++) {
-      myTimeToNextEvent[i] -= min_time_to_next_event;
-    }
+
+  for (int i = 0; i < theNumEventTypes; i++) {
+    myTimeToNextEvent[i] -= min_time_to_next_event;
   }
+
   myTimeToNextEvent[next_event_type] =
       -log(1.0 - G4UniformRand()) /
       myEventRate[next_event_type]; // new time-to-next
+  // myTimeToNextEvent[next_event_type] =
+  //     1.0 / myEventRate[next_event_type]; // new time-to-next
   myTypeOfCurrentEvent = next_event_type;
+
+  //G4cout << Form("%5d %20e", next_event_type,
+  //               myTimeToNextEvent[next_event_type])
+  //       << G4endl;
 
   // generate the event!
   int next_vtx_code = theEventGeneratorCodes[next_event_type].vertexcode;
@@ -327,43 +339,39 @@ void GLG4PrimaryGeneratorAction::GeneratePrimaries(G4Event * argEvent)
   // 			    (double)next_event_type ));// type of this event
 
   // add pileup events from normal-triggering primary events
-  {
-    for (int i = 0; i < theNumEventTypes; i++) {
-      while (myTimeToNextEvent[i] >= 0.0 &&
-             myTimeToNextEvent[i] < myEventWindow) {
-        int vtx_code = theEventGeneratorCodes[i].vertexcode;
-        int pos_code = theEventGeneratorCodes[i].poscode;
+  for (int i = 0; i < theNumEventTypes; i++) {
+    while (myTimeToNextEvent[i] >= 0.0 &&
+           myTimeToNextEvent[i] < myEventWindow) {
+      int vtx_code = theEventGeneratorCodes[i].vertexcode;
+      int pos_code = theEventGeneratorCodes[i].poscode;
+      int nstart = argEvent->GetNumberOfPrimaryVertex();
+      theVertexGenerators[vtx_code]->GeneratePrimaryVertex(argEvent);
+      G4PrimaryVertex * vn = argEvent->GetPrimaryVertex(nstart);
+      if (vn)
+        thePositionGenerators[pos_code]->GenerateVertexPositions(
+            vn, myChainClip, myEventRate[i], myTimeToNextEvent[i]);
+      myTimeToNextEvent[i] += -log(1.0 - G4UniformRand()) / myEventRate[i];
+    }
+  }
+
+  // add pileup events from pileup-triggered events (which may have rates >
+  // 1/myEventWindow)
+  for (int i = 0; i < theNumEventTypes; i++) {
+    if (myEventTriggerCondition[i] == kGeneratorTriggerPileupOnly) {
+      int vtx_code = theEventGeneratorCodes[i].vertexcode;
+      int pos_code = theEventGeneratorCodes[i].poscode;
+      double t = 0.0;
+      while ((t += -log(1.0 - G4UniformRand()) / myEventRate[i]) <
+             myEventWindow) {
         int nstart = argEvent->GetNumberOfPrimaryVertex();
         theVertexGenerators[vtx_code]->GeneratePrimaryVertex(argEvent);
         G4PrimaryVertex * vn = argEvent->GetPrimaryVertex(nstart);
         if (vn)
           thePositionGenerators[pos_code]->GenerateVertexPositions(
-              vn, myChainClip, myEventRate[i], myTimeToNextEvent[i]);
-        myTimeToNextEvent[i] += -log(1.0 - G4UniformRand()) / myEventRate[i];
+              vn, myChainClip, myEventRate[i], t);
       }
     }
   }
-  // add pileup events from pileup-triggered events (which may have rates >
-  // 1/myEventWindow)
-  {
-    for (int i = 0; i < theNumEventTypes; i++) {
-      if (myEventTriggerCondition[i] == kGeneratorTriggerPileupOnly) {
-        int vtx_code = theEventGeneratorCodes[i].vertexcode;
-        int pos_code = theEventGeneratorCodes[i].poscode;
-        double t = 0.0;
-        while ((t += -log(1.0 - G4UniformRand()) / myEventRate[i]) <
-               myEventWindow) {
-          int nstart = argEvent->GetNumberOfPrimaryVertex();
-          theVertexGenerators[vtx_code]->GeneratePrimaryVertex(argEvent);
-          G4PrimaryVertex * vn = argEvent->GetPrimaryVertex(nstart);
-          if (vn)
-            thePositionGenerators[pos_code]->GenerateVertexPositions(
-                vn, myChainClip, myEventRate[i], t);
-        }
-      }
-    }
-  }
-
   // done!
 }
 

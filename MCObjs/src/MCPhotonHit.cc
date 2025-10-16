@@ -17,3 +17,13 @@ MCPhotonHit::MCPhotonHit(const MCPhotonHit & photon)
 }
 
 MCPhotonHit::~MCPhotonHit() {}
+
+
+int MCPhotonHit::Compare(const TObject * object) const
+{
+  auto comp = (MCPhotonHit*)object;
+  if (this->GetTime() < comp->GetTime()) return 1;
+  else if (this->GetTime() > comp->GetTime()) return -1;
+
+  return 0;
+}

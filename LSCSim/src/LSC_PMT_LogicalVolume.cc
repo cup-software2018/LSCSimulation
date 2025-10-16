@@ -15,6 +15,7 @@
 #include "G4PVPlacement.hh"
 #include "G4Tubs.hh"
 #include "G4VisAttributes.hh" // for G4VisAttributes::Invisible
+
 #include "GLG4Sim/GLG4TorusStack.hh"
 #include "LSCSim/LSCPMTOpticalModel.hh"
 
@@ -31,9 +32,9 @@ LSC_PMT_LogicalVolume::LSC_PMT_LogicalVolume(
     G4double hh_bound,       // half height of bounding cylinder
     G4Material * ExteriorMat // material which fills the bounding cylinder
     )
-  : G4LogicalVolume(new G4Tubs(plabel + "_envelope_solid", 0.0, r_bound,
-                               hh_bound, 0., 2. * M_PI),
-                    ExteriorMat, plabel)
+    : G4LogicalVolume(new G4Tubs(plabel + "_envelope_solid", 0.0, r_bound,
+                                 hh_bound, 0., 2. * M_PI),
+                      ExteriorMat, plabel)
 {
   if (our_Mirror_opsurf == NULL) {
     // construct a static mirror surface with idealized properties
@@ -124,10 +125,10 @@ LSC_17inch_LogicalVolume::LSC_17inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-  : LSC_PMT_LogicalVolume(
-        plabel, 260. * millimeter,
-        340. * millimeter, // hh_bound: half height of bounding cylinder
-        ExteriorMat)
+    : LSC_PMT_LogicalVolume(
+          plabel, 260. * millimeter,
+          340. * millimeter, // hh_bound: half height of bounding cylinder
+          ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
@@ -233,10 +234,10 @@ LSC_20inch_LogicalVolume::LSC_20inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-  : LSC_PMT_LogicalVolume(
-        plabel, 260. * millimeter,
-        340. * millimeter, // hh_bound: half height of bounding cylinder
-        ExteriorMat)
+    : LSC_PMT_LogicalVolume(
+          plabel, 260. * millimeter,
+          340. * millimeter, // hh_bound: half height of bounding cylinder
+          ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
@@ -298,8 +299,8 @@ LSC_10inch_LogicalVolume::LSC_10inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-  : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 160. * millimeter,
-                          ExteriorMat)
+    : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 160. * millimeter,
+                            ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R7081_n_edge, R7081_z_edge, R7081_rho_edge, R7081_z_o,
@@ -356,8 +357,8 @@ LSC_8inch_LogicalVolume::LSC_8inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-  : LSC_PMT_LogicalVolume(plabel, 110. * millimeter, 150. * millimeter,
-                          ExteriorMat)
+    : LSC_PMT_LogicalVolume(plabel, 110. * millimeter, 150. * millimeter,
+                            ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(
       R5912_n_edge, R5912_z_edge, R5912_rho_edge, R5912_z_o,
@@ -414,8 +415,8 @@ LSC_5inch_LogicalVolume::LSC_5inch_LogicalVolume(
                           // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector // sensitive detector hook
     )
-  : LSC_PMT_LogicalVolume(plabel, 64. * millimeter, 108. * millimeter,
-                          ExteriorMat)
+    : LSC_PMT_LogicalVolume(plabel, 64. * millimeter, 108. * millimeter,
+                            ExteriorMat)
 {
 
   ConstructPMT_UsingTorusStack(
@@ -645,16 +646,18 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
   G4VisAttributes * visAtt;
   this->SetVisAttributes(G4VisAttributes::GetInvisible());
   //  PMT glass
-  visAtt = new G4VisAttributes(G4Color(0.0, 1.0, 1.0, 0.05));
-  body_log->SetVisAttributes(visAtt);
-  // body_log->SetVisAttributes(G4VisAttributes::GetInvisible());
+  // visAtt = new G4VisAttributes(G4Color(0.0, 1.0, 1.0, 0.05));
+  // body_log->SetVisAttributes(visAtt);
+  body_log->SetVisAttributes(G4VisAttributes::GetInvisible());
   //  dynode is medium gray
   visAtt = new G4VisAttributes(G4Color(0.5, 0.5, 0.5, 1.0));
   dynode_log->SetVisAttributes(visAtt);
   // (surface of) interior vacuum is clear orangish gray on top (PC),
   // silvery blue on bottom (mirror)
   visAtt = new G4VisAttributes(G4Color(0.7, 0.5, 0.3, 0.27));
+  visAtt->SetForceSolid(true);
   inner1_log->SetVisAttributes(visAtt);
   visAtt = new G4VisAttributes(G4Color(0.6, 0.7, 0.8, 0.67));
+  visAtt->SetForceSolid(true);
   inner2_log->SetVisAttributes(visAtt);
 }

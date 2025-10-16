@@ -34,6 +34,16 @@ void MCPMT::Clear(const Option_t * opt)
   Delete();
 }
 
+int MCPMT::Compare(const TObject * object) const
+{
+  auto comp = (MCPMT*)object;
+  if (this->GetId() > comp->GetId()) return 1;
+  else if (this->GetId() < comp->GetId()) return -1;
+
+  return 0;
+}
+
+
 void MCPMT::Print(const Option_t * opt) const
 {
   cout << Form("PMTID=%4d, # of hit=%d", fPMTId, GetNHit()) << endl;

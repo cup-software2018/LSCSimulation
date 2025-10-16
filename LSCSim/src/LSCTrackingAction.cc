@@ -19,9 +19,8 @@ void LSCTrackingAction::PreUserTrackingAction(const G4Track * aTrack)
   fpTrackingManager->SetTrajectory(new LSCTrajectory(aTrack));
 
   // This user track information is only relevant to the photons
-  fpTrackingManager->SetUserTrackInformation(new LSCUserTrackInformation);
-
-  if (fRecorder) fRecorder->RecordTrack(aTrack);
+  //fpTrackingManager->SetUserTrackInformation(new LSCUserTrackInformation);
+  aTrack->SetUserInformation(new LSCUserTrackInformation);
 }
 
 void LSCTrackingAction::PostUserTrackingAction(const G4Track * aTrack)
@@ -30,6 +29,10 @@ void LSCTrackingAction::PostUserTrackingAction(const G4Track * aTrack)
       (LSCTrajectory *)fpTrackingManager->GimmeTrajectory();
   LSCUserTrackInformation * trackInformation =
       (LSCUserTrackInformation *)aTrack->GetUserInformation();
+
+  if (trackInformation->GetTrackStatus() == LSCTrackStatus::deferred) return;
+
+  if (fRecorder) fRecorder->RecordTrack(aTrack);      
 
   // Let's choose to draw only the photons that hit the sphere and a pmt
   if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {

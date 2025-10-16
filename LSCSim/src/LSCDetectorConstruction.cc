@@ -105,6 +105,9 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
     geom_db.ReadFile(fGeometryDataFile.c_str());
   }
 
+  fWhichDetector = "PROTO";
+  G4cout << fWhichDetector << " will be constructed." << G4endl;
+
   // World (Rock)
   G4double worldX = cm * geom_db["worldx"];
   G4double worldY = cm * geom_db["worldy"];
@@ -116,6 +119,38 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   auto WorldPhys = new G4PVPlacement(0, G4ThreeVector(), WorldLog, "WorldPhys",
                                      0, false, 0, fGeomCheck);
 
+
+  // Veto
+  G4VPhysicalVolume * VetoLiquidPhys = nullptr;
+  if (fWhichDetector !=  "PROTO") {
+    G4double vetoR = cm * geom_db["veto_radius"];
+    G4double vetoH = cm * geom_db["veto_height"];
+    G4double vetoT = cm * geom_db["veto_thickness"];
+    auto VetoTankTubs =
+      new G4Tubs("VetoTankTubs", 0, vetoR, vetoH / 2, 0, 360 * deg);
+    auto VetoTankLog = new G4LogicalVolume(
+					   VetoTankTubs, G4Material::GetMaterial("Steel"), "VetoTankLog", 0, 0, 0);
+    VetoTankLog->SetVisAttributes(G4Colour::White());
+    auto VetoTankPhys =
+      new G4PVPlacement(0, G4ThreeVector(), VetoTankLog, "VetoTankPhys",
+                        WorldLog, false, 0, fGeomCheck);
+
+    auto VetoLiquidTubs = new G4Tubs("VetoLiquidTubs", 0, vetoR - vetoT,
+				     vetoH / 2 - vetoT, 0, 360 * deg);
+    auto VetoLiquidLog =
+      new G4LogicalVolume(VetoLiquidTubs, G4Material::GetMaterial("Water"),
+                          "VetoLiquidLog", 0, 0, 0);
+    VetoLiquidLog->SetVisAttributes(G4Colour(0, 0, 1, 0.1));
+    auto VetoLiquidPhys =
+      new G4PVPlacement(0, G4ThreeVector(), VetoLiquidLog, "VetoLiquidPhys",
+                        VetoTankLog, false, 0, fGeomCheck);
+
+    new G4LogicalBorderSurface("veto_logsurf1", VetoTankPhys, VetoLiquidPhys,
+			       Stainless_opsurf);
+    new G4LogicalBorderSurface("veto_logsurf2", VetoLiquidPhys, VetoTankPhys,
+			       Stainless_opsurf);
+  }
+  
   ///////////////////////////////////////////////////////////////////////////
   // --- PMT sensitive detector
   ///////////////////////////////////////////////////////////////////////////
@@ -123,8 +158,10 @@ G4VPhysicalVolume * LSCDetectorConstruction::ConstructDetector()
   LSCPMTSD * pmtSDInner = new LSCPMTSD("/LSC/PMT/inner");
   fSDman->AddNewDetector(pmtSDInner);
 
-  if (fWhichDetector == "LSC")
-    ConstructDetector_LSC(WorldPhys, pmtSDInner, geom_db);
+  if (fWhichDetector == "LSCC")
+    ConstructDetector_LSC_Cylinder(VetoLiquidPhys, pmtSDInner, geom_db);
+  else if (fWhichDetector == "LSCS")
+    ConstructDetector_LSC_Sphere(VetoLiquidPhys, pmtSDInner, geom_db);    
   else if (fWhichDetector == "PROTO")
     ConstructDetector_Prototype(WorldPhys, pmtSDInner, geom_db);
 

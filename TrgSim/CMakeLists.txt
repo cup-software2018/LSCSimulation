@@ -36,6 +36,13 @@ install(PROGRAMS
   ${CMAKE_INSTALL_LIBDIR}
 )
 
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}_rdict.pcm
+  ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}.rootmap
+  DESTINATION
+  ${CMAKE_INSTALL_LIBDIR}
+)
+
 # ----------------------------------------------------------------------------
 # build executables
 # ----------------------------------------------------------------------------

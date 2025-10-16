@@ -13,10 +13,10 @@
 
 #include "LSCSim/LSCPMTOpticalModel.hh"
 
-#include <complex>
-
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
+#include <complex>
+
 #include "G4GeometryTolerance.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4MaterialPropertiesTable.hh"
@@ -28,7 +28,6 @@
 #include "G4UnitsTable.hh"
 #include "G4Version.hh"
 #include "Randomize.hh"
-
 #include "TMath.h"
 
 #include "GLG4Sim/local_g4compat.hh"
@@ -47,7 +46,7 @@ LSCPMTOpticalModel::LSCPMTOpticalModel(
     G4LogicalVolume * envelope_log, G4OpticalSurface * pc_opsurf,
     double efficiency_correction, double dynodeTop, double dynodeRadius,
     double prepulseProb, double photocathode_MINrho, double photocathode_MAXrho)
-  : G4VFastSimulationModel(modelName, envelope_region)
+    : G4VFastSimulationModel(modelName, envelope_region)
 {
   surfaceTolerance = G4GeometryTolerance::GetInstance()->GetSurfaceTolerance();
   _verbosity = 0;
