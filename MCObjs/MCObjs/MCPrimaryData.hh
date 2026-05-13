@@ -1,5 +1,4 @@
-#ifndef MCPrimaryData_HH
-#define MCPrimaryData_HH
+#pragma once
 
 #include "TClonesArray.h"
 
@@ -25,4 +24,3 @@ public:
 inline int MCPrimaryData::GetN() const { return GetEntriesFast(); }
 inline MCPrimary * MCPrimaryData::Get(int n) const { return static_cast<MCPrimary *>(At(n)); }
 
-#endif

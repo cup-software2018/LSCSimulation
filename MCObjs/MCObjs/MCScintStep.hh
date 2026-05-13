@@ -1,5 +1,4 @@
-#ifndef MCScintStep_hh
-#define MCScintStep_hh
+#pragma once
 
 #include "MCObjs/MCStep.hh"
 
@@ -21,4 +20,4 @@ private:
 
   ClassDef(MCScintStep, 1)
 };
-#endif
+

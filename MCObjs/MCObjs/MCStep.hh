@@ -1,5 +1,4 @@
-#ifndef MCStep_hh
-#define MCStep_hh
+#pragma once
 
 #include "TObject.h"
 #include "TString.h"
@@ -83,4 +82,3 @@ inline void MCStep::GetStepPoint(float & x, float & y, float & z) const
 
 inline const char * MCStep::GetVolumeName() const { return fVolumeName.Data(); }
 
-#endif

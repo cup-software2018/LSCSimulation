@@ -1,7 +1,4 @@
-#ifndef MCPrimary_hh
-#define MCPrimary_hh
-
-
+#pragma once
 
 #include "TObject.h"
 #include "TString.h"
@@ -90,4 +87,4 @@ inline double MCPrimary::GetKineticEnergy() const { return fKineticEnergy; }
 inline double MCPrimary::GetT0() const { return fT0; }
 
 inline int MCPrimary::GetTrackId() const { return fTrackId; }
-#endif
+

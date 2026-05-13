@@ -1,5 +1,4 @@
-#ifndef MCTrackData_HH
-#define MCTrackData_HH
+#pragma once
 
 #include "TClonesArray.h"
 
@@ -27,4 +26,3 @@ public:
 inline int MCTrackData::GetN() const { return GetEntriesFast(); }
 inline MCTrack * MCTrackData::Get(int n) const { return static_cast<MCTrack *>(At(n)); }
 
-#endif

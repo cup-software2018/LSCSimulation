@@ -1,5 +1,4 @@
-#ifndef MCPhotonHit_hh
-#define MCPhotonHit_hh
+#pragma once
 
 #include "TObject.h"
 
@@ -32,4 +31,3 @@ inline float MCPhotonHit::GetTime() const { return fTime; }
 inline float MCPhotonHit::GetKineticEnergy() const { return fKE; }
 inline float MCPhotonHit::GetWavelength() const { return 1239.83968E-6 / fKE; }
 
-#endif

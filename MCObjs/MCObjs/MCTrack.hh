@@ -1,5 +1,4 @@
-#ifndef MCTrack_hh
-#define MCTrack_hh
+#pragma once
 
 #include "TClonesArray.h"
 #include "TString.h"
@@ -113,4 +112,3 @@ inline const char * MCTrack::GetProcessName() const
 inline int MCTrack::GetNStep() const { return GetEntriesFast(); }
 inline MCStep * MCTrack::GetStep(int n) const { return static_cast<MCStep *>(At(n)); }
 
-#endif

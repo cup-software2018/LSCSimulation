@@ -1,5 +1,4 @@
-#ifndef MCEventInfo_hh
-#define MCEventInfo_hh
+#pragma once
 
 #include "TObject.h"
 
@@ -23,4 +22,3 @@ private:
 inline void MCEventInfo::SetEventNumber(unsigned int n) { fEventNumber = n; }
 inline unsigned int MCEventInfo::GetEventNumber() const { return fEventNumber; }
 
-#endif

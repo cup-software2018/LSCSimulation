@@ -1,5 +1,4 @@
-#ifndef MCScint_hh
-#define MCScint_hh
+#pragma once
 
 #include "TClonesArray.h"
 
@@ -60,4 +59,3 @@ inline MCScintStep * MCScint::GetStep(int n) const
   return static_cast<MCScintStep *>(At(n));
 }
 
-#endif

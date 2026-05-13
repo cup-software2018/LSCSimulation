@@ -1,9 +1,9 @@
-#ifndef MCPMTData_HH
-#define MCPMTData_HH
+#pragma once
 
 #include "TClonesArray.h"
 
 #include "MCObjs/MCPMT.hh"
+
 class MCPMTData : public TClonesArray {
 public:
   MCPMTData();
@@ -25,4 +25,3 @@ public:
 inline int MCPMTData::GetN() const { return GetEntriesFast(); }
 inline MCPMT * MCPMTData::Get(int n) const { return static_cast<MCPMT *>(At(n)); }
 
-#endif

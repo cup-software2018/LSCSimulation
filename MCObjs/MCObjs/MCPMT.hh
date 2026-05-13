@@ -1,9 +1,9 @@
-#ifndef MCPMT_hh
-#define MCPMT_hh
+#pragma once
 
 #include "TClonesArray.h"
 
 #include "MCObjs/MCPhotonHit.hh"
+
 class MCPMT : public TClonesArray {
 public:
   MCPMT();
@@ -39,5 +39,3 @@ inline int MCPMT::GetId() const { return fPMTId; }
 inline int MCPMT::GetNHit() const { return GetEntriesFast(); }
 inline MCPhotonHit * MCPMT::GetHit(int n) const { return static_cast<MCPhotonHit *>(At(n)); }
 
-
-#endif

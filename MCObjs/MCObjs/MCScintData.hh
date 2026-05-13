@@ -1,5 +1,4 @@
-#ifndef MCScintData_HH
-#define MCScintData_HH
+#pragma once
 
 #include "TClonesArray.h"
 
@@ -27,4 +26,3 @@ public:
 inline int MCScintData::GetN() const { return GetEntriesFast(); }
 inline MCScint * MCScintData::Get(int n) const { return static_cast<MCScint *>(At(n)); }
 
-#endif
