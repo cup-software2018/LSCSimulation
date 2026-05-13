@@ -3,29 +3,26 @@
 
 #include "TClonesArray.h"
 
-class MCPrimary;
+#include "MCObjs/MCPrimary.hh"
 class MCPrimaryData : public TClonesArray {
 public:
   MCPrimaryData();
   MCPrimaryData(const MCPrimaryData & data);
   virtual ~MCPrimaryData();
 
-  virtual void Clear(const Option_t * opt = "");
+  void Clear(Option_t * opt = "") override;
 
   MCPrimary * Add();
 
   int GetN() const;
   MCPrimary * Get(int i) const;
 
-  virtual void Print(const Option_t * opt = "") const;
-
-private:
-  int fN; //!
+  void Print(Option_t * opt = "") const override;
 
   ClassDef(MCPrimaryData, 1)
 };
 
 inline int MCPrimaryData::GetN() const { return GetEntriesFast(); }
-inline MCPrimary * MCPrimaryData::Get(int n) const { return (MCPrimary *)At(n); }
+inline MCPrimary * MCPrimaryData::Get(int n) const { return static_cast<MCPrimary *>(At(n)); }
 
 #endif

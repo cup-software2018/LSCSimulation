@@ -29,16 +29,16 @@ public:
   double GetT0() const;
   int GetTrackId() const;
 
-  virtual void Print(const Option_t * opt = "") const;
+  void Print(Option_t * opt = "") const override;
 
 private:
   TString fName;
-  int fPDGCode;
-  int fTrackId;
-  double fVx, fVy, fVz;
-  double fPx, fPy, fPz;
-  double fKineticEnergy;
-  double fT0;
+  int fPDGCode = 0;
+  int fTrackId = 0;
+  double fVx = 0, fVy = 0, fVz = 0;
+  double fPx = 0, fPy = 0, fPz = 0;
+  double fKineticEnergy = 0;
+  double fT0 = 0;
 
   ClassDef(MCPrimary, 1)
 };

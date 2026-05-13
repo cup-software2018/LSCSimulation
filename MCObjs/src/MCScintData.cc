@@ -4,55 +4,50 @@
 
 #include "MCObjs/MCScint.hh"
 
-using namespace std;
 
 ClassImp(MCScintData)
 
 MCScintData::MCScintData()
-  : TClonesArray("MCScint")
+    : TClonesArray("MCScint")
 {
-  fN = 0;
 }
 
 MCScintData::MCScintData(const MCScintData & data)
-  : TClonesArray(data)
+    : TClonesArray(data)
 {
 }
 
-MCScintData::~MCScintData() {}
+MCScintData::~MCScintData() = default;
 
-MCScint * MCScintData::Add() { return new ((*this)[fN++]) MCScint(); }
-MCScint * MCScintData::Add(int id) { return new ((*this)[fN++]) MCScint(id); }
-
-void MCScintData::Clear(const Option_t * opt)
+MCScint * MCScintData::Add()
 {
-  fN = 0;
-  Delete();
+  return new ((*this)[GetEntriesFast()]) MCScint();
+}
+
+MCScint * MCScintData::Add(int id)
+{
+  return new ((*this)[GetEntriesFast()]) MCScint(id);
+}
+
+void MCScintData::Clear(Option_t * opt)
+{
+  TClonesArray::Clear("C");
 }
 
 MCScint * MCScintData::FindScint(int id)
 {
-  MCScint * scint = nullptr;
-
-  int n = GetN();
-  for (int i = 0; i < n; i++) {
-    MCScint * rscint = Get(i);
-    if (rscint->GetVolumeId() == id) {
-      scint = rscint;
-      break;
-    }
+  for (auto obj : *this) {
+    auto scint = static_cast<MCScint *>(obj);
+    if (scint->GetVolumeId() == id) return scint;
   }
-
-  return scint;
+  return nullptr;
 }
 
-void MCScintData::Print(const Option_t * opt) const
+void MCScintData::Print(Option_t * opt) const
 {
   int n = GetN();
-  cout << Form("===> MCScintData: number of scintillation volume: %d", n)
-       << endl;
-  for (int i = 0; i < n; i++) {
-    MCScint * scint = Get(i);
-    scint->Print();
+  std::cout << Form("===> MCScintData: number of scintillation volume: %d", n) << std::endl;
+  for (auto obj : *this) {
+    static_cast<MCScint *>(obj)->Print();
   }
 }

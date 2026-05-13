@@ -3,65 +3,47 @@
 #include "MCObjs/MCTrack.hh"
 #include "MCObjs/MCStep.hh"
 
-using namespace std;
 
 ClassImp(MCTrack)
 
 MCTrack::MCTrack()
     : TClonesArray("MCStep")
 {
-  fParticleName = "";
-  fPDGCode = 0;
-
-  fTrackId = 0;
-  fParentId = 0;
-
-  fVx = 0;
-  fVy = 0;
-  fVz = 0;
-  fKineticEnergy = 0;
-  fGlobalTime = 0;
-  fLocalTime = 0;
-
-  fProcessName = "";
-
-  fNStep = 0;
 }
 
 MCTrack::MCTrack(const MCTrack & trk)
     : TClonesArray(trk)
+    , fPDGCode(trk.GetPDGCode())
+    , fTrackId(trk.GetTrackId())
+    , fParentId(trk.GetParentId())
+    , fKineticEnergy(trk.GetKineticEnergy())
+    , fGlobalTime(trk.GetGlobalTime())
+    , fLocalTime(trk.GetLocalTime())
+    , fParticleName(trk.GetParticleName())
+    , fProcessName(trk.GetProcessName())
 {
-  fParticleName = trk.GetParticleName();
-  fPDGCode = trk.GetPDGCode();
-
-  fTrackId = trk.GetTrackId();
-  fParentId = trk.GetParentId();
-
   trk.GetVertex(fVx, fVy, fVz);
-  fKineticEnergy = trk.GetKineticEnergy();
-  fGlobalTime = trk.GetGlobalTime();
-  fLocalTime = trk.GetLocalTime();
-
-  fProcessName = trk.GetProcessName();
 }
 
-MCTrack::~MCTrack() {}
+MCTrack::~MCTrack() = default;
 
-MCStep * MCTrack::AddStep() { return new ((*this)[fNStep++]) MCStep(); }
-
-void MCTrack::Clear(const Option_t * opt)
+MCStep * MCTrack::AddStep()
 {
-  fNStep = 0;
-  Delete();
+  return new ((*this)[GetEntriesFast()]) MCStep();
 }
 
-void MCTrack::Print(const Option_t * opt) const
+void MCTrack::Clear(Option_t * opt)
 {
-  cout << "+++++++++ TrackId = " << fTrackId << endl;
-  cout << "         MotherId = " << fParentId << endl;
-  cout << "     ParticleName = " << fParticleName << endl;
-  cout << "     ProcessName  = " << fProcessName << endl;
-  cout << Form("     Global Time  = %0.6f [ns]", fGlobalTime) << endl;
-  cout << Form("   Kinetic Energy = %0.6f [MeV]", fKineticEnergy) << endl;
-  cout << endl;
+  TClonesArray::Clear("C");
+}
+
+void MCTrack::Print(Option_t * opt) const
+{
+  std::cout << "+++++++++ TrackId = " << fTrackId << std::endl;
+  std::cout << "         MotherId = " << fParentId << std::endl;
+  std::cout << "     ParticleName = " << fParticleName << std::endl;
+  std::cout << "     ProcessName  = " << fProcessName << std::endl;
+  std::cout << Form("     Global Time  = %0.6f [ns]", fGlobalTime) << std::endl;
+  std::cout << Form("   Kinetic Energy = %0.6f [MeV]", fKineticEnergy) << std::endl;
+  std::cout << std::endl;
 }

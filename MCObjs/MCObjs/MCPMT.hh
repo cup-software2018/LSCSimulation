@@ -3,7 +3,7 @@
 
 #include "TClonesArray.h"
 
-class MCPhotonHit;
+#include "MCObjs/MCPhotonHit.hh"
 class MCPMT : public TClonesArray {
 public:
   MCPMT();
@@ -11,7 +11,7 @@ public:
   MCPMT(const MCPMT & pmt);
   virtual ~MCPMT();
 
-  virtual void Clear(const Option_t * opt = "");
+  void Clear(Option_t * opt = "") override;
 
   void SetId(int id);
   int GetId() const;
@@ -22,14 +22,13 @@ public:
   int GetNHit() const;
   MCPhotonHit * GetHit(int i) const;
 
-  virtual bool IsSortable() const { return true; }
-  virtual int Compare(const TObject * object) const;
+  bool IsSortable() const override { return true; }
+  int Compare(const TObject * object) const override;
 
-  virtual void Print(const Option_t * opt = "") const;
+  void Print(Option_t * opt = "") const override;
 
 private:
-  int fPMTId;
-  int fNHit; //!
+  int fPMTId = -1;
 
   ClassDef(MCPMT, 1);
 };
@@ -38,7 +37,7 @@ inline void MCPMT::SetId(int Id) { fPMTId = Id; }
 inline int MCPMT::GetId() const { return fPMTId; }
 
 inline int MCPMT::GetNHit() const { return GetEntriesFast(); }
-inline MCPhotonHit * MCPMT::GetHit(int n) const { return (MCPhotonHit *)At(n); }
+inline MCPhotonHit * MCPMT::GetHit(int n) const { return static_cast<MCPhotonHit *>(At(n)); }
 
 
 #endif

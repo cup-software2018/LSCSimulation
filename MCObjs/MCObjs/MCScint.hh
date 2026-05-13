@@ -3,7 +3,7 @@
 
 #include "TClonesArray.h"
 
-class MCScintStep;
+#include "MCObjs/MCScintStep.hh"
 class MCScint : public TClonesArray {
 public:
   MCScint();
@@ -11,7 +11,7 @@ public:
   MCScint(const MCScint & scint);
   virtual ~MCScint();
 
-  virtual void Clear(const Option_t * opt = "");
+  void Clear(Option_t * opt = "") override;
 
   void SetVolumeId(int val);
   void AddEnergyDeposit(float val);
@@ -27,16 +27,13 @@ public:
   int GetNStep() const;
   MCScintStep * GetStep(int i) const;
 
-  virtual void Print(const Option_t * opt = "") const;
+  void Print(Option_t * opt = "") const override;
 
 private:
-  int fVolumeId;
-  int fNScintPhoton;
-  float fEdep;
-  float fEdepQuenched;
-
-  // Step
-  int fNStep; //!
+  int fVolumeId = -1;
+  int fNScintPhoton = 0;
+  float fEdep = 0;
+  float fEdepQuenched = 0;
 
   ClassDef(MCScint, 1)
 };
@@ -60,7 +57,7 @@ inline int MCScint::GetNScintPhoton() const { return fNScintPhoton; }
 inline int MCScint::GetNStep() const { return GetEntriesFast(); }
 inline MCScintStep * MCScint::GetStep(int n) const
 {
-  return (MCScintStep *)At(n);
+  return static_cast<MCScintStep *>(At(n));
 }
 
 #endif

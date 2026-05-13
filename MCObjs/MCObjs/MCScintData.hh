@@ -3,14 +3,14 @@
 
 #include "TClonesArray.h"
 
-class MCScint;
+#include "MCObjs/MCScint.hh"
 class MCScintData : public TClonesArray {
 public:
   MCScintData();
   MCScintData(const MCScintData & data);
   virtual ~MCScintData();
 
-  virtual void Clear(const Option_t * opt = "");
+  void Clear(Option_t * opt = "") override;
 
   MCScint * Add();
   MCScint * Add(int id);
@@ -19,15 +19,12 @@ public:
   MCScint * Get(int i) const;
   MCScint * FindScint(int id);
 
-  virtual void Print(const Option_t * opt = "") const;
-
-private:
-  int fN; //!
+  void Print(Option_t * opt = "") const override;
 
   ClassDef(MCScintData, 1)
 };
 
 inline int MCScintData::GetN() const { return GetEntriesFast(); }
-inline MCScint * MCScintData::Get(int n) const { return (MCScint *)At(n); }
+inline MCScint * MCScintData::Get(int n) const { return static_cast<MCScint *>(At(n)); }
 
 #endif

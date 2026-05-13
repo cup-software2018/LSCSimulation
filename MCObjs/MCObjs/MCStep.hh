@@ -9,7 +9,7 @@ class MCStep : public TObject {
 public:
   MCStep();
   MCStep(const MCStep & step);
-  virtual ~MCStep();
+  virtual ~MCStep() = default;
 
   void SetStepLength(float val);
   void SetEnergyDeposit(float val);
@@ -28,12 +28,12 @@ public:
   const char * GetVolumeName() const;
 
 protected:
-  float fStepLength;
-  float fEnergyDeposit;
-  float fEnergyDepositNonIonizing;
-  float fGlobalTime;
-  float fLocalTime;
-  float fX, fY, fZ;
+  float fStepLength = 0;
+  float fEnergyDeposit = 0;
+  float fEnergyDepositNonIonizing = 0;
+  float fGlobalTime = 0;
+  float fLocalTime = 0;
+  float fX = 0, fY = 0, fZ = 0;
   TString fVolumeName;
 
   ClassDef(MCStep, 1)

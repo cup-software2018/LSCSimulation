@@ -12,10 +12,10 @@ public:
   void SetEventNumber(unsigned int n);
   unsigned int GetEventNumber() const;
 
-  virtual void Print(const Option_t * opt = "");
+  void Print(Option_t * opt = "") const override;
 
 private:
-  unsigned int fEventNumber;
+  unsigned int fEventNumber = 0;
 
   ClassDef(MCEventInfo, 1)
 };

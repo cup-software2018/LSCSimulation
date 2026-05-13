@@ -16,8 +16,8 @@ public:
   inline int GetNScintPhoton() const { return fNScintPhoton; }
 
 private:
-  int fNScintPhoton;
-  float fEnergyVisible;
+  int fNScintPhoton = 0;
+  float fEnergyVisible = 0;
 
   ClassDef(MCScintStep, 1)
 };

@@ -4,14 +4,14 @@
 #include "TClonesArray.h"
 #include "TString.h"
 
-class MCStep;
+#include "MCObjs/MCStep.hh"
 class MCTrack : public TClonesArray {
 public:
   MCTrack();
   MCTrack(const MCTrack & trk);
   virtual ~MCTrack();
 
-  virtual void Clear(const Option_t * opt = "");
+  void Clear(Option_t * opt = "") override;
 
   void SetParticleName(const char * name);
   void SetPDGCode(int code);
@@ -38,22 +38,20 @@ public:
   int GetNStep() const;
   MCStep * GetStep(int i) const;
 
-  virtual void Print(const Option_t * opt = "") const;
+  void Print(Option_t * opt = "") const override;
 
 private:
-  int fPDGCode;
-  int fTrackId;
-  int fParentId;
+  int fPDGCode = 0;
+  int fTrackId = 0;
+  int fParentId = 0;
 
-  double fVx, fVy, fVz;
-  double fKineticEnergy;
-  double fGlobalTime;
-  double fLocalTime;
+  double fVx = 0, fVy = 0, fVz = 0;
+  double fKineticEnergy = 0;
+  double fGlobalTime = 0;
+  double fLocalTime = 0;
 
   TString fParticleName;
   TString fProcessName;
-
-  int fNStep; //!
 
   ClassDef(MCTrack, 1)
 };
@@ -113,6 +111,6 @@ inline const char * MCTrack::GetProcessName() const
 }
 
 inline int MCTrack::GetNStep() const { return GetEntriesFast(); }
-inline MCStep * MCTrack::GetStep(int n) const { return (MCStep *)At(n); }
+inline MCStep * MCTrack::GetStep(int n) const { return static_cast<MCStep *>(At(n)); }
 
 #endif

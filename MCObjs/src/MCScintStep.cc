@@ -5,15 +5,13 @@ ClassImp(MCScintStep)
 MCScintStep::MCScintStep()
     : MCStep()
 {
-  fEnergyVisible = 0;
-  fNScintPhoton = 0;
 }
 
 MCScintStep::MCScintStep(const MCScintStep & step)
     : MCStep(step)
+    , fNScintPhoton(step.GetNScintPhoton())
+    , fEnergyVisible(step.GetEnergyVisible())
 {
-  fEnergyVisible = step.GetEnergyVisible();
-  fNScintPhoton = step.GetNScintPhoton();
 }
 
-MCScintStep::~MCScintStep() {}
+MCScintStep::~MCScintStep() = default;

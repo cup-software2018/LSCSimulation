@@ -2,25 +2,23 @@
 #include "TString.h"
 #include "MCObjs/MCEventInfo.hh"
 
-using namespace std;
 
 ClassImp(MCEventInfo)
 
 MCEventInfo::MCEventInfo()
-  : TObject()
+    : TObject()
 {
-  fEventNumber = 0;
 }
 
 MCEventInfo::MCEventInfo(const MCEventInfo & info)
-  : TObject()
+    : TObject()
+    , fEventNumber(info.GetEventNumber())
 {
-  fEventNumber = info.GetEventNumber();
 }
 
-MCEventInfo::~MCEventInfo() {}
+MCEventInfo::~MCEventInfo() = default;
 
-void MCEventInfo::Print(const Option_t * opt)
+void MCEventInfo::Print(Option_t * opt) const
 {
-  cout << Form("++++++++++++++++ Event No: %d ++++++++++++++++++", fEventNumber) << endl;
+  std::cout << Form("++++++++++++++++ Event No: %d ++++++++++++++++++", fEventNumber) << std::endl;
 }

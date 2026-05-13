@@ -6,7 +6,6 @@ ClassImp(MCTrackData)
 MCTrackData::MCTrackData()
     : TClonesArray("MCTrack")
 {
-  fN = 0;
 }
 
 MCTrackData::MCTrackData(const MCTrackData & data)
@@ -14,55 +13,35 @@ MCTrackData::MCTrackData(const MCTrackData & data)
 {
 }
 
-MCTrackData::~MCTrackData() {}
+MCTrackData::~MCTrackData() = default;
 
-MCTrack * MCTrackData::Add() { return new ((*this)[fN++]) MCTrack(); }
-
-MCTrack * MCTrackData::FindTrack(int id)
+MCTrack * MCTrackData::Add()
 {
-  MCTrack * track = nullptr;
+  return new ((*this)[GetEntriesFast()]) MCTrack();
+}
 
-  int n = GetN();
-  for (int i = 0; i < n; i++) {
-    MCTrack * rtrack = Get(i);
-    if (rtrack->GetTrackId() == id) {
-      track = rtrack;
-      break;
-    }
+MCTrack * MCTrackData::FindTrack(int id) const
+{
+  for (auto obj : *this) {
+    auto track = static_cast<MCTrack *>(obj);
+    if (track->GetTrackId() == id) return track;
   }
-
-  return track;
+  return nullptr;
 }
 
 MCTrack * MCTrackData::GetParentTrack(MCTrack * track) const
 {
-  MCTrack * mother = nullptr;
-
-  int pid = track->GetParentId();
-
-  int n = GetN();
-  for (int i = 0; i < n; i++) {
-    MCTrack * rtrack = Get(i);
-    if (rtrack->GetParentId() == pid) {
-      mother = rtrack;
-      break;
-    }
-  }
-
-  return mother;
+  return FindTrack(track->GetParentId());
 }
 
-void MCTrackData::Clear(const Option_t * opt)
+void MCTrackData::Clear(Option_t * opt)
 {
-  fN = 0;
-  Delete();
+  TClonesArray::Clear("C");
 }
 
-void MCTrackData::Print(const Option_t * opt) const
+void MCTrackData::Print(Option_t * opt) const
 {
-  int n = GetN();
-  for (int i = 0; i < n; i++) {
-    MCTrack * track = Get(i);
-    track->Print();
+  for (auto obj : *this) {
+    static_cast<MCTrack *>(obj)->Print();
   }
 }

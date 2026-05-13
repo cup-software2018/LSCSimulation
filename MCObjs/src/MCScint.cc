@@ -4,75 +4,52 @@
 
 #include "MCObjs/MCScintStep.hh"
 
-using namespace std;
 
 ClassImp(MCScint)
 
 MCScint::MCScint()
-  : TClonesArray("MCScintStep")
+    : TClonesArray("MCScintStep")
 {
-  fVolumeId = 0;
-
-  // Scint
-  fEdep = 0;
-  fEdepQuenched = 0;
-  fNScintPhoton = 0;
-
-  fNStep = 0;
 }
 
 MCScint::MCScint(int id)
-  : TClonesArray("MCScintStep")
+    : TClonesArray("MCScintStep")
+    , fVolumeId(id)
 {
-  fVolumeId = id;
-
-  // Scint
-  fEdep = 0;
-  fEdepQuenched = 0;
-  fNScintPhoton = 0;
-
-  fNStep = 0;
 }
 
 MCScint::MCScint(const MCScint & scint)
-  : TClonesArray(scint)
+    : TClonesArray(scint)
+    , fVolumeId(scint.GetVolumeId())
+    , fNScintPhoton(scint.GetNScintPhoton())
+    , fEdep(scint.GetEnergyDeposit())
+    , fEdepQuenched(scint.GetEnergyVisible())
 {
-  fVolumeId = scint.GetVolumeId();
-
-  // Scint
-  fEdep = scint.GetEnergyDeposit();
-  fEdepQuenched = scint.GetEnergyVisible();
-  fNScintPhoton = scint.GetNScintPhoton();
 }
 
-MCScint::~MCScint() {}
+MCScint::~MCScint() = default;
 
 MCScintStep * MCScint::AddStep()
 {
-  return new ((*this)[fNStep++]) MCScintStep();
+  return new ((*this)[GetEntriesFast()]) MCScintStep();
 }
 
-void MCScint::Clear(const Option_t * opt)
+void MCScint::Clear(Option_t * opt)
 {
-  // Scint
   fEdep = 0;
   fEdepQuenched = 0;
   fNScintPhoton = 0;
-
-  fNStep = 0;
-  Delete();
+  TClonesArray::Clear("C");
 }
 
-void MCScint::Print(const Option_t * opt) const
+void MCScint::Print(Option_t * opt) const
 {
-  cout << Form("Volume: %d ", fVolumeId) << endl;
-  cout << Form("   Deposit Energy    = %.6f [MeV]", GetEnergyDeposit())
-       << endl;
-  cout << Form("   Visible Energy    = %.6f [MeV]", GetEnergyVisible())
-       << endl;
-  cout << Form("   # of Scint Photon = %d         ", GetNScintPhoton()) << endl;
+  std::cout << Form("Volume: %d ", fVolumeId) << std::endl;
+  std::cout << Form("   Deposit Energy    = %.6f [MeV]", GetEnergyDeposit()) << std::endl;
+  std::cout << Form("   Visible Energy    = %.6f [MeV]", GetEnergyVisible()) << std::endl;
+  std::cout << Form("   # of Scint Photon = %d         ", GetNScintPhoton()) << std::endl;
 
   if (GetNStep() > 0) {
-    cout << Form("   # of Scint Step   = %d         ", GetNStep()) << endl;
+    std::cout << Form("   # of Scint Step   = %d         ", GetNStep()) << std::endl;
   }
 }

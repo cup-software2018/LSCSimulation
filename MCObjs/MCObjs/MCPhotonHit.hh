@@ -7,7 +7,7 @@ class MCPhotonHit : public TObject {
 public:
   MCPhotonHit();
   MCPhotonHit(const MCPhotonHit & photon);
-  ~MCPhotonHit();
+  virtual ~MCPhotonHit();
 
   void SetTime(float t);
   void SetKineticEnergy(float KE);
@@ -16,12 +16,12 @@ public:
   float GetKineticEnergy() const;
   float GetWavelength() const;
 
-  virtual bool IsSortable() const { return true; }
-  virtual int Compare(const TObject * object) const;
+  bool IsSortable() const override { return true; }
+  int Compare(const TObject * object) const override;
 
 private:
-  float fTime;
-  float fKE;
+  float fTime = 0;
+  float fKE = 0;
 
   ClassDef(MCPhotonHit, 1)
 };

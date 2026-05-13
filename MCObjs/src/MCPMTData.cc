@@ -4,31 +4,30 @@
 ClassImp(MCPMTData)
 
 MCPMTData::MCPMTData()
-  : TClonesArray("MCPMT")
+    : TClonesArray("MCPMT")
 {
-  fN = 0;
 }
 
 MCPMTData::MCPMTData(const MCPMTData & data)
-  : TClonesArray(data)
+    : TClonesArray(data)
 {
 }
 
-MCPMTData::~MCPMTData() {}
+MCPMTData::~MCPMTData() = default;
 
-MCPMT * MCPMTData::Add() { return new ((*this)[fN++]) MCPMT(); }
-
-void MCPMTData::Clear(const Option_t * opt)
+MCPMT * MCPMTData::Add()
 {
-  fN = 0;
-  Delete();
+  return new ((*this)[GetEntriesFast()]) MCPMT();
 }
 
-void MCPMTData::Print(const Option_t * opt) const
+void MCPMTData::Clear(Option_t * opt)
 {
-  int n = GetN();
-  for (int i = 0; i < n; i++) {
-    MCPMT * track = Get(i);
-    track->Print();
+  TClonesArray::Clear("C");
+}
+
+void MCPMTData::Print(Option_t * opt) const
+{
+  for (auto obj : *this) {
+    static_cast<MCPMT *>(obj)->Print();
   }
 }

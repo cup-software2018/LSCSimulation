@@ -3,37 +3,36 @@
 #include "MCObjs/MCPrimaryData.hh"
 #include "MCObjs/MCPrimary.hh"
 
-using namespace std;
 
 ClassImp(MCPrimaryData)
 
 MCPrimaryData::MCPrimaryData()
-  : TClonesArray("MCPrimary")
+    : TClonesArray("MCPrimary")
 {
-  fN = 0;
 }
 
 MCPrimaryData::MCPrimaryData(const MCPrimaryData & data)
-  : TClonesArray(data)
+    : TClonesArray(data)
 {
 }
 
-MCPrimaryData::~MCPrimaryData() {}
+MCPrimaryData::~MCPrimaryData() = default;
 
-MCPrimary * MCPrimaryData::Add() { return new ((*this)[fN++]) MCPrimary(); }
-
-void MCPrimaryData::Clear(const Option_t * opt)
+MCPrimary * MCPrimaryData::Add()
 {
-  fN = 0;
-  Delete();
+  return new ((*this)[GetEntriesFast()]) MCPrimary();
 }
 
-void MCPrimaryData::Print(const Option_t * opt) const
+void MCPrimaryData::Clear(Option_t * opt)
+{
+  TClonesArray::Clear("C");
+}
+
+void MCPrimaryData::Print(Option_t * opt) const
 {
   int n = GetN();
-  cout << Form("===> MCPrimaryData: number of primary: %d", n) << endl;  
-  for (int i = 0; i < n; i++) {
-    MCPrimary * track = Get(i);
-    track->Print();
+  std::cout << Form("===> MCPrimaryData: number of primary: %d", n) << std::endl;
+  for (auto obj : *this) {
+    static_cast<MCPrimary *>(obj)->Print();
   }
 }
