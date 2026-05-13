@@ -1,5 +1,4 @@
-#ifndef AbsSignal_hh
-#define AbsSignal_hh
+#pragma once
 
 #include "TObject.h"
 #include "TRandom3.h"
@@ -18,7 +17,7 @@ public:
   virtual double GetTimeMinimum() const;
   virtual double GetTimeMaximum() const;
 
-  virtual void Draw(Option_t * option = "");  
+  virtual void Draw(Option_t * option = "");
 
 protected:
   bool fIsPrepared;
@@ -27,12 +26,10 @@ protected:
   double fMaximumTime;
 
   TGraph * fGraph;
-  TRandom3 * fRandom;  
+  TRandom3 * fRandom;
 
   ClassDef(AbsSignal, 0)
 };
 
 inline double AbsSignal::GetTimeMinimum() const { return fMinimumTime; }
 inline double AbsSignal::GetTimeMaximum() const { return fMaximumTime; }
-
-#endif

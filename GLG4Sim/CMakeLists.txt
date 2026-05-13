@@ -10,14 +10,14 @@ add_library(${MODULE_NAME} SHARED
 
 target_include_directories(${MODULE_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-        ${Geant4_INCLUDE_DIRS}
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    ${Geant4_INCLUDE_DIRS}
 )
 
 target_link_libraries(${MODULE_NAME}
     PUBLIC
-        ${Geant4_LIBRARIES}
+    ${Geant4_LIBRARIES}
 )
 
 install(TARGETS ${MODULE_NAME}

@@ -12,12 +12,12 @@ void digi_example()
   // pmt->Draw();
 
   auto fadc = new FADCWaveformGenerator();
-  fadc->SetNBIT(12);
+  fadc->SetADCBits(12);
   fadc->SetVpp(2500);
   fadc->SetSamplingRate(500);
-  fadc->SetTimeWindow(250);
-  fadc->SetPedOffset(100);
-  fadc->SetPedRMS(0.3);
+  fadc->SetRecordLength(250);
+  fadc->SetPedestalMean(100);
+  fadc->SetPedestalRMS(0.5);  // ADC counts (formerly mV)
 
   fadc->SetSignal(pmt);
   fadc->Digitize();

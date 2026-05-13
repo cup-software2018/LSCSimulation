@@ -64,4 +64,19 @@ export ROOT_INCLUDE_PATH=\"\$LSCSIM_DIR/include:\$ROOT_INCLUDE_PATH\"
 echo \"[LSCSimulation] Environment loaded from: \$LSCSIM_DIR\"
 ")
 
-install(FILES ${CMAKE_BINARY_DIR}/setup_lscsim.sh DESTINATION .)
+# Install-tree version: stubs are installed to lib64 so only one path is needed.
+install(CODE "
+  file(WRITE \"\${CMAKE_INSTALL_PREFIX}/setup_lscsim.sh\"
+    \"#!/bin/bash\\n\"
+    \"# LSCSimulation Environment Setup Script\\n\"
+    \"\\n\"
+    \"export LSCSIM_DIR=\\\"\\\$(builtin cd \\\"\\\$(dirname \\\"\\\${BASH_SOURCE[0]}\\\")\\\" && pwd)\\\"\\n\"
+    \"\\n\"
+    \"export PATH=\\\"\\\$LSCSIM_DIR/bin:\\\$PATH\\\"\\n\"
+    \"export LD_LIBRARY_PATH=\\\"\\\$LSCSIM_DIR/${CMAKE_INSTALL_LIBDIR}:\\\$LD_LIBRARY_PATH\\\"\\n\"
+    \"export ROOT_INCLUDE_PATH=\\\"\\\$LSCSIM_DIR/include:\\\$ROOT_INCLUDE_PATH\\\"\\n\"
+    \"\\n\"
+    \"echo \\\"[LSCSimulation] Environment loaded from: \\\$LSCSIM_DIR\\\"\\n\"
+  )
+  execute_process(COMMAND chmod +x \"\${CMAKE_INSTALL_PREFIX}/setup_lscsim.sh\")
+")

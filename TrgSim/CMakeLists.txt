@@ -16,9 +16,9 @@ ROOT_GENERATE_DICTIONARY(G__${MODULE_NAME}
     ${DICT_HEADERS}
     LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/inc/LinkDef.h
     OPTIONS
-        -I${CMAKE_CURRENT_SOURCE_DIR}/inc
-        -I${MCObjs_SOURCE_DIR}/inc
-        -Wno-inconsistent-missing-override
+    -I${CMAKE_CURRENT_SOURCE_DIR}/inc
+    -I${MCObjs_SOURCE_DIR}/inc
+    -Wno-inconsistent-missing-override
     NOINSTALL
 )
 
@@ -29,16 +29,16 @@ add_library(${MODULE_NAME} SHARED
 
 target_include_directories(${MODULE_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(${MODULE_NAME}
     PUBLIC
-        MCObjs
-        ROOT::Core
-        ROOT::RIO
-        ROOT::Tree
+    MCObjs
+    ROOT::Core
+    ROOT::RIO
+    ROOT::Tree
 )
 
 install(TARGETS ${MODULE_NAME}
