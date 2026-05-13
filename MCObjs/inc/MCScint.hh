@@ -4,7 +4,7 @@
 
 #include "TObject.h"
 
-#include "MCObjs/MCScintStep.hh"
+#include "MCScintStep.hh"
 
 class MCScint : public TObject {
 public:

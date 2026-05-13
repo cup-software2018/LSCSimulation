@@ -4,7 +4,7 @@
 
 #include "TObject.h"
 
-#include "MCObjs/MCPhotonHit.hh"
+#include "MCPhotonHit.hh"
 
 class MCPMT : public TObject {
 public:

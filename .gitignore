@@ -8,3 +8,4 @@
 /lib64
 /install
 /.clang-format
+/.clangd

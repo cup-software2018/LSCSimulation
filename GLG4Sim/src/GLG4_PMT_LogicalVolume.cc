@@ -7,14 +7,14 @@
 // Modification history:
 //  G.H-S.  2001/03/20:  Added GLG4PMTOpticalModel for thin photocathode
 
-#include "GLG4Sim/GLG4_PMT_LogicalVolume.hh"
-#include "GLG4Sim/GLG4PMTOpticalModel.hh"
+#include "GLG4_PMT_LogicalVolume.hh"
+#include "GLG4PMTOpticalModel.hh"
 
 #include "G4Material.hh"
 #include "G4Tubs.hh"
 #include "G4PVPlacement.hh"
-//#include "GLG4Sim/GLG4Ellipsoid.hh"
-#include "GLG4Sim/GLG4TorusStack.hh"
+//#include "GLG4Ellipsoid.hh"
+#include "GLG4TorusStack.hh"
 #include "G4VisAttributes.hh"               // for G4VisAttributes::Invisible
 #include "G4OpticalSurface.hh"
 #include "G4LogicalBorderSurface.hh"

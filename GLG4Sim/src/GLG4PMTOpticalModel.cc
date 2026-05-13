@@ -11,7 +11,7 @@
    photocathode.
 */
 
-#include "GLG4Sim/GLG4PMTOpticalModel.hh"
+#include "GLG4PMTOpticalModel.hh"
 
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <complex.h>
@@ -26,8 +26,8 @@
 #include "G4UIdirectory.hh"
 #include "Randomize.hh"
 
-#include "GLG4Sim/GLG4PMTSD.hh"
-#include "GLG4Sim/local_g4compat.hh"
+#include "GLG4PMTSD.hh"
+#include "local_g4compat.hh"
 
 using namespace CLHEP;
 

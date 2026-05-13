@@ -11,11 +11,11 @@
   photocathode.
   */
 
-#include "LSCSim/LSCPMTOpticalModel.hh"
-
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <complex>
+
+#include "TMath.h"
 
 #include "G4GeometryTolerance.hh"
 #include "G4LogicalBorderSurface.hh"
@@ -27,11 +27,10 @@
 #include "G4UIdirectory.hh"
 #include "G4UnitsTable.hh"
 #include "G4Version.hh"
+#include "LSCPMTOpticalModel.hh"
+#include "LSCPMTSD.hh"
 #include "Randomize.hh"
-#include "TMath.h"
-
-#include "GLG4Sim/local_g4compat.hh"
-#include "LSCSim/LSCPMTSD.hh"
+#include "local_g4compat.hh"
 
 using namespace std;
 
@@ -41,12 +40,12 @@ double LSCPMTOpticalModel::surfaceTolerance = 0.0;
 // constructor -- also handles all initialization
 // 28-Jul-2006 WGS: Must define a G4Region for Fast Simulations
 // (change from Geant 4.7 to Geant 4.8).
-LSCPMTOpticalModel::LSCPMTOpticalModel(
-    G4String modelName, G4Region * envelope_region,
-    G4LogicalVolume * envelope_log, G4OpticalSurface * pc_opsurf,
-    double efficiency_correction, double dynodeTop, double dynodeRadius,
-    double prepulseProb, double photocathode_MINrho, double photocathode_MAXrho)
-    : G4VFastSimulationModel(modelName, envelope_region)
+LSCPMTOpticalModel::LSCPMTOpticalModel(G4String modelName, G4Region * envelope_region,
+                                       G4LogicalVolume * envelope_log, G4OpticalSurface * pc_opsurf,
+                                       double efficiency_correction, double dynodeTop,
+                                       double dynodeRadius, double prepulseProb,
+                                       double photocathode_MINrho, double photocathode_MAXrho)
+  : G4VFastSimulationModel(modelName, envelope_region)
 {
   surfaceTolerance = G4GeometryTolerance::GetInstance()->GetSurfaceTolerance();
   _verbosity = 0;
@@ -60,8 +59,7 @@ LSCPMTOpticalModel::LSCPMTOpticalModel(
 
   // get material properties vectors
   // ... material properties of glass
-  G4MaterialPropertiesTable * glass_pt =
-      envelope_log->GetMaterial()->GetMaterialPropertiesTable();
+  G4MaterialPropertiesTable * glass_pt = envelope_log->GetMaterial()->GetMaterialPropertiesTable();
   if (glass_pt == nullptr) {
     G4Exception(__FILE__, "Bad Properties", FatalException,
                 "LSCPMTOpticalModel: glass lacks a properties table!");
@@ -74,9 +72,7 @@ LSCPMTOpticalModel::LSCPMTOpticalModel(
   }
 
   _applyCorrection = true;
-  if (_photocathode_MINrho == 0 || _photocathode_MAXrho == 0) {
-    _applyCorrection = false;
-  }
+  if (_photocathode_MINrho == 0 || _photocathode_MAXrho == 0) { _applyCorrection = false; }
 
   // ... material properties of photocathode (first get photocathode surface)
   // here we assume that the first daughter volume is the "inner1" volume
@@ -146,13 +142,12 @@ LSCPMTOpticalModel::LSCPMTOpticalModel(
     cmd->SetParameter(new G4UIparameter("level", 'i', false));
 
     cmd = new G4UIcommand("/PMTOpticalModel/luxlevel", this);
-    cmd->SetGuidance(
-        "Set \"luxury level\" for PMT Optical Model\n"
-        " 0 == standard \"black bucket\": photons stop in PC, maybe make pe, \n"
-        " 1 == shiny translucent brown film: photons only stop if they make a "
-        "PE, otherwise 50/50 chance of reflecting/transmitting\n"
-        " 2 or greater == full model\n"
-        "The default value is 3.");
+    cmd->SetGuidance("Set \"luxury level\" for PMT Optical Model\n"
+                     " 0 == standard \"black bucket\": photons stop in PC, maybe make pe, \n"
+                     " 1 == shiny translucent brown film: photons only stop if they make a "
+                     "PE, otherwise 50/50 chance of reflecting/transmitting\n"
+                     " 2 or greater == full model\n"
+                     "The default value is 3.");
     cmd->SetParameter(new G4UIparameter("level", 'i', false));
 
     cmd = new G4UIcommand("/PMTOpticalModel/BcorrTable", this);
@@ -170,8 +165,7 @@ LSCPMTOpticalModel::~LSCPMTOpticalModel()
 // IsApplicable() method overriding virtual function of G4VFastSimulationModel
 // returns true if model is applicable to given particle.
 // -- see also Geant4 docs
-G4bool
-LSCPMTOpticalModel::IsApplicable(const G4ParticleDefinition & particleType)
+G4bool LSCPMTOpticalModel::IsApplicable(const G4ParticleDefinition & particleType)
 {
   return (&particleType == G4OpticalPhoton::OpticalPhotonDefinition());
 }
@@ -183,9 +177,7 @@ G4bool LSCPMTOpticalModel::ModelTrigger(const G4FastTrack & fastTrack)
 {
   // we trigger if the track position is above the equator
   // or if it is on the equator and heading up
-  if (fastTrack.GetPrimaryTrackLocalPosition().z() > surfaceTolerance) {
-    return true;
-  }
+  if (fastTrack.GetPrimaryTrackLocalPosition().z() > surfaceTolerance) { return true; }
   if (fastTrack.GetPrimaryTrackLocalPosition().z() > -surfaceTolerance &&
       fastTrack.GetPrimaryTrackLocalDirection().z() > 0.0) {
     return true;
@@ -197,8 +189,7 @@ G4bool LSCPMTOpticalModel::ModelTrigger(const G4FastTrack & fastTrack)
 // does the fast simulation for this track.  It is basically a faster but
 // complete tracking code for the two-volume case.  It is a monster.
 // -- see also Geant4 docs and comments below
-void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
-                              G4FastStep & fastStep)
+void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack, G4FastStep & fastStep)
 {
   // Logic summary:
   //  1) If track is outside the "inner1" vacuum, then track
@@ -243,9 +234,12 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
   G4double energy;
   G4double n_glass;
   G4VSolid * envelope_solid = fastTrack.GetEnvelopeSolid();
-  G4VSensitiveDetector * detector =
-      fastTrack.GetEnvelopeLogicalVolume()->GetSensitiveDetector();
-  enum EWhereAmI { kInGlass, kInVacuum } whereAmI;
+  G4VSensitiveDetector * detector = fastTrack.GetEnvelopeLogicalVolume()->GetSensitiveDetector();
+  enum EWhereAmI
+  {
+    kInGlass,
+    kInVacuum
+  } whereAmI;
   int ipmt = -1;
 
   // find which pmt we are in
@@ -279,8 +273,7 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     _n2 = _rindex_photocathode->Value(energy);
     _k2 = _kindex_photocathode->Value(energy);
     _n3 = 1.0; // just in case we exit before setting _n3
-    _efficiency =
-        _efficiency_photocathode->Value(energy) * _efficiency_correction;
+    _efficiency = _efficiency_photocathode->Value(energy) * _efficiency_correction;
   }
 
   // initialize "whereAmI"
@@ -297,11 +290,10 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
   // print verbose info
   if (_verbosity > 0) {
     G4cout << "> Enter LSCPMTOpticalModel, ipmt=" << ipmt
-           << (whereAmI == kInVacuum ? " vacuum" : " glass") << ", pos=" << pos
-           << ", dir=" << dir << ", weight=" << weight << ", pol=" << pol
-           << ", energy=" << _photon_energy << ", wavelength=" << _wavelength
-           << ", (n1,n3,n2,k2,efficiency)=(" << _n1 << "," << _n3 << "," << _n2
-           << "," << _k2 << "," << _efficiency << ")" << endl;
+           << (whereAmI == kInVacuum ? " vacuum" : " glass") << ", pos=" << pos << ", dir=" << dir
+           << ", weight=" << weight << ", pol=" << pol << ", energy=" << _photon_energy
+           << ", wavelength=" << _wavelength << ", (n1,n3,n2,k2,efficiency)=(" << _n1 << "," << _n3
+           << "," << _n2 << "," << _k2 << "," << _efficiency << ")" << endl;
   }
   _rho = sqrt(pow(pos.x(), 2) + pow(pos.y(), 2));
   _rhoAvg = (_photocathode_MINrho + _photocathode_MAXrho) / 2.0;
@@ -337,8 +329,7 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
       dist = _inner1_solid->DistanceToOut(pos, dir);
       if (dist < 0.0) {
         G4cerr << "LSCPMTOpticalModel::DoIt(): "
-               << "Warning, strangeness detected! inner1->DistanceToOut()="
-               << dist << endl;
+               << "Warning, strangeness detected! inner1->DistanceToOut()=" << dist << endl;
         dist = 0.0;
       }
       pos += dist * dir;
@@ -402,12 +393,10 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
 #ifdef G4DEBUG
     if (A < 0.0 || A > 1.0 || collection_eff < 0.0 || collection_eff > 1.0) {
       G4cout << "LSCPMTOpticalModel::DoIt(): Strange coefficients!" << endl;
-      G4cout << "T, R, A, An, weight: " << T << " " << R << " " << A << " "
-             << An << " " << weight << endl;
-      G4cout << "collection eff, std QE: " << collection_eff << " "
-             << _efficiency << endl;
-      G4cout << "========================================================="
+      G4cout << "T, R, A, An, weight: " << T << " " << R << " " << A << " " << An << " " << weight
              << endl;
+      G4cout << "collection eff, std QE: " << collection_eff << " " << _efficiency << endl;
+      G4cout << "=========================================================" << endl;
       A = collection_eff = 0.5; // safe values???
     }
 #endif
@@ -419,14 +408,11 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     // the weight == 1 case, and as good as can be done for weight>1 case.
     G4double mean_N_pe = weight * A * collection_eff;
     if (EfficiencyCorrection.count(ipmt)) {
-      if (EfficiencyCorrection[ipmt] >= 0) {
-        mean_N_pe *= EfficiencyCorrection[ipmt];
-      }
+      if (EfficiencyCorrection[ipmt] >= 0) { mean_N_pe *= EfficiencyCorrection[ipmt]; }
       else {
         G4cerr << "LSCPMTOpticalModel[" << GetName()
-               << "] warning: individual efficiency correction for PMT " << ipmt
-               << " is " << EfficiencyCorrection[ipmt] << ", resetting to 1"
-               << endl;
+               << "] warning: individual efficiency correction for PMT " << ipmt << " is "
+               << EfficiencyCorrection[ipmt] << ", resetting to 1" << endl;
         EfficiencyCorrection[ipmt] = 1.0;
       }
     }
@@ -435,12 +421,10 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     // if the photon was transmitted into the vacuum in the last step, check
     // for prepulsing using the renormalized prepulsing probability
     bool prepulse = false;
-    if (N_pe == 0 && whereAmI == kInVacuum && _prepulseProb > 0.0 &&
-        dir.z() < 0.0) {
+    if (N_pe == 0 && whereAmI == kInVacuum && _prepulseProb > 0.0 && dir.z() < 0.0) {
       double ddist = (_dynodeTop - pos.z()) / dir.z();
       G4ThreeVector posAtDynodeZ = pos + ddist * dir;
-      if (sqrt(pow(posAtDynodeZ.x(), 2) + pow(posAtDynodeZ.y(), 2)) <
-          _dynodeRadius) {
+      if (sqrt(pow(posAtDynodeZ.x(), 2) + pow(posAtDynodeZ.y(), 2)) < _dynodeRadius) {
         if (G4UniformRand() < _prepulseProb / fT_n) {
           N_pe = 1;
           prepulse = true;
@@ -451,11 +435,8 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
 
     if (N_pe > 0) {
       if (detector != NULL && detector->isActive())
-        ((LSCPMTSD *)detector)
-            ->SimpleHit(ipmt, time, energy, pos, dir, pol, N_pe);
-      if (_verbosity >= 2) {
-        G4cout << "LSCPMTOpticalModel made " << N_pe << " pe\n";
-      }
+        ((LSCPMTSD *)detector)->SimpleHit(ipmt, time, energy, pos, dir, pol, N_pe);
+      if (_verbosity >= 2) { G4cout << "LSCPMTOpticalModel made " << N_pe << " pe\n"; }
     }
 
     // Now maybe absorb the track.
@@ -473,18 +454,14 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
     // correct, assuming there are no bugs in the code.)
     if (ranno_absorb < A) {
       weight = 0;
-      if (_verbosity >= 2) {
-        G4cout << "LSCPMTOpticalModel absorbed track" << endl;
-      }
+      if (_verbosity >= 2) { G4cout << "LSCPMTOpticalModel absorbed track" << endl; }
       break;
     }
 
     // reflect or refract the unabsorbed track
     if (G4UniformRand() < R / (R + T)) { // reflect
       Reflect(dir, pol, norm);
-      if (_verbosity >= 2) {
-        G4cout << "LSCPMTOpticalModel reflects track" << endl;
-      }
+      if (_verbosity >= 2) { G4cout << "LSCPMTOpticalModel reflects track" << endl; }
     }
     else { // transmit
       Refract(dir, pol, norm);
@@ -508,8 +485,7 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
   if (weight <= 0) {
     fastStep.ProposeTrackStatus(fStopAndKill);
     if (weight < 0) {
-      G4cerr << "LSCPMTOpticalModel::DoIt(): Logic error, weight = " << weight
-             << endl;
+      G4cerr << "LSCPMTOpticalModel::DoIt(): Logic error, weight = " << weight << endl;
     }
   }
   else {
@@ -526,9 +502,8 @@ void LSCPMTOpticalModel::DoIt(const G4FastTrack & fastTrack,
 
   if (_verbosity > 0) {
     G4cout << "> Exit LSCPMTOpticalModel, ipmt=" << ipmt
-           << (whereAmI == kInVacuum ? " vacuum" : " glass") << ", pos=" << pos
-           << ", dir=" << dir << ", weight=" << weight << ", pol=" << pol
-           << ", iloop=" << iloop << endl;
+           << (whereAmI == kInVacuum ? " vacuum" : " glass") << ", pos=" << pos << ", dir=" << dir
+           << ", weight=" << weight << ", pol=" << pol << ", iloop=" << iloop << endl;
   }
 
   return;
@@ -577,8 +552,7 @@ void LSCPMTOpticalModel::CalculateCoefficients()
   G4complex carcsin(G4complex theta); // complex sin^-1
   G4complex gfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj);
   G4complex rfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj);
-  G4complex trfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj,
-                   G4complex tk);
+  G4complex trfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj, G4complex tk);
 
   // declare some useful constants
   G4complex _n2comp(_n2, -_k2); // complex photocathode refractive index
@@ -604,11 +578,9 @@ void LSCPMTOpticalModel::CalculateCoefficients()
   _cos_theta3 = sqrt(1.0 - _sin_theta3 * _sin_theta3);
 
   // Determine all angles
-  theta1 = asin(_sin_theta1); // incidence angle
-  theta2 = carcsin((_n1 / _n2comp) *
-                   _sin_theta1); // complex angle in the photocathode
-  theta3 =
-      carcsin((_n2comp / _n3) * sin(theta2)); // angle of refraction into vacuum
+  theta1 = asin(_sin_theta1);                      // incidence angle
+  theta2 = carcsin((_n1 / _n2comp) * _sin_theta1); // complex angle in the photocathode
+  theta3 = carcsin((_n2comp / _n3) * sin(theta2)); // angle of refraction into vacuum
   if (imag(theta3) < 0.) {
     theta3 = conj(theta3); // needed! (sign ambiguity arcsin)
   }
@@ -623,10 +595,8 @@ void LSCPMTOpticalModel::CalculateCoefficients()
   t21 = trfunc(_n2comp, _n1, theta2, theta2, theta1);
   t23 = trfunc(_n2comp, _n3, theta2, theta2, theta3);
 
-  ampr = r12 + (t12 * t21 * r23 * exp(-2. * zi * delta)) /
-                   (1. + r12 * r23 * exp(-2. * zi * delta));
-  ampt =
-      (t12 * t23 * exp(-zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
+  ampr = r12 + (t12 * t21 * r23 * exp(-2. * zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
+  ampt = (t12 * t23 * exp(-zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
 
   // And finally...!
   fR_s = real(ampr * conj(ampr));
@@ -640,10 +610,8 @@ void LSCPMTOpticalModel::CalculateCoefficients()
   t21 = trfunc(_n2comp, _n1, theta2, theta1, theta2);
   t23 = trfunc(_n2comp, _n3, theta2, theta3, theta2);
 
-  ampr = r12 + (t12 * t21 * r23 * exp(-2. * zi * delta)) /
-                   (1. + r12 * r23 * exp(-2. * zi * delta));
-  ampt =
-      (t12 * t23 * exp(-zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
+  ampr = r12 + (t12 * t21 * r23 * exp(-2. * zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
+  ampt = (t12 * t23 * exp(-zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
 
   // And finally...!
   fR_p = real(ampr * conj(ampr));
@@ -659,10 +627,8 @@ void LSCPMTOpticalModel::CalculateCoefficients()
   t21 = trfunc(_n2comp, _n1, 0., 0., 0.);
   t23 = trfunc(_n2comp, _n3, 0., 0., 0.);
 
-  ampr = r12 + (t12 * t21 * r23 * exp(-2. * zi * delta)) /
-                   (1. + r12 * r23 * exp(-2. * zi * delta));
-  ampt =
-      (t12 * t23 * exp(-zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
+  ampr = r12 + (t12 * t21 * r23 * exp(-2. * zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
+  ampt = (t12 * t23 * exp(-zi * delta)) / (1. + r12 * r23 * exp(-2. * zi * delta));
 
   // And finally...!
   fR_n = real(ampr * conj(ampr));
@@ -670,15 +636,12 @@ void LSCPMTOpticalModel::CalculateCoefficients()
 
 #ifdef G4DEBUG
   if (_verbosity >= 10) {
-    G4cout << "=> lam, n1, n2: " << _wavelength / nanometer << " " << _n1 << " "
-           << _n2comp << endl;
-    G4cout << "=> Angles: " << real(theta1) / degree << " " << theta2 / degree
-           << " " << theta3 / degree << endl;
-    G4cout << "Rper, Rpar, Tper, Tpar: " << fR_s << " " << fR_p << " " << fT_s
-           << " " << fT_p;
+    G4cout << "=> lam, n1, n2: " << _wavelength / nanometer << " " << _n1 << " " << _n2comp << endl;
+    G4cout << "=> Angles: " << real(theta1) / degree << " " << theta2 / degree << " "
+           << theta3 / degree << endl;
+    G4cout << "Rper, Rpar, Tper, Tpar: " << fR_s << " " << fR_p << " " << fT_s << " " << fT_p;
     G4cout << "\nRn, Tn : " << fR_n << " " << fT_n;
-    G4cout << "\n-------------------------------------------------------"
-           << endl;
+    G4cout << "\n-------------------------------------------------------" << endl;
   }
 #endif
 }
@@ -698,29 +661,25 @@ G4complex gfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj)
 
 G4complex rfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj)
 {
-  G4complex value =
-      (ni * cos(ti) - nj * cos(tj)) / (ni * cos(ti) + nj * cos(tj));
+  G4complex value = (ni * cos(ti) - nj * cos(tj)) / (ni * cos(ti) + nj * cos(tj));
   return value;
 }
 
-G4complex trfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj,
-                 G4complex tk)
+G4complex trfunc(G4complex ni, G4complex nj, G4complex ti, G4complex tj, G4complex tk)
 {
   G4complex value = 2. * (ni * cos(ti)) / (ni * cos(tj) + nj * cos(tk));
   return value;
 }
 
 // Reflect() method, used by DoIt()
-void LSCPMTOpticalModel::Reflect(G4ThreeVector & dir, G4ThreeVector & pol,
-                                 G4ThreeVector & norm)
+void LSCPMTOpticalModel::Reflect(G4ThreeVector & dir, G4ThreeVector & pol, G4ThreeVector & norm)
 {
   dir -= 2. * (dir * norm) * norm;
   pol -= 2. * (pol * norm) * norm;
 }
 
 // Refract() method, used by DoIt()
-void LSCPMTOpticalModel::Refract(G4ThreeVector & dir, G4ThreeVector & pol,
-                                 G4ThreeVector & norm)
+void LSCPMTOpticalModel::Refract(G4ThreeVector & dir, G4ThreeVector & pol, G4ThreeVector & norm)
 {
   dir = (_cos_theta3 - _cos_theta1 * _n1 / _n3) * norm + (_n1 / _n3) * dir;
   pol = (pol - (pol * dir) * dir).unit();
@@ -730,9 +689,7 @@ void LSCPMTOpticalModel::Refract(G4ThreeVector & dir, G4ThreeVector & pol,
 void LSCPMTOpticalModel::SetNewValue(G4UIcommand * command, G4String newValues)
 {
   G4String commandName = command->GetCommandName();
-  if (commandName == "verbose") {
-    _verbosity = strtol((const char *)newValues, nullptr, 0);
-  }
+  if (commandName == "verbose") { _verbosity = strtol((const char *)newValues, nullptr, 0); }
   else if (commandName == "luxlevel") {
     _luxlevel = strtol((const char *)newValues, nullptr, 0);
   }
@@ -770,9 +727,7 @@ int LSCPMTOpticalModel::GetPMTID(const G4FastTrack & fastTrack)
   for (iDepth = 0; iDepth < handle->GetHistoryDepth(); iDepth++) {
     const std::string volName = handle->GetVolume(iDepth)->GetName();
     const size_t envelopeHistory = volName.find("PMTPhys");
-    if (envelopeHistory != std::string::npos) {
-      return handle->GetCopyNumber(iDepth);
-    }
+    if (envelopeHistory != std::string::npos) { return handle->GetCopyNumber(iDepth); }
   }
   return -1;
 }

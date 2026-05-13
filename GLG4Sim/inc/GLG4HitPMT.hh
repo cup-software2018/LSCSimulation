@@ -12,7 +12,7 @@
 #include <vector>
 #include <cstddef>
 
-#include "GLG4Sim/GLG4HitPhoton.hh"
+#include "GLG4HitPhoton.hh"
 
 
 /** GLG4HitPMT stores information about a PMT that detected one or more

@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "MCObjs/MCScint.hh"
-#include "MCObjs/MCScintData.hh"
+#include "MCScint.hh"
+#include "MCScintData.hh"
 
 ClassImp(MCScintData)
 

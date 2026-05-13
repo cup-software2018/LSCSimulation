@@ -70,14 +70,14 @@
 
 #include "globals.hh"
 
-#include "GLG4Sim/GLG4TestSolid.hh"
+#include "GLG4TestSolid.hh"
 #include "G4VSolid.hh"
 #include "G4VisExtent.hh"
 #include "G4VoxelLimits.hh"
 #include "G4AffineTransform.hh"
 #include "G4GeometryTolerance.hh"
 
-#include "GLG4Sim/local_g4compat.hh"
+#include "local_g4compat.hh"
 
 #include "sstream"
 

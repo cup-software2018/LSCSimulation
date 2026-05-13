@@ -21,12 +21,6 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 
-# ---- Build-tree header staging area ----
-# All module headers are staged here so cross-module includes work during the build.
-set(LSCSIM_HEADER_OUTPUT_PATH ${CMAKE_BINARY_DIR}/include)
-file(MAKE_DIRECTORY ${LSCSIM_HEADER_OUTPUT_PATH})
-include_directories(${LSCSIM_HEADER_OUTPUT_PATH})
-
 # ---- Global Compiler Settings ----
 add_compile_options(-O2)
 

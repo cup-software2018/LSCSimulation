@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "MCObjs/MCPrimary.hh"
-#include "MCObjs/MCPrimaryData.hh"
+#include "MCPrimary.hh"
+#include "MCPrimaryData.hh"
 
 ClassImp(MCPrimaryData)
 

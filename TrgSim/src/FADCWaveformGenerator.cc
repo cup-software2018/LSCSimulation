@@ -1,4 +1,4 @@
-#include "TrgSim/FADCWaveformGenerator.hh"
+#include "FADCWaveformGenerator.hh"
 
 #include <iostream>
 

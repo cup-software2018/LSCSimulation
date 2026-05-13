@@ -8,7 +8,7 @@
    @author G.Horton-Smith, August 3, 2001
 */
 
-#include "GLG4Sim/GLG4PosGen.hh"
+#include "GLG4PosGen.hh"
 
 #include "G4AffineTransform.hh"
 #include "G4Material.hh"
@@ -17,8 +17,8 @@
 #include "G4TransportationManager.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4VoxelLimits.hh"
-#include "GLG4Sim/GLG4VertexGen.hh" // for GLG4VertexGen_HEPEvt
-#include "GLG4Sim/GLG4param.hh"
+#include "GLG4VertexGen.hh" // for GLG4VertexGen_HEPEvt
+#include "GLG4param.hh"
 #include "Randomize.hh"
 #include "geomdefs.hh"
 #include "sstream"

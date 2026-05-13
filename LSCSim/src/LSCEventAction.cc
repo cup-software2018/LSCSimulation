@@ -1,13 +1,12 @@
-#include "LSCSim/LSCEventAction.hh"
-#include "LSCSim/LSCRecorderBase.hh"
-
 #include "G4Event.hh"
 #include "G4EventManager.hh"
+#include "LSCEventAction.hh"
+#include "LSCRecorderBase.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LSCEventAction::LSCEventAction(LSCRecorderBase * r)
-    : fRecorder(r)
+  : fRecorder(r)
 {
 }
 

@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "TrgSim/AbsSignal.hh"
+#include "AbsSignal.hh"
 
 const int kNMAXHIT = 20000;
 

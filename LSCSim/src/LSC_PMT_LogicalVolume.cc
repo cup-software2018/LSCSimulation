@@ -7,17 +7,15 @@
 // Modification history:
 //  G.H-S.  2001/03/20:  Added LSCPMTOpticalModel for thin photocathode
 
-#include "LSCSim/LSC_PMT_LogicalVolume.hh"
-
 #include "G4LogicalBorderSurface.hh"
 #include "G4Material.hh"
 #include "G4OpticalSurface.hh"
 #include "G4PVPlacement.hh"
 #include "G4Tubs.hh"
 #include "G4VisAttributes.hh" // for G4VisAttributes::Invisible
-
-#include "GLG4Sim/GLG4TorusStack.hh"
-#include "LSCSim/LSCPMTOpticalModel.hh"
+#include "GLG4TorusStack.hh"
+#include "LSCPMTOpticalModel.hh"
+#include "LSC_PMT_LogicalVolume.hh"
 
 using namespace CLHEP;
 
@@ -32,9 +30,8 @@ LSC_PMT_LogicalVolume::LSC_PMT_LogicalVolume(
     G4double hh_bound,       // half height of bounding cylinder
     G4Material * ExteriorMat // material which fills the bounding cylinder
     )
-    : G4LogicalVolume(new G4Tubs(plabel + "_envelope_solid", 0.0, r_bound,
-                                 hh_bound, 0., 2. * M_PI),
-                      ExteriorMat, plabel)
+  : G4LogicalVolume(new G4Tubs(plabel + "_envelope_solid", 0.0, r_bound, hh_bound, 0., 2. * M_PI),
+                    ExteriorMat, plabel)
 {
   if (our_Mirror_opsurf == NULL) {
     // construct a static mirror surface with idealized properties
@@ -52,10 +49,8 @@ LSC_PMT_LogicalVolume::LSC_PMT_LogicalVolume(
              << G4endl;
       propMirror = new G4MaterialPropertiesTable();
       propMirror->AddProperty("REFLECTIVITY", new G4MaterialPropertyVector());
-      propMirror->AddEntry("REFLECTIVITY", twopi * hbarc / (800.0e-9 * m),
-                           0.9999);
-      propMirror->AddEntry("REFLECTIVITY", twopi * hbarc / (200.0e-9 * m),
-                           0.9999);
+      propMirror->AddEntry("REFLECTIVITY", twopi * hbarc / (800.0e-9 * m), 0.9999);
+      propMirror->AddEntry("REFLECTIVITY", twopi * hbarc / (200.0e-9 * m), 0.9999);
     }
     our_Mirror_opsurf->SetMaterialPropertiesTable(propMirror);
   }
@@ -67,12 +62,11 @@ LSC_PMT_LogicalVolume::LSC_PMT_LogicalVolume(
 //
 static const int R3600_n_edge = 9;
 static const G4double R3600_z_edge[R3600_n_edge + 1] = {
-    188.00,  116.71,  0.00,    -116.71, -136.05,
-    -195.00, -282.00, -355.00, -370.00, -492.00};
-static const G4double R3600_rho_edge[R3600_n_edge + 1] = {
-    0.00, 198.55, 254.00, 198.55, 165.40, 127.00, 127.00, 53.00, 41.35, 41.35};
-static const G4double R3600_z_o[R3600_n_edge] = {
-    -127.00, 0.00, 0.00, 127.00, -195.00, -195.00, -280.00, -370.00, -370.00};
+    188.00, 116.71, 0.00, -116.71, -136.05, -195.00, -282.00, -355.00, -370.00, -492.00};
+static const G4double R3600_rho_edge[R3600_n_edge + 1] = {0.00,   198.55, 254.00, 198.55, 165.40,
+                                                          127.00, 127.00, 53.00,  41.35,  41.35};
+static const G4double R3600_z_o[R3600_n_edge] = {-127.00, 0.00,    0.00,    127.00, -195.00,
+                                                 -195.00, -280.00, -370.00, -370.00};
 
 // the following constants were derived from an old drawing of a
 // discontinued "R1408" model Hamamatsu phototube, but they
@@ -88,85 +82,79 @@ static const G4double R3600_z_o[R3600_n_edge] = {
 //
 
 static const int R7081_n_edge = 6;
-static const G4double R7081_z_edge[R7081_n_edge + 1] = {
-    96.7, 40.0, 0.0, -40.0, -90.0, -142.0, -223.3};
-static const G4double R7081_rho_edge[R7081_n_edge + 1] = {
-    0.0, 111.0, 126.5, 111.0, 42.25, 42.25, 42.25};
-static const G4double R7081_z_o[R7081_n_edge] = {-40.0, 0.0,    0.0,
-                                                 40.0,  -142.0, -223.3};
+static const G4double R7081_z_edge[R7081_n_edge + 1] = {96.7,  40.0,   0.0,   -40.0,
+                                                        -90.0, -142.0, -223.3};
+static const G4double R7081_rho_edge[R7081_n_edge + 1] = {0.0,   111.0, 126.5, 111.0,
+                                                          42.25, 42.25, 42.25};
+static const G4double R7081_z_o[R7081_n_edge] = {-40.0, 0.0, 0.0, 40.0, -142.0, -223.3};
 
 static const int R5912_n_edge = 6;
-static const G4double R5912_z_edge[R5912_n_edge + 1] = {
-    75.00, 53.06, 0.00, -53.06, -73.86, -85.00, -215.00};
-static const G4double R5912_rho_edge[R5912_n_edge + 1] = {
-    0.00, 72.57, 101.00, 72.57, 44.32, 42.00, 42.00};
-static const G4double R5912_z_o[R5912_n_edge] = {-56.00, 0.00,   0.00,
-                                                 56.00,  -85.00, -215.00};
+static const G4double R5912_z_edge[R5912_n_edge + 1] = {75.00,  53.06,  0.00,   -53.06,
+                                                        -73.86, -85.00, -215.00};
+static const G4double R5912_rho_edge[R5912_n_edge + 1] = {0.00,  72.57, 101.00, 72.57,
+                                                          44.32, 42.00, 42.00};
+static const G4double R5912_z_o[R5912_n_edge] = {-56.00, 0.00, 0.00, 56.00, -85.00, -215.00};
 
 static const int ETI_9372A_n_edge = 5;
-static const G4double ETI_9372A_z_edge[ETI_9372A_n_edge + 1] = {
-    50.8, 35.56, 0.00, -35.56, -42.42, -165.1};
-static const G4double ETI_9372A_rho_edge[ETI_9372A_n_edge + 1] = {
-    0.00, 45.72, 63.5, 45.72, 42.42, 42.42};
-static const G4double ETI_9372A_z_o[ETI_9372A_n_edge] = {-25.40, 0.00, 0.00,
-                                                         -42.42, -165.1};
+static const G4double ETI_9372A_z_edge[ETI_9372A_n_edge + 1] = {50.8,   35.56,  0.00,
+                                                                -35.56, -42.42, -165.1};
+static const G4double ETI_9372A_rho_edge[ETI_9372A_n_edge + 1] = {0.00,  45.72, 63.5,
+                                                                  45.72, 42.42, 42.42};
+static const G4double ETI_9372A_z_o[ETI_9372A_n_edge] = {-25.40, 0.00, 0.00, -42.42, -165.1};
 
 ////////////////////////////////////////////////////////////////
 // LSC_17inch_LogicalVolume
 //
 LSC_17inch_LogicalVolume::LSC_17inch_LogicalVolume(
-    const G4String & plabel,  // label -- subvolume names are derived from this
-    G4Material * ExteriorMat, // material which fills the bounding cylinder
-    G4Material * GlassMat,    // glass material
+    const G4String & plabel,                // label -- subvolume names are derived from this
+    G4Material * ExteriorMat,               // material which fills the bounding cylinder
+    G4Material * GlassMat,                  // glass material
     G4OpticalSurface * Photocathode_opsurf, // photocathode
     G4Material * PMT_Vacuum,                // vacuum inside tube
     G4Material * DynodeMat,                 // dynode material
-    G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
-                          // OK to set MaskMat == NULL for no mask
-    G4VSensitiveDetector * detector // sensitive detector hook
+    G4Material * MaskMat,                   // material for photocathode mask (e.g, blk acryl)
+                                            // OK to set MaskMat == NULL for no mask
+    G4VSensitiveDetector * detector         // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(
-          plabel, 260. * millimeter,
-          340. * millimeter, // hh_bound: half height of bounding cylinder
-          ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 260. * millimeter,
+                          340. * millimeter, // hh_bound: half height of bounding cylinder
+                          ExteriorMat)
 {
-  ConstructPMT_UsingTorusStack(
-      R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
-      94. * millimeter,    // radius of dynode stack
-      -117. * millimeter,  // z coordinate of top of dynode stack, equator=0
-      4. * millimeter,     // thickness of the walls
-      ExteriorMat,         // material outside tube
-      GlassMat,            // glass material
-      Photocathode_opsurf, // photocathode surface
-      PMT_Vacuum,          // tube interior
-      DynodeMat,           // dynode stack metal
-      detector             // detector hook
+  ConstructPMT_UsingTorusStack(R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
+                               94. * millimeter,   // radius of dynode stack
+                               -117. * millimeter, // z coordinate of top of dynode stack, equator=0
+                               4. * millimeter,    // thickness of the walls
+                               ExteriorMat,        // material outside tube
+                               GlassMat,           // glass material
+                               Photocathode_opsurf, // photocathode surface
+                               PMT_Vacuum,          // tube interior
+                               DynodeMat,           // dynode stack metal
+                               detector             // detector hook
   );
 
   if (MaskMat != NULL) {
     // make the mask -- use thin cylindrical disk for now
     G4double r_mask_inner = 254.0 * millimeter;
-    G4double r_mask_outer = ((G4Tubs *)(this->GetSolid()))
-                                ->GetOuterRadius(); // bounding cylinder size
-    G4double hh_mask = 1.5 * millimeter;            // half height
+    G4double r_mask_outer =
+        ((G4Tubs *)(this->GetSolid()))->GetOuterRadius(); // bounding cylinder size
+    G4double hh_mask = 1.5 * millimeter;                  // half height
 
-    G4LogicalVolume * mask_log = new G4LogicalVolume(
-        new G4Tubs(plabel + "_mask_solid",     // name of solid
-                   r_mask_inner, r_mask_outer, // inner and outer radii
-                   hh_mask,             // use flat disk, 2mm thick for now
-                   0. * deg, 360. * deg // start and end span angle
-                   ),
-        MaskMat, plabel + "_mask_log");
+    G4LogicalVolume * mask_log =
+        new G4LogicalVolume(new G4Tubs(plabel + "_mask_solid",     // name of solid
+                                       r_mask_inner, r_mask_outer, // inner and outer radii
+                                       hh_mask,             // use flat disk, 2mm thick for now
+                                       0. * deg, 360. * deg // start and end span angle
+                                       ),
+                            MaskMat, plabel + "_mask_log");
 
     /**    G4PVPlacement* mask_phys = **/
-    new G4PVPlacement(
-        0,                                                    // no rotation
-        G4ThreeVector(0., 0., 19.5 * millimeter + z_equator), // displacement
-        mask_log,                                             // logical volume
-        plabel + "_mask_phys",                                // name
-        this,                                                 // mother volume
-        false,                                                // no boolean ops
-        0);                                                   // copy number
+    new G4PVPlacement(0,                                                    // no rotation
+                      G4ThreeVector(0., 0., 19.5 * millimeter + z_equator), // displacement
+                      mask_log,                                             // logical volume
+                      plabel + "_mask_phys",                                // name
+                      this,                                                 // mother volume
+                      false,                                                // no boolean ops
+                      0);                                                   // copy number
 
     // mask is black
     //    G4VisAttributes * visAtt= new
@@ -185,23 +173,18 @@ LSC_17inch_LogicalVolume::LSC_17inch_LogicalVolume(
     rho_edge[1] = 254.1 * mm;
     G4double side_curvature_radius = 150.1 * mm;
     rho_edge[0] = rho_edge[1] - side_curvature_radius +
-                  sqrt(side_curvature_radius * side_curvature_radius -
-                       z_edge[0] * z_edge[0]);
+                  sqrt(side_curvature_radius * side_curvature_radius - z_edge[0] * z_edge[0]);
     rho_edge[2] = rho_edge[1] - side_curvature_radius +
-                  sqrt(side_curvature_radius * side_curvature_radius -
-                       z_edge[2] * z_edge[2]);
+                  sqrt(side_curvature_radius * side_curvature_radius - z_edge[2] * z_edge[2]);
 
-    GLG4TorusStack * facemask_inner_solid =
-        new GLG4TorusStack(plabel + "_facemask_inner_solid");
+    GLG4TorusStack * facemask_inner_solid = new GLG4TorusStack(plabel + "_facemask_inner_solid");
     facemask_inner_solid->SetAllParameters(2, z_edge, rho_edge, z_o);
 
     rho_edge[0] += 2.0 * mm;
     rho_edge[1] += 2.0 * mm;
     rho_edge[2] += 2.0 * mm;
-    GLG4TorusStack * facemask_solid =
-        new GLG4TorusStack(plabel + "_facemask_solid");
-    facemask_solid->SetAllParameters(2, z_edge, rho_edge, z_o,
-                                     facemask_inner_solid);
+    GLG4TorusStack * facemask_solid = new GLG4TorusStack(plabel + "_facemask_solid");
+    facemask_solid->SetAllParameters(2, z_edge, rho_edge, z_o, facemask_inner_solid);
 
     G4LogicalVolume * facemask_log =
         new G4LogicalVolume(facemask_solid, MaskMat, plabel + "_facemask_log");
@@ -224,58 +207,55 @@ LSC_17inch_LogicalVolume::LSC_17inch_LogicalVolume(
 // LSC_20inch_LogicalVolume
 //
 LSC_20inch_LogicalVolume::LSC_20inch_LogicalVolume(
-    const G4String & plabel,  // label -- subvolume names are derived from this
-    G4Material * ExteriorMat, // material which fills the bounding cylinder
-    G4Material * GlassMat,    // glass material
+    const G4String & plabel,                // label -- subvolume names are derived from this
+    G4Material * ExteriorMat,               // material which fills the bounding cylinder
+    G4Material * GlassMat,                  // glass material
     G4OpticalSurface * Photocathode_opsurf, // photocathode
     G4Material * PMT_Vacuum,                // vacuum inside tube
     G4Material * DynodeMat,                 // dynode material
-    G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
-                          // OK to set MaskMat == NULL for no mask
-    G4VSensitiveDetector * detector // sensitive detector hook
+    G4Material * MaskMat,                   // material for photocathode mask (e.g, blk acryl)
+                                            // OK to set MaskMat == NULL for no mask
+    G4VSensitiveDetector * detector         // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(
-          plabel, 260. * millimeter,
-          340. * millimeter, // hh_bound: half height of bounding cylinder
-          ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 260. * millimeter,
+                          340. * millimeter, // hh_bound: half height of bounding cylinder
+                          ExteriorMat)
 {
-  ConstructPMT_UsingTorusStack(
-      R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
-      94. * millimeter,    // radius of dynode stack
-      -117. * millimeter,  // z coordinate of top of dynode stack, equator=0
-      4. * millimeter,     // thickness of the walls
-      ExteriorMat,         // material outside tube
-      GlassMat,            // glass material
-      Photocathode_opsurf, // photocathode surface
-      PMT_Vacuum,          // tube interior
-      DynodeMat,           // dynode stack metal
-      detector             // detector hook
+  ConstructPMT_UsingTorusStack(R3600_n_edge, R3600_z_edge, R3600_rho_edge, R3600_z_o,
+                               94. * millimeter,   // radius of dynode stack
+                               -117. * millimeter, // z coordinate of top of dynode stack, equator=0
+                               4. * millimeter,    // thickness of the walls
+                               ExteriorMat,        // material outside tube
+                               GlassMat,           // glass material
+                               Photocathode_opsurf, // photocathode surface
+                               PMT_Vacuum,          // tube interior
+                               DynodeMat,           // dynode stack metal
+                               detector             // detector hook
   );
 
   if (MaskMat != NULL) {
     // make the mask -- use thin cylindrical disk for now
     G4double r_mask_inner = 254. * millimeter;
-    G4double r_mask_outer = ((G4Tubs *)(this->GetSolid()))
-                                ->GetOuterRadius(); // bounding cylinder size
-    G4double hh_mask = 1.5 * millimeter;            // half height
+    G4double r_mask_outer =
+        ((G4Tubs *)(this->GetSolid()))->GetOuterRadius(); // bounding cylinder size
+    G4double hh_mask = 1.5 * millimeter;                  // half height
 
-    G4LogicalVolume * mask_log = new G4LogicalVolume(
-        new G4Tubs(plabel + "_mask_solid",     // name of solid
-                   r_mask_inner, r_mask_outer, // inner and outer radii
-                   hh_mask,             // use flat disk, 2mm thick for now
-                   0. * deg, 360. * deg // start and end span angle
-                   ),
-        MaskMat, plabel + "_mask_log");
+    G4LogicalVolume * mask_log =
+        new G4LogicalVolume(new G4Tubs(plabel + "_mask_solid",     // name of solid
+                                       r_mask_inner, r_mask_outer, // inner and outer radii
+                                       hh_mask,             // use flat disk, 2mm thick for now
+                                       0. * deg, 360. * deg // start and end span angle
+                                       ),
+                            MaskMat, plabel + "_mask_log");
 
     /** G4PVPlacement* mask_phys =  **/
-    new G4PVPlacement(
-        0,                                                    // no rotation
-        G4ThreeVector(0., 0., 19.5 * millimeter + z_equator), // displacement
-        mask_log,                                             // logical volume
-        plabel + "_mask_phys",                                // name
-        this,                                                 // mother volume
-        false,                                                // no boolean ops
-        0);                                                   // copy number
+    new G4PVPlacement(0,                                                    // no rotation
+                      G4ThreeVector(0., 0., 19.5 * millimeter + z_equator), // displacement
+                      mask_log,                                             // logical volume
+                      plabel + "_mask_phys",                                // name
+                      this,                                                 // mother volume
+                      false,                                                // no boolean ops
+                      0);                                                   // copy number
 
     // mask is black
     //    G4VisAttributes * visAtt= new
@@ -289,57 +269,54 @@ LSC_20inch_LogicalVolume::LSC_20inch_LogicalVolume(
 // LSC_10inch_LogicalVolume
 //
 LSC_10inch_LogicalVolume::LSC_10inch_LogicalVolume(
-    const G4String & plabel,  // label -- subvolume names are derived from this
-    G4Material * ExteriorMat, // material which fills the bounding cylinder
-    G4Material * GlassMat,    // glass material
+    const G4String & plabel,                // label -- subvolume names are derived from this
+    G4Material * ExteriorMat,               // material which fills the bounding cylinder
+    G4Material * GlassMat,                  // glass material
     G4OpticalSurface * Photocathode_opsurf, // photocathode
     G4Material * PMT_Vacuum,                // vacuum inside tube
     G4Material * DynodeMat,                 // dynode material
-    G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
-                          // OK to set MaskMat == NULL for no mask
-    G4VSensitiveDetector * detector // sensitive detector hook
+    G4Material * MaskMat,                   // material for photocathode mask (e.g, blk acryl)
+                                            // OK to set MaskMat == NULL for no mask
+    G4VSensitiveDetector * detector         // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 160. * millimeter,
-                            ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 160. * millimeter, ExteriorMat)
 {
-  ConstructPMT_UsingTorusStack(
-      R7081_n_edge, R7081_z_edge, R7081_rho_edge, R7081_z_o,
-      27.5 * millimeter,   // radius of dynode stack
-      -55.0 * millimeter,  // z coordinate of top of dynode stack, equator=0
-      3. * millimeter,     // thickness of the walls
-      ExteriorMat,         // material outside tube
-      GlassMat,            // glass material
-      Photocathode_opsurf, // photocathode surface
-      PMT_Vacuum,          // tube interior
-      DynodeMat,           // dynode stack metal
-      detector             // detector hook
+  ConstructPMT_UsingTorusStack(R7081_n_edge, R7081_z_edge, R7081_rho_edge, R7081_z_o,
+                               27.5 * millimeter,  // radius of dynode stack
+                               -55.0 * millimeter, // z coordinate of top of dynode stack, equator=0
+                               3. * millimeter,    // thickness of the walls
+                               ExteriorMat,        // material outside tube
+                               GlassMat,           // glass material
+                               Photocathode_opsurf, // photocathode surface
+                               PMT_Vacuum,          // tube interior
+                               DynodeMat,           // dynode stack metal
+                               detector             // detector hook
   );
 
   if (MaskMat != NULL) {
     // make the mask -- use thin cylindrical disk for now
     G4double r_mask_inner = 96. * millimeter;
-    G4double r_mask_outer = ((G4Tubs *)(this->GetSolid()))
-                                ->GetOuterRadius(); // bounding cylinder size
-    G4double hh_mask = 1.0 * millimeter;            // half height
+    G4double r_mask_outer =
+        ((G4Tubs *)(this->GetSolid()))->GetOuterRadius(); // bounding cylinder size
+    G4double hh_mask = 1.0 * millimeter;                  // half height
 
-    G4LogicalVolume * mask_log = new G4LogicalVolume(
-        new G4Tubs(plabel + "_mask_solid",     // name of solid
-                   r_mask_inner, r_mask_outer, // inner and outer radii
-                   hh_mask,             // use flat disk, 2mm thick for now
-                   0. * deg, 360. * deg // start and end span angle
-                   ),
-        MaskMat, plabel + "_mask_log");
+    G4LogicalVolume * mask_log =
+        new G4LogicalVolume(new G4Tubs(plabel + "_mask_solid",     // name of solid
+                                       r_mask_inner, r_mask_outer, // inner and outer radii
+                                       hh_mask,             // use flat disk, 2mm thick for now
+                                       0. * deg, 360. * deg // start and end span angle
+                                       ),
+                            MaskMat, plabel + "_mask_log");
 
     /**    G4PVPlacement* mask_phys =  **/
-    new G4PVPlacement(
-        0, // no rotation
-        G4ThreeVector(0., 0.,
-                      R5912_z_edge[1] + hh_mask + z_equator), // displacement
-        mask_log,                                             // logical volume
-        plabel + "_mask_phys",                                // name
-        this,                                                 // mother volume
-        false,                                                // no boolean ops
-        0);                                                   // copy number
+    new G4PVPlacement(0, // no rotation
+                      G4ThreeVector(0., 0.,
+                                    R5912_z_edge[1] + hh_mask + z_equator), // displacement
+                      mask_log,                                             // logical volume
+                      plabel + "_mask_phys",                                // name
+                      this,                                                 // mother volume
+                      false,                                                // no boolean ops
+                      0);                                                   // copy number
   }
 }
 
@@ -347,57 +324,54 @@ LSC_10inch_LogicalVolume::LSC_10inch_LogicalVolume(
 // LSC_8inch_LogicalVolume
 //
 LSC_8inch_LogicalVolume::LSC_8inch_LogicalVolume(
-    const G4String & plabel,  // label -- subvolume names are derived from this
-    G4Material * ExteriorMat, // material which fills the bounding cylinder
-    G4Material * GlassMat,    // glass material
+    const G4String & plabel,                // label -- subvolume names are derived from this
+    G4Material * ExteriorMat,               // material which fills the bounding cylinder
+    G4Material * GlassMat,                  // glass material
     G4OpticalSurface * Photocathode_opsurf, // photocathode
     G4Material * PMT_Vacuum,                // vacuum inside tube
     G4Material * DynodeMat,                 // dynode material
-    G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
-                          // OK to set MaskMat == NULL for no mask
-    G4VSensitiveDetector * detector // sensitive detector hook
+    G4Material * MaskMat,                   // material for photocathode mask (e.g, blk acryl)
+                                            // OK to set MaskMat == NULL for no mask
+    G4VSensitiveDetector * detector         // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(plabel, 110. * millimeter, 150. * millimeter,
-                            ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 110. * millimeter, 150. * millimeter, ExteriorMat)
 {
-  ConstructPMT_UsingTorusStack(
-      R5912_n_edge, R5912_z_edge, R5912_rho_edge, R5912_z_o,
-      27.5 * millimeter,   // radius of dynode stack
-      -30.0 * millimeter,  // z coordinate of top of dynode stack, equator=0
-      3. * millimeter,     // thickness of the walls
-      ExteriorMat,         // material outside tube
-      GlassMat,            // glass material
-      Photocathode_opsurf, // photocathode surface
-      PMT_Vacuum,          // tube interior
-      DynodeMat,           // dynode stack metal
-      detector             // detector hook
+  ConstructPMT_UsingTorusStack(R5912_n_edge, R5912_z_edge, R5912_rho_edge, R5912_z_o,
+                               27.5 * millimeter,  // radius of dynode stack
+                               -30.0 * millimeter, // z coordinate of top of dynode stack, equator=0
+                               3. * millimeter,    // thickness of the walls
+                               ExteriorMat,        // material outside tube
+                               GlassMat,           // glass material
+                               Photocathode_opsurf, // photocathode surface
+                               PMT_Vacuum,          // tube interior
+                               DynodeMat,           // dynode stack metal
+                               detector             // detector hook
   );
 
   if (MaskMat != NULL) {
     // make the mask -- use thin cylindrical disk for now
     G4double r_mask_inner = 96. * millimeter;
-    G4double r_mask_outer = ((G4Tubs *)(this->GetSolid()))
-                                ->GetOuterRadius(); // bounding cylinder size
-    G4double hh_mask = 1.0 * millimeter;            // half height
+    G4double r_mask_outer =
+        ((G4Tubs *)(this->GetSolid()))->GetOuterRadius(); // bounding cylinder size
+    G4double hh_mask = 1.0 * millimeter;                  // half height
 
-    G4LogicalVolume * mask_log = new G4LogicalVolume(
-        new G4Tubs(plabel + "_mask_solid",     // name of solid
-                   r_mask_inner, r_mask_outer, // inner and outer radii
-                   hh_mask,             // use flat disk, 2mm thick for now
-                   0. * deg, 360. * deg // start and end span angle
-                   ),
-        MaskMat, plabel + "_mask_log");
+    G4LogicalVolume * mask_log =
+        new G4LogicalVolume(new G4Tubs(plabel + "_mask_solid",     // name of solid
+                                       r_mask_inner, r_mask_outer, // inner and outer radii
+                                       hh_mask,             // use flat disk, 2mm thick for now
+                                       0. * deg, 360. * deg // start and end span angle
+                                       ),
+                            MaskMat, plabel + "_mask_log");
 
     /**    G4PVPlacement* mask_phys =  **/
-    new G4PVPlacement(
-        0, // no rotation
-        G4ThreeVector(0., 0.,
-                      R5912_z_edge[1] + hh_mask + z_equator), // displacement
-        mask_log,                                             // logical volume
-        plabel + "_mask_phys",                                // name
-        this,                                                 // mother volume
-        false,                                                // no boolean ops
-        0);                                                   // copy number
+    new G4PVPlacement(0, // no rotation
+                      G4ThreeVector(0., 0.,
+                                    R5912_z_edge[1] + hh_mask + z_equator), // displacement
+                      mask_log,                                             // logical volume
+                      plabel + "_mask_phys",                                // name
+                      this,                                                 // mother volume
+                      false,                                                // no boolean ops
+                      0);                                                   // copy number
   }
 }
 
@@ -405,57 +379,55 @@ LSC_8inch_LogicalVolume::LSC_8inch_LogicalVolume(
 // LSC_5inch_LogicalVolume
 //
 LSC_5inch_LogicalVolume::LSC_5inch_LogicalVolume(
-    const G4String & plabel,  // label -- subvolume names are derived from this
-    G4Material * ExteriorMat, // material which fills the bounding cylinder
-    G4Material * GlassMat,    // glass material
+    const G4String & plabel,                // label -- subvolume names are derived from this
+    G4Material * ExteriorMat,               // material which fills the bounding cylinder
+    G4Material * GlassMat,                  // glass material
     G4OpticalSurface * Photocathode_opsurf, // photocathode
     G4Material * PMT_Vacuum,                // vacuum inside tube
     G4Material * DynodeMat,                 // dynode material
-    G4Material * MaskMat, // material for photocathode mask (e.g, blk acryl)
-                          // OK to set MaskMat == NULL for no mask
-    G4VSensitiveDetector * detector // sensitive detector hook
+    G4Material * MaskMat,                   // material for photocathode mask (e.g, blk acryl)
+                                            // OK to set MaskMat == NULL for no mask
+    G4VSensitiveDetector * detector         // sensitive detector hook
     )
-    : LSC_PMT_LogicalVolume(plabel, 64. * millimeter, 108. * millimeter,
-                            ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 64. * millimeter, 108. * millimeter, ExteriorMat)
 {
 
-  ConstructPMT_UsingTorusStack(
-      ETI_9372A_n_edge, ETI_9372A_z_edge, ETI_9372A_rho_edge, ETI_9372A_z_o,
-      40. * millimeter,    // radius of dynode stack (FIXME?)
-      -35. * millimeter,   // z coordinate of top of dynode stack, equator=0
-      2. * millimeter,     // thickness of the walls
-      ExteriorMat,         // material outside tube
-      GlassMat,            // glass material
-      Photocathode_opsurf, // photocathode surface
-      PMT_Vacuum,          // tube interior
-      DynodeMat,           // dynode stack metal
-      detector             // detector hook
+  ConstructPMT_UsingTorusStack(ETI_9372A_n_edge, ETI_9372A_z_edge, ETI_9372A_rho_edge,
+                               ETI_9372A_z_o,
+                               40. * millimeter,  // radius of dynode stack (FIXME?)
+                               -35. * millimeter, // z coordinate of top of dynode stack, equator=0
+                               2. * millimeter,   // thickness of the walls
+                               ExteriorMat,       // material outside tube
+                               GlassMat,          // glass material
+                               Photocathode_opsurf, // photocathode surface
+                               PMT_Vacuum,          // tube interior
+                               DynodeMat,           // dynode stack metal
+                               detector             // detector hook
   );
 
   if (MaskMat != NULL) {
     // make the mask -- use thin cylindrical disk for now
     G4double r_mask_inner = 45.72 * millimeter;
-    G4double r_mask_outer = ((G4Tubs *)(this->GetSolid()))
-                                ->GetOuterRadius(); // bounding cylinder size
-    G4double hh_mask = 1.0 * millimeter;            // half height
+    G4double r_mask_outer =
+        ((G4Tubs *)(this->GetSolid()))->GetOuterRadius(); // bounding cylinder size
+    G4double hh_mask = 1.0 * millimeter;                  // half height
 
-    G4LogicalVolume * mask_log = new G4LogicalVolume(
-        new G4Tubs(plabel + "_mask_solid",     // name of solid
-                   r_mask_inner, r_mask_outer, // inner and outer radii
-                   hh_mask,             // use flat disk, 2mm thick for now
-                   0. * deg, 360. * deg // start and end span angle
-                   ),
-        MaskMat, plabel + "_mask_log");
+    G4LogicalVolume * mask_log =
+        new G4LogicalVolume(new G4Tubs(plabel + "_mask_solid",     // name of solid
+                                       r_mask_inner, r_mask_outer, // inner and outer radii
+                                       hh_mask,             // use flat disk, 2mm thick for now
+                                       0. * deg, 360. * deg // start and end span angle
+                                       ),
+                            MaskMat, plabel + "_mask_log");
 
     /**    G4PVPlacement* mask_phys =  **/
-    new G4PVPlacement(
-        0,                                                     // no rotation
-        G4ThreeVector(0., 0., 36.56 * millimeter + z_equator), // displacement
-        mask_log,                                              // logical volume
-        plabel + "_mask_phys",                                 // name
-        this,                                                  // mother volume
-        false,                                                 // no boolean ops
-        0);                                                    // copy number
+    new G4PVPlacement(0,                                                     // no rotation
+                      G4ThreeVector(0., 0., 36.56 * millimeter + z_equator), // displacement
+                      mask_log,                                              // logical volume
+                      plabel + "_mask_phys",                                 // name
+                      this,                                                  // mother volume
+                      false,                                                 // no boolean ops
+                      0);                                                    // copy number
   }
 }
 
@@ -466,11 +438,11 @@ LSC_5inch_LogicalVolume::LSC_5inch_LogicalVolume(
 //     A model built using "Ellipsoid"'s is provided for comparison
 //
 void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
-    const G4int n_edge, const G4double outer_z_edge[],
-    const G4double outer_rho_edge[], const G4double outer_z_o[],
-    G4double r_dynode, // radius of dynode stack
-    G4double z_dynode, // z coordinate of top of dynode stack, equator=0.
-    G4double d_wall,   // thickness of the walls
+    const G4int n_edge, const G4double outer_z_edge[], const G4double outer_rho_edge[],
+    const G4double outer_z_o[],
+    G4double r_dynode,              // radius of dynode stack
+    G4double z_dynode,              // z coordinate of top of dynode stack, equator=0.
+    G4double d_wall,                // thickness of the walls
     G4Material * /* Exterior */,    // material outside tube
     G4Material * Glass,             // glass material
     G4OpticalSurface * OpPCSurface, // photocathode surface
@@ -488,10 +460,8 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
   body_solid->SetAllParameters(n_edge, outer_z_edge, outer_rho_edge, outer_z_o);
 
   // inner volumes (to be filled with vacuum)
-  GLG4TorusStack * inner1_solid =
-      new GLG4TorusStack(GetName() + "_inner1_solid");
-  GLG4TorusStack * inner2_solid =
-      new GLG4TorusStack(GetName() + "_inner2_solid");
+  GLG4TorusStack * inner1_solid = new GLG4TorusStack(GetName() + "_inner1_solid");
+  GLG4TorusStack * inner2_solid = new GLG4TorusStack(GetName() + "_inner2_solid");
 
   // set shapes of inner volumes
   // also scan for lowest allowed point of dynode
@@ -511,8 +481,7 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
     inner_z_edge[0] = outer_z_edge[0] - d_wall;
     inner_rho_edge[0] = 0.0;
     for (int i = 1; i < n_edge; i++) {
-      norm = body_solid->SurfaceNormal(
-          G4ThreeVector(0.0, outer_rho_edge[i], outer_z_edge[i]));
+      norm = body_solid->SurfaceNormal(G4ThreeVector(0.0, outer_rho_edge[i], outer_z_edge[i]));
       inner_z_edge[i] = outer_z_edge[i] - d_wall * norm.z();
       inner_rho_edge[i] = outer_rho_edge[i] - d_wall * norm.y();
       if (inner_rho_edge[i] > r_dynode && inner_z_edge[i] < z_lowest_dynode)
@@ -522,8 +491,7 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
     inner_z_edge[n_edge] = outer_z_edge[n_edge] + d_wall;
     inner_rho_edge[n_edge] = outer_rho_edge[n_edge] - d_wall;
     // one final check on dynode allowed position
-    if (inner_rho_edge[n_edge] > r_dynode &&
-        inner_z_edge[n_edge] < z_lowest_dynode)
+    if (inner_rho_edge[n_edge] > r_dynode && inner_z_edge[n_edge] < z_lowest_dynode)
       z_lowest_dynode = inner_z_edge[n_edge];
     // sanity check equator index
     if (iedge_equator < 0) {
@@ -540,11 +508,9 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
              << G4endl;
     }
     // set inner surfaces
-    inner1_solid->SetAllParameters(iedge_equator, inner_z_edge, inner_rho_edge,
-                                   outer_z_o);
-    inner2_solid->SetAllParameters(
-        n_edge - iedge_equator, inner_z_edge + iedge_equator,
-        inner_rho_edge + iedge_equator, outer_z_o + iedge_equator);
+    inner1_solid->SetAllParameters(iedge_equator, inner_z_edge, inner_rho_edge, outer_z_o);
+    inner2_solid->SetAllParameters(n_edge - iedge_equator, inner_z_edge + iedge_equator,
+                                   inner_rho_edge + iedge_equator, outer_z_o + iedge_equator);
     // GLG4TorusStack keeps its own copy of edges, so we can delete our
     // workspace
     delete[] dscratch;
@@ -561,8 +527,7 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
   // MAKE LOGICAL VOLUMES (add materials)
   ////
 
-  G4LogicalVolume * body_log =
-      new G4LogicalVolume(body_solid, Glass, GetName() + "_body_log");
+  G4LogicalVolume * body_log = new G4LogicalVolume(body_solid, Glass, GetName() + "_body_log");
   body_log->SetSensitiveDetector(detector);
 
   G4LogicalVolume * inner1_log =
@@ -580,65 +545,62 @@ void LSC_PMT_LogicalVolume::ConstructPMT_UsingTorusStack(
   ////
 
   // calculate z coordinate of equatorial plane in envelope
-  z_equator = ((G4Tubs *)(this->GetSolid()))->GetZHalfLength() -
-              outer_z_edge[0] -
+  z_equator = ((G4Tubs *)(this->GetSolid()))->GetZHalfLength() - outer_z_edge[0] -
               0.1 * mm; // face of tube 100 um from front of cylinder
   G4ThreeVector equatorTranslation(0., 0., z_equator);
   G4ThreeVector noTranslation(0., 0., 0.);
 
   // place outer solids in envelope
-  G4PVPlacement * body_phys = new G4PVPlacement(
-      0,                        // no rotation
-      equatorTranslation,       // puts body equator in right place
-      body_log,                 // the logical volume
-      GetName() + "_body_phys", // a name for this physical volume
-      this,                     // the mother volume
-      false,                    // no boolean ops
-      0);                       // copy number
+  G4PVPlacement * body_phys =
+      new G4PVPlacement(0,                        // no rotation
+                        equatorTranslation,       // puts body equator in right place
+                        body_log,                 // the logical volume
+                        GetName() + "_body_phys", // a name for this physical volume
+                        this,                     // the mother volume
+                        false,                    // no boolean ops
+                        0);                       // copy number
 
   // place inner solids in outer solid (vacuum)
-  G4PVPlacement * inner1_phys = new G4PVPlacement(
-      0,                          // no rotation
-      noTranslation,              // puts face equator in right place
-      GetName() + "_inner1_phys", // a name for this physical volume
-      inner1_log,                 // the logical volume
-      body_phys,                  // the mother volume
-      false,                      // no boolean ops
-      0);                         // copy number
-  G4PVPlacement * inner2_phys = new G4PVPlacement(
-      0,                          // no rotation
-      noTranslation,              // puts face equator in right place
-      GetName() + "_inner2_phys", // a name for this physical volume
-      inner2_log,                 // the logical volume
-      body_phys,                  // the mother volume
-      false,                      // no boolean ops
-      0);                         // copy number
+  G4PVPlacement * inner1_phys =
+      new G4PVPlacement(0,                          // no rotation
+                        noTranslation,              // puts face equator in right place
+                        GetName() + "_inner1_phys", // a name for this physical volume
+                        inner1_log,                 // the logical volume
+                        body_phys,                  // the mother volume
+                        false,                      // no boolean ops
+                        0);                         // copy number
+  G4PVPlacement * inner2_phys =
+      new G4PVPlacement(0,                          // no rotation
+                        noTranslation,              // puts face equator in right place
+                        GetName() + "_inner2_phys", // a name for this physical volume
+                        inner2_log,                 // the logical volume
+                        body_phys,                  // the mother volume
+                        false,                      // no boolean ops
+                        0);                         // copy number
 
   // place dynode in stem/back
   /**  G4PVPlacement* dynode_phys =  **/
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, z_dynode - hh_dynode),
-                    GetName() + "_dynode_phys", dynode_log, inner2_phys, false,
-                    0);
+  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, z_dynode - hh_dynode), GetName() + "_dynode_phys",
+                    dynode_log, inner2_phys, false, 0);
 
   ////////////////////////////////////////////////////////////////
   // Attach optical surfaces to borders
   ////
-  new G4LogicalBorderSurface(GetName() + "_photocathode_logsurf1", inner1_phys,
-                             body_phys, OpPCSurface);
-  new G4LogicalBorderSurface(GetName() + "_photocathode_logsurf2", body_phys,
-                             inner1_phys, OpPCSurface);
-  new G4LogicalBorderSurface(GetName() + "_mirror_logsurf1", inner2_phys,
-                             body_phys, our_Mirror_opsurf);
-  new G4LogicalBorderSurface(GetName() + "_mirror_logsurf2", body_phys,
-                             inner2_phys, our_Mirror_opsurf);
+  new G4LogicalBorderSurface(GetName() + "_photocathode_logsurf1", inner1_phys, body_phys,
+                             OpPCSurface);
+  new G4LogicalBorderSurface(GetName() + "_photocathode_logsurf2", body_phys, inner1_phys,
+                             OpPCSurface);
+  new G4LogicalBorderSurface(GetName() + "_mirror_logsurf1", inner2_phys, body_phys,
+                             our_Mirror_opsurf);
+  new G4LogicalBorderSurface(GetName() + "_mirror_logsurf2", body_phys, inner2_phys,
+                             our_Mirror_opsurf);
 
   ////////////////////////////////////////////////////////////////
   // FastSimulationModel
   // setup optical model
   G4Region * body_region = new G4Region(GetName() + "_GLG4_PMTOpticalRegion");
   body_region->AddRootLogicalVolume(body_log);
-  new LSCPMTOpticalModel(GetName() + "_optical_model", body_region, body_log,
-                         OpPCSurface);
+  new LSCPMTOpticalModel(GetName() + "_optical_model", body_region, body_log, OpPCSurface);
 
   ////////////////////////////////////////////////////////////////
   // Set colors and visibility

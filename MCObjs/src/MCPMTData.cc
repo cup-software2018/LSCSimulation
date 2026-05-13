@@ -1,5 +1,5 @@
-#include "MCObjs/MCPMT.hh"
-#include "MCObjs/MCPMTData.hh"
+#include "MCPMT.hh"
+#include "MCPMTData.hh"
 
 ClassImp(MCPMTData)
 

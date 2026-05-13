@@ -14,13 +14,13 @@
 #include "TTree.h"
 #include "TClonesArray.h"
 
-#include "MCObjs/MCPrimaryData.hh"
-#include "MCObjs/MCTrackData.hh"
-#include "MCObjs/MCScintData.hh"
-#include "MCObjs/MCPMTData.hh"
-#include "MCObjs/MCEventInfo.hh"
+#include "MCPrimaryData.hh"
+#include "MCTrackData.hh"
+#include "MCScintData.hh"
+#include "MCPMTData.hh"
+#include "MCEventInfo.hh"
 
-#include "LSCSim/LSCRecorderBase.hh"
+#include "LSCRecorderBase.hh"
 
 class G4UIdirectory;
 class G4UIcmdWithAString;

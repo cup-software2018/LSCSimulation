@@ -16,8 +16,8 @@
 #include "G4UImessenger.hh"
 
 #include "fstream"
-//#include "GLG4Sim/GLG4HitPhotonCollection.hh"
-#include "GLG4Sim/GLG4HitPMTCollection.hh"
+//#include "GLG4HitPhotonCollection.hh"
+#include "GLG4HitPMTCollection.hh"
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"

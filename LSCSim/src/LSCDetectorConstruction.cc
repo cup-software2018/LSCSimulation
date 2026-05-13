@@ -1,7 +1,3 @@
-#include "GLG4Sim/GLG4param.hh"
-#include "LSCSim/LSCDetectorConstruction.hh"
-#include "LSCSim/LSCPMTSD.hh"
-
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Material.hh"
@@ -14,6 +10,9 @@
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIdirectory.hh"
 #include "G4VisAttributes.hh"
+#include "GLG4param.hh"
+#include "LSCDetectorConstruction.hh"
+#include "LSCPMTSD.hh"
 
 LSCPMTSD * LSCDetectorConstruction::fPmt_SD = nullptr;
 

@@ -8,7 +8,7 @@
 // GLG4PrimaryGeneratorMessenger
 ////////////////////////////////////////////////////////////////
 
-#include "GLG4Sim/GLG4PrimaryGeneratorMessenger.hh"
+#include "GLG4PrimaryGeneratorMessenger.hh"
 
 #include "G4Event.hh"
 #include "G4LogicalVolume.hh"
@@ -25,10 +25,10 @@
 #include "iomanip" // for G4std::setw(), etc..
 #include "sstream" // for string streams
 
-#include "GLG4Sim/GLG4PosGen.hh" // for GetState(), SetState()
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
-#include "GLG4Sim/GLG4VertexGen.hh" // for GetState(), SetState()
-#include "GLG4Sim/local_g4compat.hh"
+#include "GLG4PosGen.hh" // for GetState(), SetState()
+#include "GLG4PrimaryGeneratorAction.hh"
+#include "GLG4VertexGen.hh" // for GetState(), SetState()
+#include "local_g4compat.hh"
 
 using namespace std;
 using namespace CLHEP;

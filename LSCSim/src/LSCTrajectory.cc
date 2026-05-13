@@ -28,8 +28,6 @@
 /// \brief Implementation of the LSCTrajectory class
 //
 //
-#include "LSCSim/LSCTrajectory.hh"
-
 #include "G4Circle.hh"
 #include "G4Colour.hh"
 #include "G4ParticleTable.hh"
@@ -41,17 +39,18 @@
 #include "G4TrajectoryPoint.hh"
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
+#include "LSCTrajectory.hh"
 
 G4ThreadLocal G4Allocator<LSCTrajectory> * LSCTrajectoryAllocator = nullptr;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LSCTrajectory::LSCTrajectory()
-    : G4Trajectory(),
-      fWls(false),
-      fDrawit(false),
-      fForceNoDraw(false),
-      fForceDraw(false)
+  : G4Trajectory(),
+    fWls(false),
+    fDrawit(false),
+    fForceNoDraw(false),
+    fForceDraw(false)
 {
   fParticleDefinition = nullptr;
 }
@@ -59,9 +58,9 @@ LSCTrajectory::LSCTrajectory()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LSCTrajectory::LSCTrajectory(const G4Track * aTrack)
-    : G4Trajectory(aTrack),
-      fWls(false),
-      fDrawit(false)
+  : G4Trajectory(aTrack),
+    fWls(false),
+    fDrawit(false)
 {
   fParticleDefinition = aTrack->GetDefinition();
 }
@@ -69,9 +68,9 @@ LSCTrajectory::LSCTrajectory(const G4Track * aTrack)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LSCTrajectory::LSCTrajectory(LSCTrajectory & right)
-    : G4Trajectory(right),
-      fWls(right.fWls),
-      fDrawit(right.fDrawit)
+  : G4Trajectory(right),
+    fWls(right.fWls),
+    fDrawit(right.fDrawit)
 {
   fParticleDefinition = right.fParticleDefinition;
 }
@@ -102,8 +101,7 @@ void LSCTrajectory::DrawTrajectory() const
 
   for (G4int i = 0; i < GetPointEntries(); ++i) {
     G4VTrajectoryPoint * aTrajectoryPoint = GetPoint(i);
-    const std::vector<G4ThreeVector> * auxiliaries =
-        aTrajectoryPoint->GetAuxiliaryPoints();
+    const std::vector<G4ThreeVector> * auxiliaries = aTrajectoryPoint->GetAuxiliaryPoints();
     if (auxiliaries) {
       for (size_t iAux = 0; iAux < auxiliaries->size(); ++iAux) {
         const G4ThreeVector pos((*auxiliaries)[iAux]);

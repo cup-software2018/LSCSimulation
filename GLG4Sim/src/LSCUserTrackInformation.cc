@@ -28,7 +28,7 @@
 /// \brief Implementation of the LSCUserTrackInformation class
 //
 //
-#include "LSCSim/LSCUserTrackInformation.hh"
+#include "LSCUserTrackInformation.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

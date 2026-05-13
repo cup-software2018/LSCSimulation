@@ -3,7 +3,7 @@
 // establish some compatibility between versions of Geant4
 
 #ifndef G4VERSIONCODE
-#include "GLG4Sim/local_g4version.hh"
+#include "local_g4version.hh"
 #endif
 
 #if (G4VERSIONCODE < 40500)

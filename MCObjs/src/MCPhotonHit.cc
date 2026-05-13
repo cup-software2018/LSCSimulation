@@ -1,4 +1,4 @@
-#include "MCObjs/MCPhotonHit.hh"
+#include "MCPhotonHit.hh"
 
 ClassImp(MCPhotonHit)
 

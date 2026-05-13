@@ -7,7 +7,7 @@
     @author Glenn Horton-Smith, December 2004
 */
 
-#include "GLG4Sim/GLG4HitPhoton.hh"
+#include "GLG4HitPhoton.hh"
 #include <CLHEP/Units/PhysicalConstants.h>
 //#include <CLHEP/Units/GlobalPhysicalConstants.h> //EJ
 

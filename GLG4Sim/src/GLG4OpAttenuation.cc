@@ -10,7 +10,7 @@
 // GLG4OpAttenuation.cc
 // 
 
-#include "GLG4Sim/GLG4OpAttenuation.hh"
+#include "GLG4OpAttenuation.hh"
 
 #include "globals.hh"
 #include "templates.hh"

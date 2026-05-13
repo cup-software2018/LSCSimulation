@@ -4,7 +4,7 @@
 // GLG4InputDataReader.cc
 // v.0 by Glenn Horton-Smith, Feb 12, 1999
 
-#include "GLG4Sim/GLG4InputDataReader.hh"
+#include "GLG4InputDataReader.hh"
 
 #include <ctype.h>
 

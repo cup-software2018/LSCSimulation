@@ -2,7 +2,7 @@
 
 #include "TClonesArray.h"
 
-#include "MCObjs/MCTrack.hh"
+#include "MCTrack.hh"
 
 class MCTrackData : public TClonesArray {
 public:

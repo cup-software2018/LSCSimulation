@@ -10,8 +10,8 @@
 //  Based on earlier work by O. Tajima and G. Horton-Smith
 //
 
-#include "GLG4Sim/GLG4PMTSD.hh"
-#include "GLG4Sim/GLG4VEventAction.hh"
+#include "GLG4PMTSD.hh"
+#include "GLG4VEventAction.hh"
 
 #include "G4Track.hh"
 #include "G4Step.hh"
@@ -20,9 +20,9 @@
 #include "G4ios.hh"
 #include "G4SDManager.hh"
 
-#include "GLG4Sim/GLG4Scint.hh"  // for doScintilllation and total energy deposition info
+#include "GLG4Scint.hh"  // for doScintilllation and total energy deposition info
 #include "G4VSolid.hh" // for access to solid store
-//#include "GLG4Sim/GLG4DetectorConstruction.hh"
+//#include "GLG4DetectorConstruction.hh"
 #include "Randomize.hh"
 
 #include <string.h>  // for memset

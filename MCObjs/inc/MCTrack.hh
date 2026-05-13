@@ -5,7 +5,7 @@
 #include "TObject.h"
 #include "TString.h"
 
-#include "MCObjs/MCStep.hh"
+#include "MCStep.hh"
 
 class MCTrack : public TObject {
 public:

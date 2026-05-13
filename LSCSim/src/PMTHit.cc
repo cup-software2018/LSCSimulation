@@ -1,11 +1,10 @@
-#include "LSCSim/PMTHit.hh"
-
-#include "MCObjs/MCPhotonHit.hh"
+#include "MCPhotonHit.hh"
+#include "PMTHit.hh"
 
 G4Allocator<PMTHit> PMTHitAllocator;
 
 PMTHit::PMTHit()
-    : G4VHit()
+  : G4VHit()
 {
   fPMTId = -1;
   fNHit = 0;
@@ -13,7 +12,7 @@ PMTHit::PMTHit()
 }
 
 PMTHit::PMTHit(const PMTHit & pmt)
-    : G4VHit()
+  : G4VHit()
 {
   fPMTId = pmt.GetPMTId();
   fNHit = pmt.GetNHit();
@@ -26,10 +25,7 @@ PMTHit::~PMTHit()
   delete fPhotonHitColl;
 }
 
-MCPhotonHit * PMTHit::AddHit()
-{
-  return new ((*fPhotonHitColl)[fNHit++]) MCPhotonHit();
-}
+MCPhotonHit * PMTHit::AddHit() { return new ((*fPhotonHitColl)[fNHit++]) MCPhotonHit(); }
 
 const PMTHit & PMTHit::operator=(const PMTHit & pmt)
 {
@@ -39,10 +35,7 @@ const PMTHit & PMTHit::operator=(const PMTHit & pmt)
   return *this;
 }
 
-G4int PMTHit::operator==(const PMTHit & pmt) const
-{
-  return (fPMTId == pmt.GetPMTId());
-}
+G4int PMTHit::operator==(const PMTHit & pmt) const { return (fPMTId == pmt.GetPMTId()); }
 
 void * PMTHit::operator new(size_t)
 {
@@ -51,7 +44,4 @@ void * PMTHit::operator new(size_t)
   return aHit;
 }
 
-void PMTHit::operator delete(void * aHit)
-{
-  PMTHitAllocator.FreeSingle((PMTHit *)aHit);
-}
+void PMTHit::operator delete(void * aHit) { PMTHitAllocator.FreeSingle((PMTHit *)aHit); }

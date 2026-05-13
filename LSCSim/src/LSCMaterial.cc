@@ -3,9 +3,8 @@
 #include "G4MaterialTable.hh"
 #include "G4NistManager.hh"
 #include "G4OpticalSurface.hh"
-
-#include "GLG4Sim/GLG4InputDataReader.hh"
-#include "LSCSim/LSCDetectorConstruction.hh"
+#include "GLG4InputDataReader.hh"
+#include "LSCDetectorConstruction.hh"
 
 using namespace CLHEP;
 
@@ -58,8 +57,7 @@ void LSCDetectorConstruction::ConstructMaterials()
   density = 1e-3 * kGasThreshold;         // from PhysicalConstants.h
   G4double temperature = STP_Temperature; // from PhysicalConstants.h
   G4double pressure = STP_Pressure * density / (1.29e-3 * g / cm3);
-  auto PMT_Vac =
-      new G4Material(name, density, 1, kStateGas, temperature, pressure);
+  auto PMT_Vac = new G4Material(name, density, 1, kStateGas, temperature, pressure);
   PMT_Vac->AddMaterial(air, 1.);
 
   // --- Rock  SiO2 ---------------
@@ -259,8 +257,7 @@ void LSCDetectorConstruction::ConstructMaterials()
   PPO->SetChemicalFormula("FLUOR");
 
   // Calculate the molecular weight
-  mol = elementC->GetA() * 15 + elementH->GetA() * 11 + elementN->GetA() * 1 +
-        elementO->GetA() * 1;
+  mol = elementC->GetA() * 15 + elementH->GetA() * 11 + elementN->GetA() * 1 + elementO->GetA() * 1;
   // Allocate memory for a new Material Property Table
   MPT = new G4MaterialPropertiesTable();
   // Fill with the molecular weight
@@ -305,10 +302,8 @@ void LSCDetectorConstruction::ConstructMaterials()
   LS_LAB->AddMaterial(LAB[3], 0.3472 / (1.0 + PPO_fraction + BisMSB_fraction));
   LS_LAB->AddMaterial(LAB[4], 0.2083 / (1.0 + PPO_fraction + BisMSB_fraction));
   LS_LAB->AddMaterial(LAB[5], 0.0043 / (1.0 + PPO_fraction + BisMSB_fraction));
-  LS_LAB->AddMaterial(PPO,
-                      PPO_fraction / (1.0 + PPO_fraction + BisMSB_fraction));
-  LS_LAB->AddMaterial(BisMSB,
-                      BisMSB_fraction / (1.0 + PPO_fraction + BisMSB_fraction));
+  LS_LAB->AddMaterial(PPO, PPO_fraction / (1.0 + PPO_fraction + BisMSB_fraction));
+  LS_LAB->AddMaterial(BisMSB, BisMSB_fraction / (1.0 + PPO_fraction + BisMSB_fraction));
 
   LS_LAB->GetIonisation()->SetBirksConstant(0.117 * mm / MeV);
 
@@ -345,8 +340,7 @@ void LSCDetectorConstruction::ConstructMaterials()
   if (fMaterialDataFile.empty()) {
     G4String msg = "Error, material properties file could not be opened.\n";
     G4cerr << msg << G4endl;
-    G4Exception("LSCDetectorConstruction::LSCDetectorConstruction", "",
-                FatalException, msg);
+    G4Exception("LSCDetectorConstruction::LSCDetectorConstruction", "", FatalException, msg);
   }
   else {
     ifs.open(fMaterialDataFile.data());
@@ -356,11 +350,10 @@ void LSCDetectorConstruction::ConstructMaterials()
   ifs.close();
 
   if (errorCount_ReadMaterials) {
-    G4cerr << "Error count after reading material properties file is "
-           << errorCount_ReadMaterials << G4endl;
+    G4cerr << "Error count after reading material properties file is " << errorCount_ReadMaterials
+           << G4endl;
     G4String msg = "Error reading material properties file.\n";
-    G4Exception("LSCDetectorConstruction::LSCDetectorConstruction", "",
-                FatalException, msg);
+    G4Exception("LSCDetectorConstruction::LSCDetectorConstruction", "", FatalException, msg);
   }
 
   //
@@ -375,24 +368,21 @@ void LSCDetectorConstruction::ConstructMaterials()
   Stainless_opsurf->SetModel(glisur);
   Stainless_opsurf->SetType(dielectric_metal);
   Stainless_opsurf->SetPolish(0.95); // a guess -- FIXME?
-  Stainless_opsurf->SetMaterialPropertiesTable(
-      steel_polished->GetMaterialPropertiesTable());
+  Stainless_opsurf->SetMaterialPropertiesTable(steel_polished->GetMaterialPropertiesTable());
 
   Stainless_opsurf = new G4OpticalSurface("steel_unpolished_opsurf");
   Stainless_opsurf->SetFinish(ground);
   Stainless_opsurf->SetModel(glisur);
   Stainless_opsurf->SetType(dielectric_metal);
   Stainless_opsurf->SetPolish(0.1); // a guess -- FIXME?
-  Stainless_opsurf->SetMaterialPropertiesTable(
-      steel_unpolished->GetMaterialPropertiesTable());
+  Stainless_opsurf->SetMaterialPropertiesTable(steel_unpolished->GetMaterialPropertiesTable());
 
   Polyethylene_opsurf = new G4OpticalSurface("Polyethylene_opsurf");
   Polyethylene_opsurf->SetFinish(ground);         // a guess -- FIXME?
   Polyethylene_opsurf->SetModel(glisur);          // a guess -- FIXME?
   Polyethylene_opsurf->SetType(dielectric_metal); // a guess -- FIXME?
   Polyethylene_opsurf->SetPolish(0.7);            // a guess -- FIXME?
-  Polyethylene_opsurf->SetMaterialPropertiesTable(
-      polyethylene->GetMaterialPropertiesTable());
+  Polyethylene_opsurf->SetMaterialPropertiesTable(polyethylene->GetMaterialPropertiesTable());
 
   Tyvek_opsurf = new G4OpticalSurface("Tyvek_opsurf");
   Tyvek_opsurf->SetFinish(ground);
@@ -406,6 +396,5 @@ void LSCDetectorConstruction::ConstructMaterials()
   Teflon_opsurf->SetModel(glisur);
   Teflon_opsurf->SetType(dielectric_metal);
   Teflon_opsurf->SetPolish(0.01); // a guess -- FIXME
-  Teflon_opsurf->SetMaterialPropertiesTable(
-      teflon->GetMaterialPropertiesTable());
+  Teflon_opsurf->SetMaterialPropertiesTable(teflon->GetMaterialPropertiesTable());
 }

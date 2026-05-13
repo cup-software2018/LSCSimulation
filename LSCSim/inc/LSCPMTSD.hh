@@ -5,7 +5,7 @@
 #include "G4MaterialPropertyVector.hh"
 #include "G4VSensitiveDetector.hh"
 
-#include "LSCSim/PMTHit.hh"
+#include "PMTHit.hh"
 
 class G4Step;
 class G4HCofThisEvent;

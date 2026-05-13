@@ -1,4 +1,4 @@
-#include "MCObjs/MCStep.hh"
+#include "MCStep.hh"
 
 ClassImp(MCStep)
 

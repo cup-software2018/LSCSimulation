@@ -7,8 +7,8 @@
     @author Glenn Horton-Smith
 */
 
-#include "GLG4Sim/GLG4NeutronDiffusionAndCapture.hh"
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
+#include "GLG4NeutronDiffusionAndCapture.hh"
+#include "GLG4PrimaryGeneratorAction.hh"
 
 #include "G4Step.hh"
 #include "G4VParticleChange.hh"

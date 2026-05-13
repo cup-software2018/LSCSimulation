@@ -17,7 +17,7 @@
 // 1999/11/22 G.Horton-Smith First version of GLG4TorusStack
 //  (see CVS history for other changes)
 
-#include "GLG4Sim/GLG4TorusStack.hh"
+#include "GLG4TorusStack.hh"
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -31,7 +31,7 @@
 #include "G4VisExtent.hh"
 #include "G4VoxelLimits.hh"
 #include "G4ios.hh"  // for std::cerr
-#include "GLG4Sim/local_g4compat.hh"
+#include "local_g4compat.hh"
 #include "meshdefs.hh"
 
 // debugging

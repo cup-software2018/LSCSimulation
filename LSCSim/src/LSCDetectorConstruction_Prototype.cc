@@ -2,11 +2,6 @@
 #include <sstream>
 #include <string>
 
-#include "GLG4Sim/GLG4param.hh"
-#include "LSCSim/LSCDetectorConstruction.hh"
-#include "LSCSim/LSCPMTSD.hh"
-#include "LSCSim/LSC_PMT_LogicalVolume.hh"
-
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Material.hh"
@@ -17,6 +12,10 @@
 #include "G4UnionSolid.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4VisAttributes.hh"
+#include "GLG4param.hh"
+#include "LSCDetectorConstruction.hh"
+#include "LSCPMTSD.hh"
+#include "LSC_PMT_LogicalVolume.hh"
 
 using namespace std;
 using namespace CLHEP;

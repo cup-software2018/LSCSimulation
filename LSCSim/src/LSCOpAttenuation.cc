@@ -1,5 +1,3 @@
-#include "LSCSim/LSCOpAttenuation.hh"
-
 #include "G4GeometryTolerance.hh"
 #include "G4OpProcessSubType.hh"
 #include "G4PhysicalConstants.hh"
@@ -7,6 +5,7 @@
 #include "G4WLSTimeGeneratorProfileDelta.hh"
 #include "G4WLSTimeGeneratorProfileExponential.hh"
 #include "G4ios.hh"
+#include "LSCOpAttenuation.hh"
 
 static const int N_COSTHETA_ENTRIES = 129;
 
@@ -24,8 +23,7 @@ static void InitializeTable(void)
       old_cos2th = cos2th;
       double costh = 2.0 * x / (3.0 - cos2th);
       cos2th = costh * costh;
-    } while (fabs(old_cos2th - cos2th) >
-             G4GeometryTolerance::GetInstance()->GetAngularTolerance());
+    } while (fabs(old_cos2th - cos2th) > G4GeometryTolerance::GetInstance()->GetAngularTolerance());
 
     Cos2ThetaTable[i] = cos2th;
   }
@@ -34,20 +32,16 @@ static void InitializeTable(void)
   TableInitialized = 1;
 }
 
-LSCOpAttenuation::LSCOpAttenuation(const G4String & processName,
-                                   G4ProcessType type)
-    : G4VDiscreteProcess(processName, type)
+LSCOpAttenuation::LSCOpAttenuation(const G4String & processName, G4ProcessType type)
+  : G4VDiscreteProcess(processName, type)
 {
-  if (verboseLevel > 0) {
-    G4cout << GetProcessName() << " is created " << G4endl;
-  }
+  if (verboseLevel > 0) { G4cout << GetProcessName() << " is created " << G4endl; }
 
   SetProcessSubType(fOpAbsorption);
 
   if (!TableInitialized) InitializeTable();
 
-  WLSTimeGeneratorProfile =
-      new G4WLSTimeGeneratorProfileDelta("WLSTimeGeneratorProfileDelta");
+  WLSTimeGeneratorProfile = new G4WLSTimeGeneratorProfileDelta("WLSTimeGeneratorProfileDelta");
 
   theIntegralTable = 0;
   BuildThePhysicsTable();
@@ -63,8 +57,7 @@ LSCOpAttenuation::~LSCOpAttenuation()
   delete WLSTimeGeneratorProfile;
 }
 
-G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
-                                                   const G4Step & aStep)
+G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack, const G4Step & aStep)
 {
   aParticleChange.Initialize(aTrack);
 
@@ -73,13 +66,10 @@ G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
 
   G4double thePhotonMomentum = aParticle->GetTotalMomentum();
 
-  G4MaterialPropertiesTable * aMaterialPropertiesTable =
-      aMaterial->GetMaterialPropertiesTable();
-  if (!aMaterialPropertiesTable)
-    return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+  G4MaterialPropertiesTable * aMaterialPropertiesTable = aMaterial->GetMaterialPropertiesTable();
+  if (!aMaterialPropertiesTable) return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 
-  G4MaterialPropertyVector * OpScatFracVector =
-      aMaterialPropertiesTable->GetProperty("OPSCATFRAC");
+  G4MaterialPropertyVector * OpScatFracVector = aMaterialPropertiesTable->GetProperty("OPSCATFRAC");
 
   G4double OpScatFrac = 0.0;
   if (OpScatFracVector) OpScatFrac = OpScatFracVector->Value(thePhotonMomentum);
@@ -91,33 +81,28 @@ G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
   // Scattering
   if (OpScatFrac > 0.0 && G4UniformRand() < OpScatFrac) {
     G4double urand = G4UniformRand() - 0.5;
-    G4double Cos2Theta0 = Cos2ThetaTable[(
-        int)(fabs(urand) * 2.0 * (N_COSTHETA_ENTRIES - 1) + 0.5)];
+    G4double Cos2Theta0 = Cos2ThetaTable[(int)(fabs(urand) * 2.0 * (N_COSTHETA_ENTRIES - 1) + 0.5)];
     G4double CosTheta = 4.0 * urand / (3.0 - Cos2Theta0);
 
 #ifdef G4DEBUG
     if (fabs(CosTheta) > 1.0) {
-      cerr << "GLG4OpAttenution: Warning, CosTheta=" << CosTheta
-           << " urand=" << urand << endl;
+      cerr << "GLG4OpAttenution: Warning, CosTheta=" << CosTheta << " urand=" << urand << endl;
       CosTheta = CosTheta > 0.0 ? 1.0 : -1.0;
     }
 #endif
 
     G4double SinTheta = sqrt(1.0 - CosTheta * CosTheta);
     G4double Phi = (2.0 * G4UniformRand() - 1.0) * M_PI;
-    G4ThreeVector e2(
-        aParticle->GetMomentumDirection().cross(aParticle->GetPolarization()));
+    G4ThreeVector e2(aParticle->GetMomentumDirection().cross(aParticle->GetPolarization()));
 
     G4ThreeVector NewMomentum =
         (CosTheta * aParticle->GetPolarization() +
-         (SinTheta * cos(Phi)) * aParticle->GetMomentumDirection() +
-         (SinTheta * sin(Phi)) * e2)
+         (SinTheta * cos(Phi)) * aParticle->GetMomentumDirection() + (SinTheta * sin(Phi)) * e2)
             .unit();
 
     // polarization is normal to new momentum and in same plane as
     // old new momentum and old polarization
-    G4ThreeVector NewPolarization =
-        (aParticle->GetPolarization() - CosTheta * NewMomentum).unit();
+    G4ThreeVector NewPolarization = (aParticle->GetPolarization() - CosTheta * NewMomentum).unit();
 
     aParticleChange.ProposeMomentumDirection(NewMomentum);
     aParticleChange.ProposePolarization(NewPolarization);
@@ -160,8 +145,7 @@ G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
 
     if (aMaterialPropertiesTable->GetConstProperty("WLSTIMECONSTANT"))
       WLSTime = aMaterialPropertiesTable->GetConstProperty("WLSTIMECONSTANT");
-    WLSIntegral =
-        (G4PhysicsOrderedFreeVector *)((*theIntegralTable)(materialIndex));
+    WLSIntegral = (G4PhysicsOrderedFreeVector *)((*theIntegralTable)(materialIndex));
 
     // Max WLS Integral
     G4double CIImax = WLSIntegral->GetMaxValue();
@@ -181,8 +165,7 @@ G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
 
     // If no such energy can be sampled, return
     if (sampledEnergy > primaryEnergy) {
-      if (verboseLevel > 1)
-        G4cout << " *** One less WLS photon will be returned ***" << G4endl;
+      if (verboseLevel > 1) G4cout << " *** One less WLS photon will be returned ***" << G4endl;
       aParticleChange.SetNumberOfSecondaries(0);
       return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
     }
@@ -234,8 +217,7 @@ G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
 
     G4ThreeVector aSecondaryPosition = pPostStepPoint->GetPosition();
 
-    G4Track * aSecondaryTrack =
-        new G4Track(aWLSPhoton, aSecondaryTime, aSecondaryPosition);
+    G4Track * aSecondaryTrack = new G4Track(aWLSPhoton, aSecondaryTime, aSecondaryPosition);
 
     aSecondaryTrack->SetTouchableHandle(aTrack.GetTouchableHandle());
     aSecondaryTrack->SetParentID(aTrack.GetTrackID());
@@ -243,9 +225,8 @@ G4VParticleChange * LSCOpAttenuation::PostStepDoIt(const G4Track & aTrack,
     aParticleChange.AddSecondary(aSecondaryTrack);
 
     if (verboseLevel > 0) {
-      G4cout
-          << "\n Exiting from LSCOpAttenuation::DoIt -- NumberOfSecondaries = "
-          << aParticleChange.GetNumberOfSecondaries() << G4endl;
+      G4cout << "\n Exiting from LSCOpAttenuation::DoIt -- NumberOfSecondaries = "
+             << aParticleChange.GetNumberOfSecondaries() << G4endl;
     }
   }
 
@@ -264,15 +245,13 @@ void LSCOpAttenuation::BuildThePhysicsTable()
 
   // loop for materials
   for (G4int i = 0; i < numOfMaterials; i++) {
-    G4PhysicsOrderedFreeVector * aPhysicsOrderedFreeVector =
-        new G4PhysicsOrderedFreeVector();
+    G4PhysicsOrderedFreeVector * aPhysicsOrderedFreeVector = new G4PhysicsOrderedFreeVector();
 
     // Retrieve vector of WLS wavelength intensity for
     // the material from the material's optical properties table.
     G4Material * aMaterial = (*theMaterialTable)[i];
 
-    G4MaterialPropertiesTable * aMaterialPropertiesTable =
-        aMaterial->GetMaterialPropertiesTable();
+    G4MaterialPropertiesTable * aMaterialPropertiesTable = aMaterial->GetMaterialPropertiesTable();
 
     if (aMaterialPropertiesTable) {
       G4MaterialPropertyVector * theWLSVector =
@@ -321,8 +300,7 @@ void LSCOpAttenuation::BuildThePhysicsTable()
   }
 }
 
-G4double LSCOpAttenuation::GetMeanFreePath(const G4Track & aTrack, G4double,
-                                           G4ForceCondition *)
+G4double LSCOpAttenuation::GetMeanFreePath(const G4Track & aTrack, G4double, G4ForceCondition *)
 {
   const G4DynamicParticle * aParticle = aTrack.GetDynamicParticle();
   const G4Material * aMaterial = aTrack.GetMaterial();
@@ -353,10 +331,8 @@ void LSCOpAttenuation::UseTimeProfile(const G4String name)
   }
   else if (name == "exponential") {
     delete WLSTimeGeneratorProfile;
-    WLSTimeGeneratorProfile =
-        new G4WLSTimeGeneratorProfileExponential("exponential");
+    WLSTimeGeneratorProfile = new G4WLSTimeGeneratorProfileExponential("exponential");
   }
   else
-    G4Exception("LSCOpWLS::UseTimeProfile", "em0202", FatalException,
-                "generator does not exist");
+    G4Exception("LSCOpWLS::UseTimeProfile", "em0202", FatalException, "generator does not exist");
 }

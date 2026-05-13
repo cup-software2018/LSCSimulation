@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////
 
 // include files (boring)
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
+#include "GLG4PrimaryGeneratorAction.hh"
 
 #include <stdio.h> // for sprintf
 
@@ -21,10 +21,10 @@
 #include "globals.hh"
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include "GLG4Sim/GLG4PosGen.hh" // for global position generator
-#include "GLG4Sim/GLG4PrimaryGeneratorMessenger.hh"
-#include "GLG4Sim/GLG4VertexGen.hh" // for vertex generator
-#include "GLG4Sim/GLG4param.hh"     // for GLG4param
+#include "GLG4PosGen.hh" // for global position generator
+#include "GLG4PrimaryGeneratorMessenger.hh"
+#include "GLG4VertexGen.hh" // for vertex generator
+#include "GLG4param.hh"     // for GLG4param
 
 using namespace CLHEP;
 

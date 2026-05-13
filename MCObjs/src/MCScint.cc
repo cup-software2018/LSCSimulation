@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "MCObjs/MCScint.hh"
+#include "MCScint.hh"
 
 ClassImp(MCScint)
 

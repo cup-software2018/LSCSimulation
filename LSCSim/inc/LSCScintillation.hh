@@ -18,7 +18,7 @@
 #include "templates.hh"
 #include "G4EmSaturation.hh"
 
-// #include "LSCSim/LSCEmSaturation.hh"
+// #include "LSCEmSaturation.hh"
 
 class G4UIdirectory;
 class G4UIcmdWithAString;

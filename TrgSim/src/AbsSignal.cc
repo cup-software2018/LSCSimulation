@@ -1,4 +1,4 @@
-#include "TrgSim/AbsSignal.hh"
+#include "AbsSignal.hh"
 
 ClassImp(AbsSignal)
 

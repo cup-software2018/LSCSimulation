@@ -1,6 +1,9 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include "TRandom3.h"
+
+#include "CLHEP/Random/MTwistEngine.h"
 #include "G4RunManager.hh"
 #include "G4String.hh"
 #include "G4UIExecutive.hh"
@@ -8,18 +11,15 @@
 #include "G4UItcsh.hh"
 #include "G4UIterminal.hh"
 #include "G4VisExecutive.hh"
+#include "GLG4PrimaryGeneratorAction.hh"
+#include "LSCDetectorConstruction.hh"
+#include "LSCEventAction.hh"
+#include "LSCPhysicsList.hh"
+#include "LSCRootManager.hh"
+#include "LSCRunAction.hh"
+#include "LSCSteppingAction.hh"
+#include "LSCTrackingAction.hh"
 #include "Randomize.hh"
-#include "TRandom3.h"
-
-#include "CLHEP/Random/MTwistEngine.h"
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
-#include "LSCSim/LSCDetectorConstruction.hh"
-#include "LSCSim/LSCEventAction.hh"
-#include "LSCSim/LSCPhysicsList.hh"
-#include "LSCSim/LSCRootManager.hh"
-#include "LSCSim/LSCRunAction.hh"
-#include "LSCSim/LSCSteppingAction.hh"
-#include "LSCSim/LSCTrackingAction.hh"
 
 using namespace std;
 
@@ -125,7 +125,7 @@ int main(int argc, char ** argv)
     command = Form("/run/beamOn %d", nevent);
     UImanager->ApplyCommand(command);
   }
-  
+
   if (rootManager) delete rootManager;
   if (visManager != nullptr) delete visManager;
 

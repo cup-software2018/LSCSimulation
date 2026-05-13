@@ -4,9 +4,9 @@
 //  GLG4 version by Glenn Horton-Smith December, 2004.
 //  Based on earlier work by H. Ikeda and G. Horton-Smith
 
-#include "GLG4Sim/local_g4compat.hh"
+#include "local_g4compat.hh"
 
-#include "GLG4Sim/GLG4VEventAction.hh"
+#include "GLG4VEventAction.hh"
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
@@ -25,7 +25,7 @@
 #include "G4ios.hh"
 #include "G4UIcmdWithAString.hh"
 
-#include "GLG4Sim/GLG4Scint.hh"  // for doScintilllation and total energy deposition info
+#include "GLG4Scint.hh"  // for doScintilllation and total energy deposition info
 
 
 //GLG4HitPhotonCollection GLG4VEventAction :: theHitPhotons= GLG4HitPhotonCollection();

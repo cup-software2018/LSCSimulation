@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "MCObjs/MCPrimary.hh"
+#include "MCPrimary.hh"
 
 ClassImp(MCPrimary)
 

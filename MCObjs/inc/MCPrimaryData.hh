@@ -2,7 +2,7 @@
 
 #include "TClonesArray.h"
 
-#include "MCObjs/MCPrimary.hh"
+#include "MCPrimary.hh"
 
 class MCPrimaryData : public TClonesArray {
 public:

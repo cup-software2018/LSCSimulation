@@ -8,8 +8,8 @@
 //
 #ifdef G4VIS_USE
 
-#include "GLG4Sim/GLG4VisMessenger.hh"
-#include "GLG4Sim/GLG4VisManager.hh"
+#include "GLG4VisMessenger.hh"
+#include "GLG4VisManager.hh"
 
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
@@ -17,7 +17,7 @@
 #include "G4ViewParameters.hh"
 #include "globals.hh"
 
-#include "GLG4Sim/local_g4compat.hh"
+#include "local_g4compat.hh"
 
 #include <sstream>
 

@@ -3,7 +3,7 @@
 
 #include "TString.h"
 
-#include "MCObjs/MCPMT.hh"
+#include "MCPMT.hh"
 
 ClassImp(MCPMT)
 

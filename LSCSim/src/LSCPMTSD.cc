@@ -1,5 +1,3 @@
-#include "LSCSim/LSCPMTSD.hh"
-
 #include <iostream>
 
 #include "G4LogicalVolume.hh"
@@ -13,14 +11,14 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4VTouchable.hh"
 #include "G4ios.hh"
+#include "LSCPMTSD.hh"
+#include "MCPhotonHit.hh"
 #include "Randomize.hh"
-
-#include "MCObjs/MCPhotonHit.hh"
 using namespace std;
 
 LSCPMTSD::LSCPMTSD(G4String name)
-    : G4VSensitiveDetector(name),
-      fPMTHitCollection(0)
+  : G4VSensitiveDetector(name),
+    fPMTHitCollection(0)
 {
   collectionName.insert("pmtHitCollection");
 }
@@ -29,8 +27,7 @@ LSCPMTSD::~LSCPMTSD() {}
 
 void LSCPMTSD::Initialize(G4HCofThisEvent * hitsCE)
 {
-  fPMTHitCollection =
-      new PMTHitsCollection(SensitiveDetectorName, collectionName[0]);
+  fPMTHitCollection = new PMTHitsCollection(SensitiveDetectorName, collectionName[0]);
 
   // Store collection with event and keep ID
   static G4int hitCID = -1;
@@ -41,10 +38,8 @@ void LSCPMTSD::Initialize(G4HCofThisEvent * hitsCE)
 G4bool LSCPMTSD::ProcessHits(G4Step *, G4TouchableHistory *) { return false; }
 
 void LSCPMTSD::SimpleHit(G4int ipmt, G4double time, G4double kineticEnergy,
-                          const G4ThreeVector & hit_position,
-                          const G4ThreeVector & hit_momentum,
-                          const G4ThreeVector & hit_polarization,
-                          G4int iHitPhotonCount)
+                         const G4ThreeVector & hit_position, const G4ThreeVector & hit_momentum,
+                         const G4ThreeVector & hit_polarization, G4int iHitPhotonCount)
 {
   PMTHit * pmt = nullptr;
 

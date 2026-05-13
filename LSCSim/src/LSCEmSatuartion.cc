@@ -43,17 +43,16 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-#include "G4UIcommand.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4SystemOfUnits.hh"
+#include "G4Electron.hh"
 #include "G4LossTableManager.hh"
-#include "G4NistManager.hh"
 #include "G4Material.hh"
 #include "G4MaterialCutsCouple.hh"
-#include "G4Electron.hh"
+#include "G4NistManager.hh"
+#include "G4PhysicalConstants.hh"
 #include "G4Proton.hh"
-
-#include "LSCSim/LSCEmSaturation.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4UIcommand.hh"
+#include "LSCEmSaturation.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
@@ -77,17 +76,13 @@ LSCEmSaturation::LSCEmSaturation()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-LSCEmSaturation::~LSCEmSaturation()
-{}
+LSCEmSaturation::~LSCEmSaturation() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-G4double LSCEmSaturation::VisibleEnergyDeposition(
-  const G4ParticleDefinition * p,
-  const G4MaterialCutsCouple * couple,
-  G4double length,
-  G4double edep,
-  G4double niel)
+G4double LSCEmSaturation::VisibleEnergyDeposition(const G4ParticleDefinition * p,
+                                                  const G4MaterialCutsCouple * couple,
+                                                  G4double length, G4double edep, G4double niel)
 {
   if (edep <= 0.0) { return 0.0; }
 
@@ -101,7 +96,7 @@ G4double LSCEmSaturation::VisibleEnergyDeposition(
     G4int pdgCode = p->GetPDGEncoding();
     // atomic relaxations for gamma incident
     if (22 == pdgCode) {
-      evis /= (1.0 + bfactor*edep/manager->GetRange(electron, edep, couple));
+      evis /= (1.0 + bfactor * edep / manager->GetRange(electron, edep, couple));
 
       // energy loss
     }
@@ -120,15 +115,15 @@ G4double LSCEmSaturation::VisibleEnergyDeposition(
 
       // continues energy loss
       if (eloss > 0.0) {
-        eloss /= (1.0 + bfactor1*eloss/length + bfactor2*eloss*eloss/length/length);
+        eloss /= (1.0 + bfactor1 * eloss / length + bfactor2 * eloss * eloss / length / length);
       }
 
       // non-ionizing energy loss
       if (nloss > 0.0) {
         if (!proton) { proton = G4Proton::Proton(); }
-        G4double escaled = nloss*curRatio;
-        G4double range = manager->GetRange(proton, escaled, couple)/curChargeSq;
-        nloss /= (1.0 + bfactor*nloss/range);
+        G4double escaled = nloss * curRatio;
+        G4double range = manager->GetRange(proton, escaled, couple) / curChargeSq;
+        nloss /= (1.0 + bfactor * nloss / range);
       }
 
       evis = eloss + nloss;
@@ -148,9 +143,8 @@ G4double LSCEmSaturation::FindG4BirksCoefficient(const G4Material * mat)
   for (G4int j = 0; j < nG4Birks; ++j) {
     if (name == g4MatNames[j]) {
       if (verbose > 0) {
-        G4cout << "### LSCEmSaturation::FindG4BirksCoefficient for "
-               << name << " is " << g4MatData[j]*MeV/mm << " mm/MeV "
-               << G4endl;
+        G4cout << "### LSCEmSaturation::FindG4BirksCoefficient for " << name << " is "
+               << g4MatData[j] * MeV / mm << " mm/MeV " << G4endl;
       }
       return g4MatData[j];
     }
@@ -202,7 +196,8 @@ G4double LSCEmSaturation::FindBirksCoefficient(const G4Material * mat)
 
   if (curBirks == 0.0 && verbose > 0) {
     G4cout << "### LSCEmSaturation::FindBirksCoefficient fails "
-              " for material " << name << G4endl;
+              " for material "
+           << name << G4endl;
   }
 
   // compute mean mass ratio
@@ -215,12 +210,12 @@ G4double LSCEmSaturation::FindBirksCoefficient(const G4Material * mat)
   for (size_t i = 0; i < nelm; ++i) {
     const G4Element * elm = (*theElementVector)[i];
     G4double Z = elm->GetZ();
-    G4double w = Z*Z*theAtomNumDensityVector[i];
-    curRatio += w/nist->GetAtomicMassAmu(G4int(Z));
-    curChargeSq = Z*Z*w;
+    G4double w = Z * Z * theAtomNumDensityVector[i];
+    curRatio += w / nist->GetAtomicMassAmu(G4int(Z));
+    curChargeSq = Z * Z * w;
     norm += w;
   }
-  curRatio *= proton_mass_c2/norm;
+  curRatio *= proton_mass_c2 / norm;
   curChargeSq /= norm;
 
   // store results
@@ -230,8 +225,8 @@ G4double LSCEmSaturation::FindBirksCoefficient(const G4Material * mat)
   effCharges.push_back(curChargeSq);
   nMaterials++;
   if (curBirks > 0.0 && verbose > 0) {
-    G4cout << "### LSCEmSaturation::FindBirksCoefficient Birks coefficient for "
-           << name << "  " << curBirks*MeV/mm << " mm/MeV" << G4endl;
+    G4cout << "### LSCEmSaturation::FindBirksCoefficient Birks coefficient for " << name << "  "
+           << curBirks * MeV / mm << " mm/MeV" << G4endl;
   }
   return curBirks;
 }
@@ -244,11 +239,8 @@ void LSCEmSaturation::DumpBirksCoefficients()
     G4cout << "### Birks coeffitients used in run time" << G4endl;
     for (G4int i = 0; i < nMaterials; ++i) {
       G4double br = matPointers[i]->GetIonisation()->GetBirksConstant();
-      G4cout << "   " << matNames[i] << "     "
-             << br*MeV/mm << " mm/MeV" << "     "
-             << br*matPointers[i]->GetDensity()*MeV*cm2/g
-             << " g/cm^2/MeV"
-             << G4endl;
+      G4cout << "   " << matNames[i] << "     " << br * MeV / mm << " mm/MeV" << "     "
+             << br * matPointers[i]->GetDensity() * MeV * cm2 / g << " g/cm^2/MeV" << G4endl;
     }
   }
 }
@@ -260,8 +252,7 @@ void LSCEmSaturation::DumpG4BirksCoefficients()
   if (nG4Birks > 0) {
     G4cout << "### Birks coeffitients for Geant4 materials" << G4endl;
     for (G4int i = 0; i < nG4Birks; ++i) {
-      G4cout << "   " << g4MatNames[i] << "   "
-             << g4MatData[i]*MeV/mm << " mm/MeV" << G4endl;
+      G4cout << "   " << g4MatNames[i] << "   " << g4MatData[i] * MeV / mm << " mm/MeV" << G4endl;
     }
   }
 }
@@ -273,31 +264,31 @@ void LSCEmSaturation::Initialise()
   // M.Hirschberg et al., IEEE Trans. Nuc. Sci. 39 (1992) 511
   // SCSN-38 kB = 0.00842 g/cm^2/MeV; rho = 1.06 g/cm^3
   g4MatNames.push_back("G4_POLYSTYRENE");
-  g4MatData.push_back(0.07943*mm/MeV);
+  g4MatData.push_back(0.07943 * mm / MeV);
 
   // C.Fabjan (private communication)
   // kB = 0.006 g/cm^2/MeV; rho = 7.13 g/cm^3
   g4MatNames.push_back("G4_BGO");
-  g4MatData.push_back(0.008415*mm/MeV);
+  g4MatData.push_back(0.008415 * mm / MeV);
 
   // A.Ribon analysis of publications
   // Scallettar et al., Phys. Rev. A25 (1982) 2419.
-  // NIM A 523 (2004) 275. 
-  // kB = 0.022 g/cm^2/MeV; rho = 1.396 g/cm^3; 
-  // ATLAS Efield = 10 kV/cm provide the strongest effect 
+  // NIM A 523 (2004) 275.
+  // kB = 0.022 g/cm^2/MeV; rho = 1.396 g/cm^3;
+  // ATLAS Efield = 10 kV/cm provide the strongest effect
   g4MatNames.push_back("G4_lAr");
-  g4MatData.push_back(0.1576*mm/MeV);
+  g4MatData.push_back(0.1576 * mm / MeV);
 
-  //G4_BARIUM_FLUORIDE
-  //G4_CESIUM_IODIDE
-  //G4_GEL_PHOTO_EMULSION
-  //G4_PHOTO_EMULSION
-  //G4_PLASTIC_SC_VINYLTOLUENE
-  //G4_SODIUM_IODIDE
-  //G4_STILBENE
-  //G4_lAr
-  //G4_PbWO4
-  //G4_Lucite
+  // G4_BARIUM_FLUORIDE
+  // G4_CESIUM_IODIDE
+  // G4_GEL_PHOTO_EMULSION
+  // G4_PHOTO_EMULSION
+  // G4_PLASTIC_SC_VINYLTOLUENE
+  // G4_SODIUM_IODIDE
+  // G4_STILBENE
+  // G4_lAr
+  // G4_PbWO4
+  // G4_Lucite
 
   nG4Birks = g4MatData.size();
 }

@@ -2,7 +2,7 @@
 
 #include "TString.h"
 
-#include "MCObjs/MCEventInfo.hh"
+#include "MCEventInfo.hh"
 
 ClassImp(MCEventInfo)
 

@@ -6,7 +6,7 @@
 // (a string/value hashtable that is initialized from a file)
 // Original by Glenn Horton-Smith, Jan 2001
 
-#include "GLG4Sim/GLG4param.hh"
+#include "GLG4param.hh"
 
 #include "fstream"
 #include "sstream"

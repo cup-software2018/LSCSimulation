@@ -1,11 +1,10 @@
-#include "LSCSim/LSCSteppingAction.hh"
-#include "LSCSim/LSCRecorderBase.hh"
-
-#include "G4VProcess.hh"
 #include "G4SteppingManager.hh"
+#include "G4VProcess.hh"
+#include "LSCRecorderBase.hh"
+#include "LSCSteppingAction.hh"
 
 LSCSteppingAction::LSCSteppingAction(LSCRecorderBase * r)
-    : fRecorder(r)
+  : fRecorder(r)
 {
 }
 

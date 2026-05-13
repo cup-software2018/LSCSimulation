@@ -17,8 +17,8 @@
 
 #include <string.h>
 
-#include "GLG4Sim/GLG4BoxSD.hh"
-#include "GLG4Sim/local_g4compat.hh"
+#include "GLG4BoxSD.hh"
+#include "local_g4compat.hh"
 
 #include "G4Track.hh"
 #include "G4Step.hh"

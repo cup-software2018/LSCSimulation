@@ -14,7 +14,7 @@
 //
 //  Author: Glenn Horton-Smith, April 7, 2000
 
-#include "GLG4Sim/GLG4SteppingAction.hh"
+#include "GLG4SteppingAction.hh"
 #include "globals.hh"
 #include "G4Track.hh"
 #include "G4Step.hh"
@@ -23,10 +23,10 @@
 #include "G4ios.hh"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "G4OpticalPhoton.hh"
-#include "GLG4Sim/GLG4Scint.hh"
+#include "GLG4Scint.hh"
 #include "G4SteppingManager.hh"
 #include "G4VisExtent.hh"
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
+#include "GLG4PrimaryGeneratorAction.hh"
 #include "G4VSolid.hh"
 
 GLG4SteppingAction::GLG4SteppingAction()

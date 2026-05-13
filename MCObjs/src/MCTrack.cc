@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "MCObjs/MCTrack.hh"
+#include "MCTrack.hh"
 
 ClassImp(MCTrack)
 

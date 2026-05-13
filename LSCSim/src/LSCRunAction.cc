@@ -28,13 +28,13 @@
 //
 //
 
-#include "LSCSim/LSCRunAction.hh"
-#include "LSCSim/LSCRecorderBase.hh"
+#include "LSCRecorderBase.hh"
+#include "LSCRunAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 LSCRunAction::LSCRunAction(LSCRecorderBase * r)
-    : fRecorder(r)
+  : fRecorder(r)
 {
 }
 

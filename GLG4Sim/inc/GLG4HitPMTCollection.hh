@@ -12,7 +12,7 @@
 #include <vector>
 #include <map>
 
-#include "GLG4Sim/GLG4HitPMT.hh"
+#include "GLG4HitPMT.hh"
 
 /** GLG4HitPMTCollection stores GLG4HitPMT objects.
 

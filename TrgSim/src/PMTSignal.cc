@@ -1,4 +1,4 @@
-#include "TrgSim/PMTSignal.hh"
+#include "PMTSignal.hh"
 
 #include <algorithm>
 #include <iostream>

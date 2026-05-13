@@ -1,5 +1,3 @@
-#include "LSCSim/LSCRootManager.hh"
-
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -19,14 +17,15 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIdirectory.hh"
 #include "G4VPhysicalVolume.hh"
-#include "LSCSim/LSCScintillation.hh"
-#include "LSCSim/PMTHit.hh"
-#include "MCObjs/MCPMT.hh"
-#include "MCObjs/MCPhotonHit.hh"
-#include "MCObjs/MCPrimary.hh"
-#include "MCObjs/MCScint.hh"
-#include "MCObjs/MCScintStep.hh"
-#include "MCObjs/MCTrack.hh"
+#include "LSCRootManager.hh"
+#include "LSCScintillation.hh"
+#include "MCPMT.hh"
+#include "MCPhotonHit.hh"
+#include "MCPrimary.hh"
+#include "MCScint.hh"
+#include "MCScintStep.hh"
+#include "MCTrack.hh"
+#include "PMTHit.hh"
 
 using namespace std;
 using namespace CLHEP;
@@ -124,9 +123,7 @@ void LSCRootManager::BeginOfEvent(const G4Event *)
   fPMTData->Clear();
 
   G4SDManager * SDman = G4SDManager::GetSDMpointer();
-  if (fPMTHitCollId < 0) {
-    fPMTHitCollId = SDman->GetCollectionID("pmtHitCollection");
-  }
+  if (fPMTHitCollId < 0) { fPMTHitCollId = SDman->GetCollectionID("pmtHitCollection"); }
 }
 
 void LSCRootManager::EndOfEvent(const G4Event * anEvent)
@@ -163,9 +160,7 @@ void LSCRootManager::EndOfEvent(const G4Event * anEvent)
   G4HCofThisEvent * hits = anEvent->GetHCofThisEvent();
   PMTHitsCollection * pmtHC = nullptr;
 
-  if (hits && (fPMTHitCollId >= 0)) {
-    pmtHC = (PMTHitsCollection *)(hits->GetHC(fPMTHitCollId));
-  }
+  if (hits && (fPMTHitCollId >= 0)) { pmtHC = (PMTHitsCollection *)(hits->GetHC(fPMTHitCollId)); }
 
   if (pmtHC) {
     G4int nPMT = pmtHC->entries();
@@ -193,7 +188,7 @@ void LSCRootManager::EndOfEvent(const G4Event * anEvent)
 
   fEventTree->Fill();
 
-  if (eventId > 0 && eventId % 100 ==0)
+  if (eventId > 0 && eventId % 100 == 0)
     G4cout << std::setw(12) << eventId << " events processed ..." << G4endl;
 }
 
@@ -225,13 +220,11 @@ void LSCRootManager::RecordTrack(const G4Track * gtrack)
   MCTrack * mtrack = fTrackData->FindTrack(gtrack->GetTrackID());
   if (!mtrack) {
     mtrack = fTrackData->Add();
-    mtrack->SetParticleName(
-        gtrack->GetParticleDefinition()->GetParticleName().data());
+    mtrack->SetParticleName(gtrack->GetParticleDefinition()->GetParticleName().data());
     mtrack->SetPDGCode(gtrack->GetParticleDefinition()->GetPDGEncoding());
     mtrack->SetTrackId(gtrack->GetTrackID());
     mtrack->SetParentId(gtrack->GetParentID());
-    mtrack->SetVertex(gtrack->GetVertexPosition().x(),
-                      gtrack->GetVertexPosition().y(),
+    mtrack->SetVertex(gtrack->GetVertexPosition().x(), gtrack->GetVertexPosition().y(),
                       gtrack->GetVertexPosition().z());
     mtrack->SetKineticEnergy(gtrack->GetVertexKineticEnergy());
     mtrack->SetGlobalTime(gtrack->GetGlobalTime());
@@ -282,7 +275,7 @@ void LSCRootManager::RecordStep(const G4Step * aStep, const G4VProcess * proc)
     }
     scintproc->InitializeScint();
   }
-  
+
   if (fTrackSaveOption > 0 && fStepSaveOption > 0) {
     int trackId = track->GetTrackID();
     MCTrack * mcTrack = fTrackData->FindTrack(trackId);
@@ -300,8 +293,8 @@ void LSCRootManager::RecordStep(const G4Step * aStep, const G4VProcess * proc)
 void LSCRootManager::OpenRootFile()
 {
   fRootFile = new TFile(fRootFileName.Data(), "recreate");
-  G4cout << "LSCRootManager::OpenRootFile(): output file " << fRootFileName
-         << " opened ..." << G4endl;
+  G4cout << "LSCRootManager::OpenRootFile(): output file " << fRootFileName << " opened ..."
+         << G4endl;
 }
 
 void LSCRootManager::CloseRootFile()

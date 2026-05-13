@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-#include "GLG4Sim/GLG4HitPMTCollection.hh"
+#include "GLG4HitPMTCollection.hh"
 
 #include <G4ios.hh>
 

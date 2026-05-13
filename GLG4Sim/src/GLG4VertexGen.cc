@@ -8,7 +8,7 @@
    @author G.Horton-Smith, August 3, 2001
 */
 
-#include "GLG4Sim/GLG4VertexGen.hh"
+#include "GLG4VertexGen.hh"
 
 #include <string.h> // for strcmp
 
@@ -21,9 +21,9 @@
 #include "G4ParticleTable.hh"
 #include "G4PrimaryVertex.hh"
 #include "G4Track.hh"
-#include "GLG4Sim/GLG4PosGen.hh" // for Strip() utility function
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
-#include "GLG4Sim/GLG4param.hh"
+#include "GLG4PosGen.hh" // for Strip() utility function
+#include "GLG4PrimaryGeneratorAction.hh"
+#include "GLG4param.hh"
 #include "Randomize.hh"
 #include "globals.hh"
 #include "sstream"

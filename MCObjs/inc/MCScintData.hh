@@ -2,7 +2,7 @@
 
 #include "TClonesArray.h"
 
-#include "MCObjs/MCScint.hh"
+#include "MCScint.hh"
 
 class MCScintData : public TClonesArray {
 public:

@@ -6,7 +6,7 @@
 #include "TObject.h"
 #include "TRandom3.h"
 
-#include "TrgSim/AbsSignal.hh"
+#include "AbsSignal.hh"
 
 class FADCWaveformGenerator : public TObject {
 public:

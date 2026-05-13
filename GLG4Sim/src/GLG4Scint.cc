@@ -10,7 +10,7 @@
 
 // [see detailed class description in GLG4Scint.hh]
 
-#include "GLG4Sim/GLG4Scint.hh"
+#include "GLG4Scint.hh"
 #include "G4ios.hh"
 #include "G4Timer.hh"
 #include "G4Poisson.hh"

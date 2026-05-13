@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MCObjs/MCStep.hh"
+#include "MCStep.hh"
 
 class MCScintStep : public MCStep {
 public:

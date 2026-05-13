@@ -1,5 +1,5 @@
-#include "MCObjs/MCTrack.hh"
-#include "MCObjs/MCTrackData.hh"
+#include "MCTrack.hh"
+#include "MCTrackData.hh"
 
 ClassImp(MCTrackData)
 

@@ -9,8 +9,8 @@
 // Author:  Glenn Horton-Smith, Jan 28, 2000
 //
 #ifdef G4VIS_USE
-#include "GLG4Sim/GLG4VisManager.hh"
-#include "GLG4Sim/GLG4VisMessenger.hh"
+#include "GLG4VisManager.hh"
+#include "GLG4VisMessenger.hh"
 #include "G4ViewParameters.hh"
 
 // Supported drivers...

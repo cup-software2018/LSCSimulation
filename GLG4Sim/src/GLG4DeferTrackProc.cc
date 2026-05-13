@@ -9,8 +9,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#include "GLG4Sim/GLG4DeferTrackProc.hh"
-#include "GLG4Sim/GLG4PrimaryGeneratorAction.hh"
+#include "GLG4DeferTrackProc.hh"
+#include "GLG4PrimaryGeneratorAction.hh"
 
 #include "G4ios.hh"
 #include "G4Step.hh"
@@ -21,7 +21,7 @@
 
 #include "TString.h"
 
-#include "LSCSim/LSCUserTrackInformation.hh"
+#include "LSCUserTrackInformation.hh"
 
 using namespace CLHEP;
 

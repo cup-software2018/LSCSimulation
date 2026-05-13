@@ -2,7 +2,7 @@
 
 #include "TClonesArray.h"
 
-#include "MCObjs/MCPMT.hh"
+#include "MCPMT.hh"
 
 class MCPMTData : public TClonesArray {
 public:
