@@ -1,26 +1,25 @@
 #include <iostream>
 
 #include "MCObjs/MCTrack.hh"
-#include "MCObjs/MCStep.hh"
-
 
 ClassImp(MCTrack)
 
 MCTrack::MCTrack()
-    : TClonesArray("MCStep")
+  : TObject()
 {
 }
 
 MCTrack::MCTrack(const MCTrack & trk)
-    : TClonesArray(trk)
-    , fPDGCode(trk.GetPDGCode())
-    , fTrackId(trk.GetTrackId())
-    , fParentId(trk.GetParentId())
-    , fKineticEnergy(trk.GetKineticEnergy())
-    , fGlobalTime(trk.GetGlobalTime())
-    , fLocalTime(trk.GetLocalTime())
-    , fParticleName(trk.GetParticleName())
-    , fProcessName(trk.GetProcessName())
+  : TObject(trk),
+    fPDGCode(trk.GetPDGCode()),
+    fTrackId(trk.GetTrackId()),
+    fParentId(trk.GetParentId()),
+    fKineticEnergy(trk.GetKineticEnergy()),
+    fGlobalTime(trk.GetGlobalTime()),
+    fLocalTime(trk.GetLocalTime()),
+    fParticleName(trk.GetParticleName()),
+    fProcessName(trk.GetProcessName()),
+    fSteps(trk.fSteps)
 {
   trk.GetVertex(fVx, fVy, fVz);
 }
@@ -29,13 +28,11 @@ MCTrack::~MCTrack() = default;
 
 MCStep * MCTrack::AddStep()
 {
-  return new ((*this)[GetEntriesFast()]) MCStep();
+  fSteps.emplace_back();
+  return &fSteps.back();
 }
 
-void MCTrack::Clear(Option_t * opt)
-{
-  TClonesArray::Clear("C");
-}
+void MCTrack::Clear(Option_t * opt) { fSteps.clear(); }
 
 void MCTrack::Print(Option_t * opt) const
 {

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "TClonesArray.h"
+#include <vector>
+
+#include "TObject.h"
 
 #include "MCObjs/MCPhotonHit.hh"
 
-class MCPMT : public TClonesArray {
+class MCPMT : public TObject {
 public:
   MCPMT();
   MCPMT(int id);
@@ -22,6 +24,8 @@ public:
   int GetNHit() const;
   MCPhotonHit * GetHit(int i) const;
 
+  void Sort();
+
   bool IsSortable() const override { return true; }
   int Compare(const TObject * object) const override;
 
@@ -29,13 +33,13 @@ public:
 
 private:
   int fPMTId = -1;
+  std::vector<MCPhotonHit> fHits;
 
-  ClassDef(MCPMT, 1);
+  ClassDef(MCPMT, 2);
 };
 
-inline void MCPMT::SetId(int Id) { fPMTId = Id; }
+inline void MCPMT::SetId(int id) { fPMTId = id; }
 inline int MCPMT::GetId() const { return fPMTId; }
 
-inline int MCPMT::GetNHit() const { return GetEntriesFast(); }
-inline MCPhotonHit * MCPMT::GetHit(int n) const { return static_cast<MCPhotonHit *>(At(n)); }
-
+inline int MCPMT::GetNHit() const { return (int)fHits.size(); }
+inline MCPhotonHit * MCPMT::GetHit(int n) const { return const_cast<MCPhotonHit *>(&fHits[n]); }

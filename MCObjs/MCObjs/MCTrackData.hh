@@ -3,6 +3,7 @@
 #include "TClonesArray.h"
 
 #include "MCObjs/MCTrack.hh"
+
 class MCTrackData : public TClonesArray {
 public:
   MCTrackData();
@@ -24,5 +25,5 @@ public:
 };
 
 inline int MCTrackData::GetN() const { return GetEntriesFast(); }
-inline MCTrack * MCTrackData::Get(int n) const { return static_cast<MCTrack *>(At(n)); }
 
+inline MCTrack * MCTrackData::Get(int n) const { return static_cast<MCTrack *>(At(n)); }

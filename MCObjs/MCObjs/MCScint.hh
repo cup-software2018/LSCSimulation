@@ -1,9 +1,12 @@
 #pragma once
 
-#include "TClonesArray.h"
+#include <vector>
+
+#include "TObject.h"
 
 #include "MCObjs/MCScintStep.hh"
-class MCScint : public TClonesArray {
+
+class MCScint : public TObject {
 public:
   MCScint();
   MCScint(int id);
@@ -33,8 +36,9 @@ private:
   int fNScintPhoton = 0;
   float fEdep = 0;
   float fEdepQuenched = 0;
+  std::vector<MCScintStep> fSteps;
 
-  ClassDef(MCScint, 1)
+  ClassDef(MCScint, 2)
 };
 
 inline void MCScint::SetVolumeId(int val) { fVolumeId = val; }
@@ -53,9 +57,9 @@ inline float MCScint::GetEnergyVisible() const { return fEdepQuenched; }
 
 inline int MCScint::GetNScintPhoton() const { return fNScintPhoton; }
 
-inline int MCScint::GetNStep() const { return GetEntriesFast(); }
+inline int MCScint::GetNStep() const { return (int)fSteps.size(); }
+
 inline MCScintStep * MCScint::GetStep(int n) const
 {
-  return static_cast<MCScintStep *>(At(n));
+  return const_cast<MCScintStep *>(&fSteps[n]);
 }
-

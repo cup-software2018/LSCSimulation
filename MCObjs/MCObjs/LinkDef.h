@@ -13,8 +13,11 @@
 #pragma link C++ class  MCScint+;
 #pragma link C++ class  MCScintData+;
 #pragma link C++ class  MCPhotonHit+;
+#pragma link C++ class  std::vector<MCPhotonHit>+;
 #pragma link C++ class  MCPMT+;
 #pragma link C++ class  MCPMTData+;
+#pragma link C++ class  std::vector<MCScintStep>+;
+#pragma link C++ class  std::vector<MCStep>+;
 #pragma link C++ class  MCEventInfo+;
 
 #endif

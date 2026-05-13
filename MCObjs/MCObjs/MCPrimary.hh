@@ -3,7 +3,6 @@
 #include "TObject.h"
 #include "TString.h"
 
-
 class MCPrimary : public TObject {
 public:
   MCPrimary();
@@ -48,14 +47,14 @@ inline void MCPrimary::SetVertex(double x, double y, double z)
 {
   fVx = x;
   fVy = y;
-  fVz = z;  
+  fVz = z;
 }
 
 inline void MCPrimary::SetMomentum(double x, double y, double z)
 {
   fPx = x;
   fPy = y;
-  fPz = z;  
+  fPz = z;
 }
 
 inline void MCPrimary::SetKineticEnergy(double val) { fKineticEnergy = val; }
@@ -68,15 +67,15 @@ inline TString MCPrimary::GetParticleName() const { return fName; }
 
 inline int MCPrimary::GetPDGCode() const { return fPDGCode; }
 
-inline void MCPrimary::GetVertex(double & x, double & y, double & z) const 
-{ 
+inline void MCPrimary::GetVertex(double & x, double & y, double & z) const
+{
   x = fVx;
   y = fVy;
   z = fVz;
 }
 
-inline void MCPrimary::GetMomentum(double & x, double & y, double & z) const 
-{ 
+inline void MCPrimary::GetMomentum(double & x, double & y, double & z) const
+{
   x = fPx;
   y = fPy;
   z = fPz;
@@ -87,4 +86,3 @@ inline double MCPrimary::GetKineticEnergy() const { return fKineticEnergy; }
 inline double MCPrimary::GetT0() const { return fT0; }
 
 inline int MCPrimary::GetTrackId() const { return fTrackId; }
-

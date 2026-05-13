@@ -1,29 +1,27 @@
-#include "MCObjs/MCScint.hh"
-
 #include <iostream>
 
-#include "MCObjs/MCScintStep.hh"
-
+#include "MCObjs/MCScint.hh"
 
 ClassImp(MCScint)
 
 MCScint::MCScint()
-    : TClonesArray("MCScintStep")
+  : TObject()
 {
 }
 
 MCScint::MCScint(int id)
-    : TClonesArray("MCScintStep")
-    , fVolumeId(id)
+  : TObject(),
+    fVolumeId(id)
 {
 }
 
 MCScint::MCScint(const MCScint & scint)
-    : TClonesArray(scint)
-    , fVolumeId(scint.GetVolumeId())
-    , fNScintPhoton(scint.GetNScintPhoton())
-    , fEdep(scint.GetEnergyDeposit())
-    , fEdepQuenched(scint.GetEnergyVisible())
+  : TObject(scint),
+    fVolumeId(scint.GetVolumeId()),
+    fNScintPhoton(scint.GetNScintPhoton()),
+    fEdep(scint.GetEnergyDeposit()),
+    fEdepQuenched(scint.GetEnergyVisible()),
+    fSteps(scint.fSteps)
 {
 }
 
@@ -31,7 +29,8 @@ MCScint::~MCScint() = default;
 
 MCScintStep * MCScint::AddStep()
 {
-  return new ((*this)[GetEntriesFast()]) MCScintStep();
+  fSteps.emplace_back();
+  return &fSteps.back();
 }
 
 void MCScint::Clear(Option_t * opt)
@@ -39,7 +38,7 @@ void MCScint::Clear(Option_t * opt)
   fEdep = 0;
   fEdepQuenched = 0;
   fNScintPhoton = 0;
-  TClonesArray::Clear("C");
+  fSteps.clear();
 }
 
 void MCScint::Print(Option_t * opt) const
@@ -49,7 +48,7 @@ void MCScint::Print(Option_t * opt) const
   std::cout << Form("   Visible Energy    = %.6f [MeV]", GetEnergyVisible()) << std::endl;
   std::cout << Form("   # of Scint Photon = %d         ", GetNScintPhoton()) << std::endl;
 
-  if (GetNStep() > 0) {
+  if (!fSteps.empty()) {
     std::cout << Form("   # of Scint Step   = %d         ", GetNStep()) << std::endl;
   }
 }

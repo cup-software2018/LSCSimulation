@@ -1,24 +1,27 @@
+#include <algorithm>
 #include <iostream>
-#include "MCObjs/MCPMT.hh"
-#include "MCObjs/MCPhotonHit.hh"
 
+#include "TString.h"
+
+#include "MCObjs/MCPMT.hh"
 
 ClassImp(MCPMT)
 
 MCPMT::MCPMT()
-    : TClonesArray("MCPhotonHit")
+  : TObject()
 {
 }
 
 MCPMT::MCPMT(int id)
-    : TClonesArray("MCPhotonHit")
-    , fPMTId(id)
+  : TObject(),
+    fPMTId(id)
 {
 }
 
 MCPMT::MCPMT(const MCPMT & pmt)
-    : TClonesArray(pmt)
-    , fPMTId(pmt.GetId())
+  : TObject(pmt),
+    fPMTId(pmt.GetId()),
+    fHits(pmt.fHits)
 {
 }
 
@@ -26,25 +29,29 @@ MCPMT::~MCPMT() = default;
 
 MCPhotonHit * MCPMT::AddHit()
 {
-  return new ((*this)[GetEntriesFast()]) MCPhotonHit();
+  fHits.emplace_back();
+  return &fHits.back();
 }
 
 MCPhotonHit * MCPMT::AddHit(MCPhotonHit * hit)
 {
-  return new ((*this)[GetEntriesFast()]) MCPhotonHit(*hit);
+  fHits.push_back(*hit);
+  return &fHits.back();
 }
 
-void MCPMT::Clear(Option_t * opt)
+void MCPMT::Clear(Option_t * opt) { fHits.clear(); }
+
+void MCPMT::Sort()
 {
-  TClonesArray::Clear("C");
+  std::sort(fHits.begin(), fHits.end(),
+            [](const MCPhotonHit & a, const MCPhotonHit & b) { return a.GetTime() < b.GetTime(); });
 }
 
 int MCPMT::Compare(const TObject * object) const
 {
   auto comp = static_cast<const MCPMT *>(object);
   if (this->GetId() > comp->GetId()) return 1;
-  else if (this->GetId() < comp->GetId()) return -1;
-
+  if (this->GetId() < comp->GetId()) return -1;
   return 0;
 }
 

@@ -3,14 +3,14 @@
 ClassImp(MCScintStep)
 
 MCScintStep::MCScintStep()
-    : MCStep()
+  : MCStep()
 {
 }
 
 MCScintStep::MCScintStep(const MCScintStep & step)
-    : MCStep(step)
-    , fNScintPhoton(step.GetNScintPhoton())
-    , fEnergyVisible(step.GetEnergyVisible())
+  : MCStep(step),
+    fNScintPhoton(step.GetNScintPhoton()),
+    fEnergyVisible(step.GetEnergyVisible())
 {
 }
 

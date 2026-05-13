@@ -1,38 +1,27 @@
-#include "MCObjs/MCScintData.hh"
-
 #include <iostream>
 
 #include "MCObjs/MCScint.hh"
-
+#include "MCObjs/MCScintData.hh"
 
 ClassImp(MCScintData)
 
 MCScintData::MCScintData()
-    : TClonesArray("MCScint")
+  : TClonesArray("MCScint")
 {
 }
 
 MCScintData::MCScintData(const MCScintData & data)
-    : TClonesArray(data)
+  : TClonesArray(data)
 {
 }
 
 MCScintData::~MCScintData() = default;
 
-MCScint * MCScintData::Add()
-{
-  return new ((*this)[GetEntriesFast()]) MCScint();
-}
+MCScint * MCScintData::Add() { return new ((*this)[GetEntriesFast()]) MCScint(); }
 
-MCScint * MCScintData::Add(int id)
-{
-  return new ((*this)[GetEntriesFast()]) MCScint(id);
-}
+MCScint * MCScintData::Add(int id) { return new ((*this)[GetEntriesFast()]) MCScint(id); }
 
-void MCScintData::Clear(Option_t * opt)
-{
-  TClonesArray::Clear("C");
-}
+void MCScintData::Clear(Option_t * opt) { TClonesArray::Clear("C"); }
 
 MCScint * MCScintData::FindScint(int id)
 {

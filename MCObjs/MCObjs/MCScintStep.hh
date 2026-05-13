@@ -20,4 +20,3 @@ private:
 
   ClassDef(MCScintStep, 1)
 };
-

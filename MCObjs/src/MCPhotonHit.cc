@@ -3,19 +3,18 @@
 ClassImp(MCPhotonHit)
 
 MCPhotonHit::MCPhotonHit()
-    : TObject()
+  : TObject()
 {
 }
 
 MCPhotonHit::MCPhotonHit(const MCPhotonHit & photon)
-    : TObject()
-    , fTime(photon.GetTime())
-    , fKE(photon.GetKineticEnergy())
+  : TObject(),
+    fTime(photon.GetTime()),
+    fKE(photon.GetKineticEnergy())
 {
 }
 
 MCPhotonHit::~MCPhotonHit() = default;
-
 
 int MCPhotonHit::Compare(const TObject * object) const
 {

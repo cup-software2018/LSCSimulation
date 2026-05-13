@@ -1,32 +1,25 @@
 #include <iostream>
 
-#include "MCObjs/MCPrimaryData.hh"
 #include "MCObjs/MCPrimary.hh"
-
+#include "MCObjs/MCPrimaryData.hh"
 
 ClassImp(MCPrimaryData)
 
 MCPrimaryData::MCPrimaryData()
-    : TClonesArray("MCPrimary")
+  : TClonesArray("MCPrimary")
 {
 }
 
 MCPrimaryData::MCPrimaryData(const MCPrimaryData & data)
-    : TClonesArray(data)
+  : TClonesArray(data)
 {
 }
 
 MCPrimaryData::~MCPrimaryData() = default;
 
-MCPrimary * MCPrimaryData::Add()
-{
-  return new ((*this)[GetEntriesFast()]) MCPrimary();
-}
+MCPrimary * MCPrimaryData::Add() { return new ((*this)[GetEntriesFast()]) MCPrimary(); }
 
-void MCPrimaryData::Clear(Option_t * opt)
-{
-  TClonesArray::Clear("C");
-}
+void MCPrimaryData::Clear(Option_t * opt) { TClonesArray::Clear("C"); }
 
 void MCPrimaryData::Print(Option_t * opt) const
 {

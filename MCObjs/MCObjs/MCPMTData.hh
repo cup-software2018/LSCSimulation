@@ -23,5 +23,5 @@ public:
 };
 
 inline int MCPMTData::GetN() const { return GetEntriesFast(); }
-inline MCPMT * MCPMTData::Get(int n) const { return static_cast<MCPMT *>(At(n)); }
 
+inline MCPMT * MCPMTData::Get(int n) const { return static_cast<MCPMT *>(At(n)); }

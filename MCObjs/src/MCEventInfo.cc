@@ -1,18 +1,19 @@
 #include <iostream>
-#include "TString.h"
-#include "MCObjs/MCEventInfo.hh"
 
+#include "TString.h"
+
+#include "MCObjs/MCEventInfo.hh"
 
 ClassImp(MCEventInfo)
 
 MCEventInfo::MCEventInfo()
-    : TObject()
+  : TObject()
 {
 }
 
 MCEventInfo::MCEventInfo(const MCEventInfo & info)
-    : TObject()
-    , fEventNumber(info.GetEventNumber())
+  : TObject(),
+    fEventNumber(info.GetEventNumber())
 {
 }
 

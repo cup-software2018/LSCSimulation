@@ -1,10 +1,13 @@
 #pragma once
 
-#include "TClonesArray.h"
+#include <vector>
+
+#include "TObject.h"
 #include "TString.h"
 
 #include "MCObjs/MCStep.hh"
-class MCTrack : public TClonesArray {
+
+class MCTrack : public TObject {
 public:
   MCTrack();
   MCTrack(const MCTrack & trk);
@@ -33,7 +36,6 @@ public:
   const char * GetProcessName() const;
 
   MCStep * AddStep();
-
   int GetNStep() const;
   MCStep * GetStep(int i) const;
 
@@ -51,13 +53,12 @@ private:
 
   TString fParticleName;
   TString fProcessName;
+  std::vector<MCStep> fSteps;
 
-  ClassDef(MCTrack, 1)
+  ClassDef(MCTrack, 2)
 };
-inline void MCTrack::SetParticleName(const char * name)
-{
-  fParticleName = name;
-}
+
+inline void MCTrack::SetParticleName(const char * name) { fParticleName = name; }
 
 inline void MCTrack::SetPDGCode(int code) { fPDGCode = code; }
 
@@ -80,10 +81,7 @@ inline void MCTrack::SetLocalTime(double time) { fLocalTime = time; }
 
 inline void MCTrack::SetProcessName(const char * name) { fProcessName = name; }
 
-inline const char * MCTrack::GetParticleName() const
-{
-  return fParticleName.Data();
-}
+inline const char * MCTrack::GetParticleName() const { return fParticleName.Data(); }
 
 inline int MCTrack::GetPDGCode() const { return fPDGCode; }
 
@@ -104,11 +102,8 @@ inline double MCTrack::GetGlobalTime() const { return fGlobalTime; }
 
 inline double MCTrack::GetLocalTime() const { return fLocalTime; }
 
-inline const char * MCTrack::GetProcessName() const
-{
-  return fProcessName.Data();
-}
+inline const char * MCTrack::GetProcessName() const { return fProcessName.Data(); }
 
-inline int MCTrack::GetNStep() const { return GetEntriesFast(); }
-inline MCStep * MCTrack::GetStep(int n) const { return static_cast<MCStep *>(At(n)); }
+inline int MCTrack::GetNStep() const { return (int)fSteps.size(); }
 
+inline MCStep * MCTrack::GetStep(int n) const { return const_cast<MCStep *>(&fSteps[n]); }

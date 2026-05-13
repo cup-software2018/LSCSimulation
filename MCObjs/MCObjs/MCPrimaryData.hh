@@ -3,6 +3,7 @@
 #include "TClonesArray.h"
 
 #include "MCObjs/MCPrimary.hh"
+
 class MCPrimaryData : public TClonesArray {
 public:
   MCPrimaryData();
@@ -23,4 +24,3 @@ public:
 
 inline int MCPrimaryData::GetN() const { return GetEntriesFast(); }
 inline MCPrimary * MCPrimaryData::Get(int n) const { return static_cast<MCPrimary *>(At(n)); }
-

@@ -42,10 +42,7 @@ inline void MCStep::SetStepLength(float val) { fStepLength = val; }
 
 inline void MCStep::SetEnergyDeposit(float val) { fEnergyDeposit = val; }
 
-inline void MCStep::SetEnergyDepositNonIonizing(float val)
-{
-  fEnergyDepositNonIonizing = val;
-}
+inline void MCStep::SetEnergyDepositNonIonizing(float val) { fEnergyDepositNonIonizing = val; }
 
 inline void MCStep::SetGlobalTime(float val) { fGlobalTime = val; }
 
@@ -64,10 +61,7 @@ inline float MCStep::GetStepLength() const { return fStepLength; }
 
 inline float MCStep::GetEnergyDeposit() const { return fEnergyDeposit; }
 
-inline float MCStep::GetEnergyDepositNonIonizing() const
-{
-  return fEnergyDepositNonIonizing;
-}
+inline float MCStep::GetEnergyDepositNonIonizing() const { return fEnergyDepositNonIonizing; }
 
 inline float MCStep::GetGlobalTime() const { return fGlobalTime; }
 
@@ -81,4 +75,3 @@ inline void MCStep::GetStepPoint(float & x, float & y, float & z) const
 }
 
 inline const char * MCStep::GetVolumeName() const { return fVolumeName.Data(); }
-
