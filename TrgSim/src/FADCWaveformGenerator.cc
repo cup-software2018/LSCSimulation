@@ -35,6 +35,7 @@ void FADCWaveformGenerator::Digitize()
   Prepare();
 
   const double covfactor = fResolution * fTermination / fVpp;
+  const int maxADC = TMath::Nint(fResolution);
 
   for (int j = 1; j <= fNdp; j++) {
     double time = (j - 0.5) * fBinTimeWidth;
@@ -43,7 +44,7 @@ void FADCWaveformGenerator::Digitize()
     if (sig < 0) sig = 0;
 
     fWaveform[j - 1] =
-        static_cast<unsigned short>(TMath::Min(TMath::Nint(sig), TMath::Nint(fResolution)));
+        static_cast<unsigned short>(TMath::Min(TMath::Nint(sig), maxADC));
     fWaveformHist->SetBinContent(j, fWaveform[j - 1]);
   }
 }
