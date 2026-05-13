@@ -1,10 +1,8 @@
-#ifndef LSCDetectorConstruction_hh
-#define LSCDetectorConstruction_hh
+#pragma once
 
 #include "G4OpticalSurface.hh"
 #include "G4UImessenger.hh"
 #include "G4VUserDetectorConstruction.hh"
-#include "G4VisAttributes.hh"
 
 class G4VPhysicalVolume;
 class G4UIdirectory;
@@ -23,25 +21,17 @@ public:
   virtual void SetNewValue(G4UIcommand *, G4String);
 
   void SetGeometryDataFile(const char * file) { fGeometryDataFile = file; }
-  void SetPMTPositionDataFile(const char * file)
-  {
-    fPMTPositionDataFile = file;
-  }
+  void SetPMTPositionDataFile(const char * file) { fPMTPositionDataFile = file; }
   void SetMaterialDataFile(const char * file) { fMaterialDataFile = file; }
-  void SetDetectorType(const char * type) { fWhichDetector = type; }
 
 private:
-  // Sensitive Detectors
   static LSCPMTSD * fPmt_SD;
 
   void ConstructMaterials();
   G4VPhysicalVolume * ConstructDetector();
-  void ConstructDetector_LSC_Cylinder(G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db);
-  void ConstructDetector_LSC_Sphere(G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db);
-  void ConstructDetector_Prototype(G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd, GLG4param & geom_db);
+  void ConstructDetector_Prototype(G4VPhysicalVolume * worldphys, LSCPMTSD * pmtsd,
+                                   GLG4param & geom_db);
 
-  
-  // Optical surface
   G4OpticalSurface * Photocathode_opsurf;
   G4OpticalSurface * Stainless_opsurf;
   G4OpticalSurface * Polyethylene_opsurf;
@@ -51,15 +41,11 @@ private:
   G4String fMaterialDataFile;
   G4String fGeometryDataFile;
   G4String fPMTPositionDataFile;
-  G4String fWhichDetector;
 
   G4UIdirectory * fDetectorDir;
   G4UIcmdWithAnInteger * fGeomCheckOptCmd;
   G4UIcmdWithAString * fMaterialDataFileCmd;
   G4UIcmdWithAString * fGeometryDataFileCmd;
   G4UIcmdWithAString * fPMTPositionDataFileCmd;
-  G4UIcmdWithAString * fWhichDetectorCmd;
   G4int fGeomCheck;
 };
-
-#endif

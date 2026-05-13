@@ -54,9 +54,8 @@ int main(int argc, char ** argv)
   G4String materialData;
   G4String geometryData;
   G4String pmtposData;
-  G4String detectorType = "LSCS";
 
-  while ((opt = getopt(argc, argv, "o:f:m:g:p:n:vhcst")) != -1) {
+  while ((opt = getopt(argc, argv, "o:f:m:g:p:n:vh")) != -1) {
     switch (opt) {
       case 'o': outputFileName = G4String(optarg); break;
       case 'f': macroFileName = G4String(optarg); break;
@@ -65,9 +64,6 @@ int main(int argc, char ** argv)
       case 'p': pmtposData = G4String(optarg); break;
       case 'n': nevent = atoi(G4String(optarg).data()); break;
       case 'v': doVis = 1; break;
-      case 'c': detectorType = "LSCC"; break;
-      case 's': detectorType = "LSCS"; break;
-      case 't': detectorType = "PROTO"; break;
       case 'h': PrintHelp(); break;
       default: PrintHelp();
     }
@@ -92,7 +88,6 @@ int main(int argc, char ** argv)
   G4RunManager * runManager = new G4RunManager;
 
   LSCDetectorConstruction * LSCDetector = new LSCDetectorConstruction();
-  LSCDetector->SetDetectorType(detectorType);
   if (!geometryData.empty()) LSCDetector->SetGeometryDataFile(geometryData);
   if (!pmtposData.empty()) LSCDetector->SetPMTPositionDataFile(pmtposData);
   if (!materialData.empty()) LSCDetector->SetMaterialDataFile(materialData);
