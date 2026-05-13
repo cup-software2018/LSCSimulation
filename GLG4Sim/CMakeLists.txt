@@ -1,26 +1,33 @@
-set(PROJECT_NAME "GLG4Sim")
+set(MODULE_NAME GLG4Sim)
+message(STATUS "Configuring ${MODULE_NAME} ...")
 
-project(${PROJECT_NAME})
-message(STATUS "cmaking ${PROJECT_NAME} ...")
+file(GLOB MODULE_HEADERS CONFIGURE_DEPENDS ${MODULE_NAME}/*.hh)
+file(GLOB MODULE_SOURCES CONFIGURE_DEPENDS src/*.cc)
 
-# ----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# ----------------------------------------------------------------------------
-file(GLOB ${PROJECT_NAME}_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB ${PROJECT_NAME}_HEADERS ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/*.hh)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME}/
+     DESTINATION ${LSCSIM_HEADER_OUTPUT_PATH}/${MODULE_NAME}
+     FILES_MATCHING PATTERN "*.hh")
 
-file(MAKE_DIRECTORY ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME})
-
-foreach(HEADER_i ${${PROJECT_NAME}_HEADERS})
-  configure_file(${HEADER_i} ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME} COPYONLY)
-endforeach(HEADER_i)
-
-add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES}
+add_library(${MODULE_NAME} SHARED
+    ${MODULE_SOURCES}
 )
 
-install(PROGRAMS
-  ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}.so
-  DESTINATION
-  ${CMAKE_INSTALL_LIBDIR}
+target_include_directories(${MODULE_NAME}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        ${Geant4_INCLUDE_DIRS}
+)
+
+target_link_libraries(${MODULE_NAME}
+    PUBLIC
+        ${Geant4_LIBRARIES}
+)
+
+install(TARGETS ${MODULE_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(DIRECTORY ${MODULE_NAME}/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${MODULE_NAME}
+    FILES_MATCHING PATTERN "*.hh"
 )

@@ -1,11 +1,9 @@
-/.lh/
-/.vscode/
-/build/
-/test/
+/build
+/test
 /bin
 /data
 /include
 /lib
-/mac
-/RawObjs
+/lib64
+/install
 /.clang-format

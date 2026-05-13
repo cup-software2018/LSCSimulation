@@ -1,58 +1,75 @@
-set(PROJECT_NAME "TrgSim")
+set(MODULE_NAME TrgSim)
+message(STATUS "Configuring ${MODULE_NAME} ...")
 
-project(${PROJECT_NAME})
-message(STATUS "cmaking ${PROJECT_NAME} ...")
+file(GLOB MODULE_HEADERS CONFIGURE_DEPENDS ${MODULE_NAME}/*.hh)
+file(GLOB MODULE_SOURCES CONFIGURE_DEPENDS src/*.cc)
 
-# ----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# ----------------------------------------------------------------------------
-file(GLOB ${PROJECT_NAME}_SOURCES ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB ${PROJECT_NAME}_HEADERS ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/*.hh)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME}/
+     DESTINATION ${LSCSIM_HEADER_OUTPUT_PATH}/${MODULE_NAME}
+     FILES_MATCHING PATTERN "*.hh" PATTERN "LinkDef.h")
 
-file(MAKE_DIRECTORY ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME})
 
-foreach(HEADER_i ${${PROJECT_NAME}_HEADERS})
-  configure_file(${HEADER_i} ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME} COPYONLY)
-endforeach(HEADER_i)
+set(DICT_HEADERS "")
+foreach(_h ${MODULE_HEADERS})
+    get_filename_component(_n ${_h} NAME)
+    list(APPEND DICT_HEADERS ${_n})
+endforeach()
 
-configure_file(${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/LinkDef.h ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME} COPYONLY)
-
-file(GLOB ${PROJECT_NAME}_HEADERS ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME}/*.hh)
-set(${PROJECT_NAME}_DICT_FILE ${PROJECT_INCLUDE_DIR}/${PROJECT_NAME}/LinkDef.h)
-
-root_generate_dictionary(G__${PROJECT_NAME}
-  ${${PROJECT_NAME}_HEADERS}
-  LINKDEF ${${PROJECT_NAME}_DICT_FILE}
+ROOT_GENERATE_DICTIONARY(G__${MODULE_NAME}
+    ${DICT_HEADERS}
+    LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME}/LinkDef.h
+    OPTIONS
+        -I${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME}
+        -I${LSCSIM_HEADER_OUTPUT_PATH}
+        -Wno-inconsistent-missing-override
+    NOINSTALL
 )
 
-add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES}
-  G__${PROJECT_NAME}.cxx
+add_library(${MODULE_NAME} SHARED
+    ${MODULE_SOURCES}
+    G__${MODULE_NAME}.cxx
 )
 
-install(PROGRAMS
-  ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}.so
-  DESTINATION
-  ${CMAKE_INSTALL_LIBDIR}
+target_include_directories(${MODULE_NAME}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        ${ROOT_INCLUDE_DIRS}
 )
 
+target_link_libraries(${MODULE_NAME}
+    PUBLIC
+        MCObjs
+        ROOT::Core
+        ROOT::RIO
+        ROOT::Tree
+)
+
+target_compile_definitions(${MODULE_NAME}
+    PUBLIC
+        ${ROOT_DEFINITIONS}
+)
+
+install(TARGETS ${MODULE_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(DIRECTORY ${MODULE_NAME}/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${MODULE_NAME}
+    FILES_MATCHING PATTERN "*.hh"
+)
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}_rdict.pcm
-  ${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_NAME}.rootmap
-  DESTINATION
-  ${CMAKE_INSTALL_LIBDIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/lib${MODULE_NAME}_rdict.pcm
+    ${CMAKE_CURRENT_BINARY_DIR}/lib${MODULE_NAME}.rootmap
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-# ----------------------------------------------------------------------------
-# build executables
-# ----------------------------------------------------------------------------
-set(LINK_EXTERNALS ${ROOT_LIBRARIES})
+# ---- Executables ----
+file(GLOB MODULE_EXECUTABLES CONFIGURE_DEPENDS test/*.cc)
 
-file(GLOB ${PROJECT_NAME}_EXECUTABLES ${PROJECT_SOURCE_DIR}/test/*.cc)
-
-foreach(testsourcefile ${${PROJECT_NAME}_EXECUTABLES})
-  get_filename_component(testname ${testsourcefile} NAME_WE)
-  add_executable(${testname} ${testsourcefile})
-  target_link_libraries(${testname} ${LINK_PACKAGES} ${LINK_EXTERNALS})
-  install(TARGETS ${testname} DESTINATION ${CMAKE_INSTALL_BINDIR})
-endforeach(testsourcefile ${${PROJECT_NAME}_EXECUTABLES})
+foreach(testsourcefile ${MODULE_EXECUTABLES})
+    get_filename_component(testname ${testsourcefile} NAME_WE)
+    add_executable(${testname} ${testsourcefile})
+    target_link_libraries(${testname} PRIVATE ${MODULE_NAME})
+    install(TARGETS ${testname} DESTINATION ${CMAKE_INSTALL_BINDIR})
+endforeach()
