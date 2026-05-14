@@ -6,10 +6,8 @@
 #include "G4LogicalVolume.hh"
 #include "G4Material.hh"
 #include "G4PVPlacement.hh"
-#include "G4SubtractionSolid.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4Tubs.hh"
-#include "G4UnionSolid.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4VisAttributes.hh"
 #include "GLG4param.hh"
@@ -85,89 +83,6 @@ void LSCDetectorConstruction::ConstructDetector_Prototype(G4VPhysicalVolume * wo
   double coord_x, coord_y, coord_z;
   int pmtno, nring, region;
 
-  int doReflector = geom_db["reflector_on"];
-
-  if (doReflector) {
-    // reflector
-    double reflectorR, reflectorH, PMTR;
-    double reflectorT = 10.0 * mm;
-
-    pmtposfile.open(fPMTPositionDataFile.c_str());
-
-    getline(pmtposfile, line);
-    istringstream sline(line);
-    sline >> reflectorR >> reflectorH >> PMTR;
-
-    reflectorR += reflectorT / 2;
-    reflectorH += reflectorT;
-
-    // making a hollow cylinder
-    G4Tubs * bodyTubs = new G4Tubs("bodyTubs", reflectorR, reflectorR + reflectorT,
-                                   reflectorH / 2.0, 0. * deg, 360. * deg);
-    G4Tubs * capTubs =
-        new G4Tubs("capTubs", 0, reflectorR + reflectorT, reflectorT / 2, 0. * deg, 360. * deg);
-
-    G4UnionSolid * withTop = new G4UnionSolid("withTop", bodyTubs, capTubs, 0,
-                                              G4ThreeVector(0, 0, (reflectorH + reflectorT) / 2.0));
-
-    G4UnionSolid * reflectorTubs = new G4UnionSolid(
-        "reflectorTubs", withTop, capTubs, 0, G4ThreeVector(0, 0, -(reflectorH + reflectorT) / 2));
-
-    auto holeTubs = new G4Tubs("bodyTubs", 0, PMTR, 320 * mm, 0. * deg, 360. * deg);
-
-    // read first pmt position
-    getline(pmtposfile, line);
-    sline = istringstream(line);
-    sline >> pmtno >> coord_x >> coord_y >> coord_z >> nring >> region;
-
-    auto reflectorWithHoles =
-        new G4SubtractionSolid("reflectorWithHoles", reflectorTubs, holeTubs, nullptr,
-                               G4ThreeVector(coord_x, coord_y, coord_z));
-
-    while (getline(pmtposfile, line)) {
-      if (line.empty() || line[0] == '#') continue;
-      sline = istringstream(line);
-      sline >> pmtno >> coord_x >> coord_y >> coord_z >> nring >> region;
-
-      G4double r = sqrt(coord_x * coord_x + coord_y * coord_y + coord_z * coord_z);
-      G4double dx = -coord_x / r;
-      G4double dy = -coord_y / r;
-      G4double dz = -coord_z / r;
-
-      double angle_z = atan2(dx, dy);
-      double angle_x = atan2(dz, sqrt(dx * dx + dy * dy));
-
-      if (region != 0) {
-        // top or bottom PMTs
-        double normal_angle = (region > 0 ? -M_PI / 2 : M_PI / 2);
-        angle_x = normal_angle;
-      }
-      else {
-        angle_x = 0;
-      }
-
-      auto PMT_rotation = new G4RotationMatrix();
-      PMT_rotation->rotateZ(angle_z);
-      PMT_rotation->rotateX(M_PI / 2.0 - angle_x);
-
-      G4ThreeVector pmtpos(coord_x, coord_y, coord_z);
-
-      reflectorWithHoles = new G4SubtractionSolid("reflectorWithHoles", reflectorWithHoles,
-                                                  holeTubs, PMT_rotation, pmtpos);
-    }
-    pmtposfile.close();
-
-    auto reflectorLog =
-        new G4LogicalVolume(reflectorWithHoles, G4Material::GetMaterial("Teflon"), "reflectorLog");
-
-    visatt = new G4VisAttributes(G4Color(1, 1, 1, 0.7));
-    visatt->SetForceSolid(true);
-    reflectorLog->SetVisAttributes(visatt);
-
-    new G4PVPlacement(0, G4ThreeVector(), reflectorLog, "reflectorPhys", BufferLiquidLog, false, 0,
-                      fGeomCheck);
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // --- make the fundamental inner  PMT assembly
   ///////////////////////////////////////////////////////////////////////////
@@ -180,7 +95,6 @@ void LSCDetectorConstruction::ConstructDetector_Prototype(G4VPhysicalVolume * wo
   char PMTname[64];
 
   pmtposfile.open(fPMTPositionDataFile.c_str());
-  getline(pmtposfile, line);
   while (getline(pmtposfile, line)) {
     if (line.empty() || line[0] == '#') continue;
 
@@ -210,7 +124,18 @@ void LSCDetectorConstruction::ConstructDetector_Prototype(G4VPhysicalVolume * wo
     PMT_rotation->rotateZ(angle_z);
     PMT_rotation->rotateX(M_PI / 2.0 - angle_x);
 
-    G4ThreeVector pmtpos(coord_x, coord_y, coord_z);
+    // shift PMT inward by fPMTOffset from the inner wall
+    G4double ox = 0, oy = 0, oz = 0;
+    if (region > 0) {
+      oz = -fPMTOffset;
+    } else if (region < 0) {
+      oz = fPMTOffset;
+    } else {
+      G4double rxy = std::sqrt(coord_x * coord_x + coord_y * coord_y);
+      ox = -coord_x / rxy * fPMTOffset;
+      oy = -coord_y / rxy * fPMTOffset;
+    }
+    G4ThreeVector pmtpos(coord_x + ox, coord_y + oy, coord_z + oz);
 
     new G4PVPlacement(PMT_rotation, pmtpos, PMTname, _logiInnerPMT, BufferLiquidPhys, false, pmtno,
                       fGeomCheck);

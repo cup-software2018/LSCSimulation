@@ -8,7 +8,7 @@ worldy		   300
 worldz		   300
 
 buffer_radius 110
-buffer_height 220
+buffer_height 218.6
 buffer_thickness 0.6
 
 target_radius 60

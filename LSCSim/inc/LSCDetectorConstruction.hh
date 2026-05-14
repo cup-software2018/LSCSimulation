@@ -8,6 +8,7 @@ class G4VPhysicalVolume;
 class G4UIdirectory;
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithAString;
+class G4UIcmdWithADoubleAndUnit;
 class LSCPMTSD;
 class GLG4param;
 
@@ -41,11 +42,13 @@ private:
   G4String fMaterialDataFile;
   G4String fGeometryDataFile;
   G4String fPMTPositionDataFile;
+  G4double fPMTOffset;
 
   G4UIdirectory * fDetectorDir;
   G4UIcmdWithAnInteger * fGeomCheckOptCmd;
   G4UIcmdWithAString * fMaterialDataFileCmd;
   G4UIcmdWithAString * fGeometryDataFileCmd;
   G4UIcmdWithAString * fPMTPositionDataFileCmd;
+  G4UIcmdWithADoubleAndUnit * fPMTOffsetCmd;
   G4int fGeomCheck;
 };

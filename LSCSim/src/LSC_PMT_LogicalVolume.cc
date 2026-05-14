@@ -82,10 +82,8 @@ static const G4double R3600_z_o[R3600_n_edge] = {-127.00, 0.00,    0.00,    127.
 //
 
 static const int R7081_n_edge = 6;
-static const G4double R7081_z_edge[R7081_n_edge + 1] = {96.7,  40.0,   0.0,   -40.0,
-                                                        -90.0, -142.0, -223.3};
-static const G4double R7081_rho_edge[R7081_n_edge + 1] = {0.0,   111.0, 126.5, 111.0,
-                                                          42.25, 42.25, 42.25};
+static const G4double R7081_z_edge[R7081_n_edge + 1] = {96.7, 40.0, 0.0, -40.0, -90.0, -142.0, -233.3};
+static const G4double R7081_rho_edge[R7081_n_edge + 1] = {0.0, 111.0, 126.5, 111.0, 42.25, 42.25, 42.25};
 static const G4double R7081_z_o[R7081_n_edge] = {-40.0, 0.0, 0.0, 40.0, -142.0, -223.3};
 
 static const int R5912_n_edge = 6;
@@ -279,7 +277,7 @@ LSC_10inch_LogicalVolume::LSC_10inch_LogicalVolume(
                                             // OK to set MaskMat == NULL for no mask
     G4VSensitiveDetector * detector         // sensitive detector hook
     )
-  : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 160. * millimeter, ExteriorMat)
+  : LSC_PMT_LogicalVolume(plabel, 126.5 * millimeter, 165. * millimeter, ExteriorMat)
 {
   ConstructPMT_UsingTorusStack(R7081_n_edge, R7081_z_edge, R7081_rho_edge, R7081_z_o,
                                27.5 * millimeter,  // radius of dynode stack
