@@ -77,15 +77,19 @@ void LSCDetectorConstruction::ConstructDetector_Prototype(G4VPhysicalVolume * wo
     G4Exception("LSCDetectorConstruction::LSCDetectorConstruction", "", FatalException, msg);
   }
 
+
+  ///////////////////////////////////////////////////////////////////////////
+  // --- make and install the inner PMTs
+  ///////////////////////////////////////////////////////////////////////////
+
+  fPMTOffset = cm * geom_db["pmtoffset"];
+
   string line;
   ifstream pmtposfile;
 
   double coord_x, coord_y, coord_z;
   int pmtno, nring, region;
 
-  ///////////////////////////////////////////////////////////////////////////
-  // --- make the fundamental inner  PMT assembly
-  ///////////////////////////////////////////////////////////////////////////
   auto _logiInnerPMT = new LSC_10inch_LogicalVolume(
       "InnerPMT", G4Material::GetMaterial("Water"), G4Material::GetMaterial("Glass"),
       Photocathode_opsurf, G4Material::GetMaterial("PMT_Vac"), G4Material::GetMaterial("Steel"),

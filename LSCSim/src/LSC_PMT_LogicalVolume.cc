@@ -82,9 +82,11 @@ static const G4double R3600_z_o[R3600_n_edge] = {-127.00, 0.00,    0.00,    127.
 //
 
 static const int R7081_n_edge = 6;
-static const G4double R7081_z_edge[R7081_n_edge + 1] = {96.7, 40.0, 0.0, -40.0, -90.0, -142.0, -233.3};
-static const G4double R7081_rho_edge[R7081_n_edge + 1] = {0.0, 111.0, 126.5, 111.0, 42.25, 42.25, 42.25};
-static const G4double R7081_z_o[R7081_n_edge] = {-40.0, 0.0, 0.0, 40.0, -142.0, -223.3};
+static const G4double R7081_z_edge[R7081_n_edge + 1] = {96.7,  40.0,   0.0,   -40.0,
+                                                        -90.0, -142.0, -233.3};
+static const G4double R7081_rho_edge[R7081_n_edge + 1] = {0.0,   111.0, 126.5, 111.0,
+                                                          42.25, 42.25, 42.25};
+static const G4double R7081_z_o[R7081_n_edge] = {-40.0, 0.0, 0.0, 40.0, -142.0, -233.3};
 
 static const int R5912_n_edge = 6;
 static const G4double R5912_z_edge[R5912_n_edge + 1] = {75.00,  53.06,  0.00,   -53.06,

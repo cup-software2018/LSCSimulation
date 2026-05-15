@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 # Geometry constants (mm)
 # ---------------------------------------------------------------------------
 TANK_R_OUT = 1100.0
-TANK_HH_OUT = 1408.0
+TANK_HH_OUT = 1093.0
 WALL_T = 6.0
 TANK_R_IN = TANK_R_OUT - WALL_T   # 1094.0
 TANK_HH_IN = TANK_HH_OUT - WALL_T   # 1402.0

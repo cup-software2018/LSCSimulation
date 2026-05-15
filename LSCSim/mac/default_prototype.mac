@@ -7,8 +7,6 @@
 /LSC/det/geometrydata data/geometry_prototype.dat
 /LSC/det/materialdata data/materials.dat
 /LSC/det/pmtposdata data/pmtpos_prototype.dat
-/LSC/det/pmtoffset 50 mm
-
 
 /LSC/ROOT/savetrackopt  0
 /LSC/ROOT/savestepopt  0

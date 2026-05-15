@@ -6,7 +6,6 @@
 #include "G4String.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIdirectory.hh"
@@ -30,10 +29,6 @@ LSCDetectorConstruction::LSCDetectorConstruction()
   fGeometryDataFileCmd = new G4UIcmdWithAString("/LSC/det/geometrydata", this);
   fPMTPositionDataFileCmd = new G4UIcmdWithAString("/LSC/det/pmtposdata", this);
 
-  fPMTOffsetCmd = new G4UIcmdWithADoubleAndUnit("/LSC/det/pmtoffset", this);
-  fPMTOffsetCmd->SetGuidance("Gap between PMT back face and tank inner wall");
-  fPMTOffsetCmd->SetDefaultUnit("mm");
-  fPMTOffsetCmd->SetUnitCandidates("mm cm m");
 }
 
 LSCDetectorConstruction::~LSCDetectorConstruction()
@@ -43,7 +38,6 @@ LSCDetectorConstruction::~LSCDetectorConstruction()
   delete fMaterialDataFileCmd;
   delete fGeometryDataFileCmd;
   delete fPMTPositionDataFileCmd;
-  delete fPMTOffsetCmd;
 }
 
 void LSCDetectorConstruction::SetNewValue(G4UIcommand * command, G4String newValues)
@@ -58,9 +52,6 @@ void LSCDetectorConstruction::SetNewValue(G4UIcommand * command, G4String newVal
   }
   if (command == fPMTPositionDataFileCmd) {
     if (fPMTPositionDataFile.empty()) fPMTPositionDataFile = newValues;
-  }
-  if (command == fPMTOffsetCmd) {
-    fPMTOffset = fPMTOffsetCmd->GetNewDoubleValue(newValues);
   }
 }
 
